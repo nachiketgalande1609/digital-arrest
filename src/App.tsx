@@ -39,6 +39,20 @@ const App: React.FC = () => {
     avatar: 'https://randomuser.me/api/portraits/lego/1.jpg'
   });
   const terminalRef = useRef<HTMLDivElement>(null);
+  const ringtoneRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    if (!ringtoneRef.current) return;
+  
+    if (callStatus === 'incoming') {
+      ringtoneRef.current.loop = true;
+      ringtoneRef.current.play().catch((err) => console.error('Autoplay failed:', err));
+    } else {
+      ringtoneRef.current.pause();
+      ringtoneRef.current.currentTime = 0;
+    }
+  }, [callStatus]);
+
 
   const addLog = (message: string, type: LogEntry['type'] = 'info') => {
     const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
@@ -158,7 +172,8 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="app-container">
+    <>
+    <audio ref={ringtoneRef} src="/ringtone.mp3" /><div className="app-container">
       <div className="terminal-panel">
         <div className="terminal-header">
           <div className="terminal-buttons">
@@ -236,6 +251,8 @@ const App: React.FC = () => {
         </div>
       </div>
     </div>
+    </>
+    
   );
 };
 
