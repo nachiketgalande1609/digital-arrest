@@ -90,15 +90,15 @@ const App: React.FC = () => {
       const initLogs = setInterval(() => {
         logNetworkActivity();
         logMemoryUsage();
-      }, 800);
+      }, 1000);
 
-      const timer = setTimeout(() => {
-        clearInterval(initLogs);
-        setCallStatus('analyzing');
-      }, 3000);
+      // const timer = setTimeout(() => {
+      //   clearInterval(initLogs);
+      //   setCallStatus('analyzing');
+      // }, 3000);
       
       return () => {
-        clearTimeout(timer);
+        // clearTimeout(timer);
         clearInterval(initLogs);
       };
     }
