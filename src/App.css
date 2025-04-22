@@ -1,0 +1,267 @@
+/* General Styles */
+body {
+    margin: 0;
+    font-family: 'Courier New', monospace;
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+  }
+  
+  .app-container {
+    display: flex;
+    height: 100vh;
+  }
+  
+  /* Terminal Panel */
+  .terminal-panel {
+    flex: 1;
+    background-color: #1e1e1e;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid #333;
+  }
+  
+  .terminal-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+  
+  .terminal-buttons {
+    display: flex;
+    gap: 8px;
+    margin-right: 10px;
+  }
+  
+  .terminal-btn {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+  
+  .terminal-btn.close {
+    background-color: #ff5f56;
+  }
+  
+  .terminal-btn.minimize {
+    background-color: #ffbd2e;
+  }
+  
+  .terminal-btn.maximize {
+    background-color: #27c93f;
+  }
+  
+  .terminal-title {
+    color: #888;
+    font-size: 14px;
+  }
+  
+  .terminal-body {
+    flex: 1;
+    overflow-y: auto;
+    background-color: #1e1e1e;
+    padding: 10px;
+    border-radius: 5px;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 10px;
+  }
+  
+  .log-entry {
+    margin-bottom: 5px;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  
+  .timestamp {
+    color: #6a9955;
+    margin-right: 10px;
+  }
+  
+  .log-entry.info .log-message {
+    color: #9cdcfe;
+  }
+  
+  .log-entry.warning .log-message {
+    color: #dcdcaa;
+  }
+  
+  .log-entry.error .log-message {
+    color: #f48771;
+    font-weight: bold;
+  }
+  
+  .log-entry.success .log-message {
+    color: #4ec9b0;
+  }
+  
+  .terminal-input {
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    background-color: #252526;
+    border-radius: 3px;
+  }
+  
+  .prompt {
+    color: #4ec9b0;
+    margin-right: 5px;
+  }
+  
+  .cursor {
+    animation: blink 1s infinite;
+  }
+  
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+  
+  /* Call Panel */
+  .call-panel {
+    width: 350px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #2d2d2d;
+    padding: 20px;
+  }
+  
+  .call-screen {
+    width: 100%;
+    padding: 30px;
+    border-radius: 20px;
+    background-color: white;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: all 0.3s ease;
+    color: #333;
+  }
+  
+  /* Rest of your existing call screen styles remain the same */
+  .caller-info {
+    margin-bottom: 30px;
+  }
+  
+  .caller-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 15px;
+    border: 3px solid #4CAF50;
+  }
+  
+  .call-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+  }
+  
+  .answer-btn, .decline-btn, .end-call-btn {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .answer-btn {
+    background-color: #4CAF50;
+    color: white;
+  }
+  
+  .decline-btn {
+    background-color: #f44336;
+    color: white;
+  }
+  
+  .end-call-btn {
+    background-color: #f44336;
+    color: white;
+    margin-top: 20px;
+    width: 100%;
+  }
+  
+  .answer-btn:hover, .decline-btn:hover, .end-call-btn:hover {
+    transform: scale(1.05);
+  }
+  
+  .analysis-container {
+    margin-top: 20px;
+  }
+  
+  .analyzing-animation {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 60px;
+    margin-bottom: 20px;
+  }
+  
+  .wave {
+    width: 5px;
+    height: 30px;
+    background: #4CAF50;
+    margin: 0 3px;
+    border-radius: 5px;
+    animation: wave 1s linear infinite;
+  }
+  
+  .wave:nth-child(2) {
+    animation-delay: 0.1s;
+  }
+  
+  .wave:nth-child(3) {
+    animation-delay: 0.2s;
+  }
+  
+  @keyframes wave {
+    0% {
+      height: 10px;
+    }
+    50% {
+      height: 30px;
+    }
+    100% {
+      height: 10px;
+    }
+  }
+  
+  .progress-bar {
+    width: 100%;
+    height: 10px;
+    background-color: #e0e0e0;
+    border-radius: 5px;
+    margin-top: 10px;
+    overflow: hidden;
+  }
+  
+  .progress {
+    height: 100%;
+    background-color: #4CAF50;
+    transition: width 0.2s ease;
+  }
+  
+  .scam-alert {
+    color: #f44336;
+    margin-top: 20px;
+  }
+  
+  .warning-icon {
+    font-size: 50px;
+    margin-bottom: 15px;
+  }
+  
+  /* Different backgrounds for different states */
+  .call-screen.analyzing {
+    background-color: #f9f9f9;
+  }
+  
+  .call-screen.scam-detected {
+    background-color: #fff0f0;
+    border: 2px solid #f44336;
+  }
