@@ -183,6 +183,11 @@ animation: fadeIn 0.2s ease-out;
   text-align: center;
   transition: all 0.3s ease;
   color: #333;
+  height: 500.65px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content:center;
 }
 
 /* Rest of your existing call screen styles remain the same */
@@ -201,8 +206,8 @@ animation: fadeIn 0.2s ease-out;
 
 .call-buttons {
   display: flex;
-  justify-content: space-between;
   margin-top: 20px;
+  gap: 20px;
 }
 
 .answer-btn, .decline-btn, .end-call-btn {

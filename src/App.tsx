@@ -41,7 +41,7 @@ const App: React.FC = () => {
   const [activeSpeaker, setActiveSpeaker] = useState<"caller" | "aditi">("caller");
 
   const [callerInfo] = useState<CallerInfo>({
-    name: "Unknown",
+    name: "Unknown Caller",
     number: "+1 (555) 123-4567",
     avatar: "https://img.freepik.com/premium-photo/male-customer-service-3d-cartoon-avatar-portrait_839035-522335.jpg",
   });
@@ -214,7 +214,7 @@ const App: React.FC = () => {
 
           return prev + (Math.random() * 3 + 2);
         });
-      }, 150);
+      }, 300);
 
       return () => clearInterval(analysisInterval);
     }
