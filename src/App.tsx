@@ -38,10 +38,12 @@ const App: React.FC = () => {
   const [callStatus, setCallStatus] = useState<CallStatus>("incoming");
   const [progress, setProgress] = useState<number>(0);
   const [logs, setLogs] = useState<LogEntry[]>([]);
+  const [activeSpeaker, setActiveSpeaker] = useState<"caller" | "aditi">("caller");
+
   const [callerInfo] = useState<CallerInfo>({
     name: "Unknown",
     number: "+1 (555) 123-4567",
-    avatar: "https://randomuser.me/api/portraits/lego/1.jpg",
+    avatar: "https://img.freepik.com/premium-photo/male-customer-service-3d-cartoon-avatar-portrait_839035-522335.jpg",
   });
   const terminalRef = useRef<HTMLDivElement>(null);
   const ringtoneRef = useRef<HTMLAudioElement | null>(null);
@@ -221,18 +223,21 @@ const App: React.FC = () => {
   const handleAnswer = (): void => {
     addLog("User answered call - beginning analysis", "success");
     setCallStatus("analyzing");
-
+  
     if (prabhatRef.current) {
-      console.log("Running");
-
       prabhatRef.current
         .play()
         .catch((err) => console.error("Error playing Prabhat audio:", err));
       prabhatRef.current.onended = () => {
         if (aditiRef.current) {
+          setActiveSpeaker("aditi");
+          addLog("Agent Aditi has taken over the call", "info");
           aditiRef.current
             .play()
             .catch((err) => console.error("Error playing Aditi audio:", err));
+          aditiRef.current.onended = () => {
+            setActiveSpeaker("caller");
+          };
         }
       };
     }
@@ -291,57 +296,80 @@ const App: React.FC = () => {
         </div>
 
         <div className="call-panel">
-          <div className={`call-screen ${callStatus}`}>
-            <div className="caller-info">
-              <img
-                src={callerInfo.avatar}
-                alt="Caller"
-                className="caller-avatar"
-              />
-              <h2>{callerInfo.name}</h2>
-              <p>{callerInfo.number}</p>
-            </div>
+  {activeSpeaker === "caller" ? (
+    <div className={`call-screen ${callStatus}`}>
+      <div className="caller-info">
+        <img
+          src={callerInfo.avatar}
+          alt="Caller"
+          className="caller-avatar"
+        />
+        <h2>{callerInfo.name}</h2>
+        <p>{callerInfo.number}</p>
+      </div>
 
-            {callStatus === "incoming" && (
-              <div className="call-buttons">
-                <button className="decline-btn" onClick={handleDecline}>
-                  Decline
-                </button>
-                <button className="answer-btn" onClick={handleAnswer}>
-                  Answer
-                </button>
-              </div>
-            )}
+      {callStatus === "incoming" && (
+        <div className="call-buttons">
+          <button className="decline-btn" onClick={handleDecline}>
+            Decline
+          </button>
+          <button className="answer-btn" onClick={handleAnswer}>
+            Answer
+          </button>
+        </div>
+      )}
 
-            {callStatus === "analyzing" && (
-              <div className="analysis-container">
-                <div className="analyzing-animation">
-                  <div className="wave"></div>
-                  <div className="wave"></div>
-                  <div className="wave"></div>
-                </div>
-                <p>Analyzing voice patterns...</p>
-                <div className="progress-bar">
-                  <div
-                    className="progress"
-                    style={{ width: `${progress}%` }}
-                  ></div>
-                </div>
-              </div>
-            )}
-
-            {callStatus === "scam-detected" && (
-              <div className="scam-alert">
-                <div className="warning-icon">⚠️</div>
-                <h2>SCAM ALERT</h2>
-                <p>Deepfake AI voice detected</p>
-                <button className="end-call-btn" onClick={handleDecline}>
-                  End Call
-                </button>
-              </div>
-            )}
+      {callStatus === "analyzing" && (
+        <div className="analysis-container">
+          <div className="analyzing-animation">
+            <div className="wave"></div>
+            <div className="wave"></div>
+            <div className="wave"></div>
+          </div>
+          <p>Analyzing voice patterns...</p>
+          <div className="progress-bar">
+            <div
+              className="progress"
+              style={{ width: `${progress}%` }}
+            ></div>
           </div>
         </div>
+      )}
+
+      {callStatus === "scam-detected" && (
+        <div className="scam-alert">
+          <div className="warning-icon">⚠️</div>
+          <h2>SCAM ALERT</h2>
+          <p>Deepfake AI voice detected</p>
+          <button className="end-call-btn" onClick={handleDecline}>
+            End Call
+          </button>
+        </div>
+      )}
+    </div>
+  ) : (
+    <div className="call-screen agent-active">
+      <div className="agent-info">
+        <img
+          src="/aditi-avatar.jpg" // Replace with your agent avatar path
+          alt="Agent Aditi"
+          className="agent-avatar"
+        />
+        <h2>Agent Aditi</h2>
+        <p>Security Specialist</p>
+        <div className="agent-status">
+          <div className="pulse-animation"></div>
+          <span>Active Intervention</span>
+        </div>
+      </div>
+      <div className="call-controls">
+        <button className="end-call-btn" onClick={handleDecline}>
+          End Intervention
+        </button>
+      </div>
+    </div>
+  )}
+</div>
       </div>
     </>
   );
