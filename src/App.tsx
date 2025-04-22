@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 
 type CallStatus = 'incoming' | 'analyzing' | 'scam-detected';
 type LogEntry = {
   timestamp: string;
   message: string;
-  type: 'info' | 'warning' | 'error' | 'success';
+  type: 'info' | 'warning' | 'error' | 'success' | 'debug';
 };
 
 interface CallerInfo {
@@ -22,6 +22,13 @@ const generateRandomIP = (): string => {
   return `${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`;
 };
 
+const generateRandomUUID = (): string => {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+};
+
 const App: React.FC = () => {
   const [callStatus, setCallStatus] = useState<CallStatus>('incoming');
   const [progress, setProgress] = useState<number>(0);
@@ -31,73 +38,123 @@ const App: React.FC = () => {
     number: '+1 (555) 123-4567',
     avatar: 'https://randomuser.me/api/portraits/lego/1.jpg'
   });
+  const terminalRef = useRef<HTMLDivElement>(null);
 
   const addLog = (message: string, type: LogEntry['type'] = 'info') => {
     const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
-    setLogs(prev => [...prev, { timestamp, message, type }]);
+    setLogs(prev => [...prev.slice(-200), { timestamp, message, type }]);
   };
 
-  // Simulate call flow
+  // Auto-scroll terminal to bottom
+  useEffect(() => {
+    if (terminalRef.current) {
+      terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
+    }
+  }, [logs]);
+
+  // Complex technical logging functions
+  const logNetworkActivity = () => {
+    addLog(`Network packet received from ${generateRandomIP()} (size: ${Math.floor(Math.random() * 2048)} bytes)`, 'debug');
+  };
+
+  const logMemoryUsage = () => {
+    addLog(`Memory usage: ${(Math.random() * 100).toFixed(2)}% (${Math.floor(Math.random() * 2048)}MB/${Math.floor(Math.random() * 4096)}MB)`, 'debug');
+  };
+
+  const logFeatureAnalysis = () => {
+    const features = [
+      'pitch variance', 'spectral centroid', 'MFCC coefficients', 
+      'formant dispersion', 'jitter', 'shimmer', 'harmonicity'
+    ];
+    const feature = features[Math.floor(Math.random() * features.length)];
+    addLog(`Analyzing ${feature}: deviation ${(Math.random() * 10).toFixed(2)}%`, 'info');
+  };
+
+  const logModelUpdate = () => {
+    addLog(`Updating detection model weights (epoch: ${Math.floor(Math.random() * 100)}, loss: ${Math.random().toFixed(4)})`, 'debug');
+  };
+
+  // Simulate call flow with more complex logging
   useEffect(() => {
     if (callStatus === 'incoming') {
-      addLog('Incoming call detected from ' + callerInfo.number);
-      addLog('Initializing voice pattern analysis module...');
-      addLog('Loading AI detection models...', 'info');
+      addLog('=== DEEPFAKE DETECTION ENGINE v2.3.7 ===', 'info');
+      addLog('Initializing system...', 'info');
+      addLog(`Session ID: ${generateRandomUUID()}`, 'debug');
+      addLog('Loading neural network models...', 'info');
+      addLog('Model "voiceprint-v5" loaded (43.7MB, SHA-256: ' + generateRandomHex(64) + ')', 'success');
+      addLog('Model "spectral-v3" loaded (28.2MB, SHA-256: ' + generateRandomHex(64) + ')', 'success');
+      addLog('Incoming call detected from ' + callerInfo.number, 'info');
+      addLog('Establishing secure connection...', 'info');
+      addLog('Connection encrypted (TLS 1.3, AES-256-GCM)', 'success');
       
+      const initLogs = setInterval(() => {
+        logNetworkActivity();
+        logMemoryUsage();
+      }, 800);
+
       const timer = setTimeout(() => {
+        clearInterval(initLogs);
         setCallStatus('analyzing');
       }, 3000);
-      return () => clearTimeout(timer);
+      
+      return () => {
+        clearTimeout(timer);
+        clearInterval(initLogs);
+      };
     }
 
     if (callStatus === 'analyzing') {
-      addLog('Beginning real-time voice analysis...', 'info');
-      addLog('Extracting vocal features...');
+      addLog('=== BEGINNING REAL-TIME ANALYSIS ===', 'info');
+      addLog('Extracting 256-dimensional voice features...', 'info');
       
-      const features = ['pitch', 'timbre', 'formants', 'spectral', 'prosody'];
-      features.forEach(feat => {
-        addLog(`Analyzing ${feat} patterns...`);
-      });
-
-      const interval = setInterval(() => {
+      const analysisInterval = setInterval(() => {
         setProgress(prev => {
           if (prev >= 100) {
-            clearInterval(interval);
+            clearInterval(analysisInterval);
             setCallStatus('scam-detected');
-            addLog('WARNING: Synthetic voice patterns detected!', 'error');
-            addLog('Confidence level: 92.7%', 'error');
-            addLog('Signature match to known deepfake samples', 'error');
+            addLog('WARNING: SYNTHETIC VOICE PATTERNS DETECTED!', 'error');
+            addLog('Confidence: 94.2% (±2.1%)', 'error');
+            addLog('Signature match to known GAN-generated samples', 'error');
+            addLog('Vocal artifact detection: POSITIVE', 'error');
             return 100;
           }
           
-          // Add random logs during analysis
-          if (Math.random() > 0.7) {
-            const randomLogs = [
-              `Processing frame ${Math.floor(prev * 30)}...`,
-              `Voiceprint hash: ${generateRandomHex(8)}`,
-              `Comparing to ${Math.floor(Math.random() * 5000)} known samples`,
-              `Network connection established with ${generateRandomIP()}`,
-              `Calculating spectral deviation (current: ${(Math.random() * 10).toFixed(2)}%)`
+          // Intense logging during analysis
+          if (Math.random() > 0.3) {
+            const randomActions = [
+              logFeatureAnalysis,
+              logNetworkActivity,
+              logMemoryUsage,
+              logModelUpdate,
+              () => addLog(`Processing frame ${Math.floor(prev * 50)} (checksum: ${generateRandomHex(8)})`),
+              () => addLog(`Comparing to ${Math.floor(Math.random() * 10000)} known samples`),
+              () => addLog(`Calculating probability distribution (entropy: ${(Math.random() * 5).toFixed(2)})`),
+              () => addLog(`GPU acceleration: ${Math.random() > 0.5 ? 'enabled' : 'disabled'} (CUDA cores: ${Math.floor(Math.random() * 1024)})`, 'debug')
             ];
-            addLog(randomLogs[Math.floor(Math.random() * randomLogs.length)]);
+            randomActions[Math.floor(Math.random() * randomActions.length)]();
           }
           
-          return prev + 5;
+          return prev + (Math.random() * 3 + 2);
         });
-      }, 200);
-      return () => clearInterval(interval);
+      }, 150);
+      
+      return () => clearInterval(analysisInterval);
     }
   }, [callStatus]);
 
   const handleAnswer = (): void => {
-    addLog('User answered call', 'success');
+    addLog('User answered call - beginning analysis', 'success');
     setCallStatus('analyzing');
   };
 
   const handleDecline = (): void => {
-    addLog('Call declined by user', 'warning');
+    addLog('Call declined by user - terminating session', 'warning');
+    addLog('Releasing GPU memory...', 'info');
+    addLog('Closing network connections...', 'info');
+    addLog('Session terminated cleanly', 'success');
     setCallStatus('incoming');
     setProgress(0);
+    setLogs([]);
   };
 
   return (
@@ -109,9 +166,9 @@ const App: React.FC = () => {
             <div className="terminal-btn minimize"></div>
             <div className="terminal-btn maximize"></div>
           </div>
-          <div className="terminal-title">deepfake-detection-engine</div>
+          <div className="terminal-title">deepfake-detection-engine --log-level=DEBUG</div>
         </div>
-        <div className="terminal-body">
+        <div className="terminal-body" ref={terminalRef}>
           {logs.map((log, index) => (
             <div key={index} className={`log-entry ${log.type}`}>
               <span className="timestamp">[{log.timestamp}]</span>
@@ -122,14 +179,13 @@ const App: React.FC = () => {
             <div className="log-entry info">
               <span className="timestamp">[{new Date().toISOString().split('T')[1].split('.')[0]}]</span>
               <span className="log-message">
-                Analyzing... {progress}% complete
-                {progress % 20 === 0 && ` (checksum: ${generateRandomHex(4)})`}
+                Analysis progress: {Math.min(progress, 100).toFixed(1)}% (ETA: {Math.floor((100 - progress) / 3)}s)
               </span>
             </div>
           )}
         </div>
         <div className="terminal-input">
-          <span className="prompt">$</span>
+          <span className="prompt">root@detection-engine:~#</span>
           <span className="cursor">|</span>
         </div>
       </div>
