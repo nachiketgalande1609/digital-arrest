@@ -56,7 +56,6 @@ const App: React.FC = () => {
 
     const logMemoryUsage = () => {
         if (Math.random() > 0.8) {
-            // Only log 20% of the time
             addLog(
                 `Memory usage: ${(Math.random() * 100).toFixed(2)}% (${Math.floor(Math.random() * 2048)}MB/${Math.floor(Math.random() * 4096)}MB)`,
                 "debug"
@@ -72,7 +71,6 @@ const App: React.FC = () => {
 
     const logModelUpdate = () => {
         if (Math.random() > 0.9) {
-            // Only log 10% of the time
             addLog(`Updating detection model weights (epoch: ${Math.floor(Math.random() * 100)}, loss: ${Math.random().toFixed(4)})`, "debug");
         }
     };
@@ -92,7 +90,7 @@ const App: React.FC = () => {
 
             const initLogs = setInterval(() => {
                 logMemoryUsage();
-            }, 1500); // Increased interval from 1s to 1.5s
+            }, 1500);
 
             return () => {
                 clearInterval(initLogs);
@@ -115,9 +113,7 @@ const App: React.FC = () => {
                         return 100;
                     }
 
-                    // Reduced logging during analysis
                     if (Math.random() > 0.6) {
-                        // Only log 40% of the time (down from 70%)
                         const randomActions = [
                             logFeatureAnalysis,
                             logMemoryUsage,
@@ -130,7 +126,7 @@ const App: React.FC = () => {
 
                     return prev + (Math.random() * 3 + 2);
                 });
-            }, 400); // Increased interval from 300ms to 400ms
+            }, 400);
 
             return () => clearInterval(analysisInterval);
         }
@@ -178,7 +174,14 @@ const App: React.FC = () => {
                             <div className="terminal-btn minimize"></div>
                             <div className="terminal-btn maximize"></div>
                         </div>
-                        <div className="terminal-title">deepfake-detection-engine --log-level=DEBUG</div>
+                        <div className="terminal-title">
+                            <span className="app-name">Digital Arrest</span>
+                            <span className="app-version">v2.3.7</span>
+                        </div>
+                        <div className="terminal-status">
+                            <div className={`status-indicator ${callStatus}`}></div>
+                            <span>{callStatus.toUpperCase()}</span>
+                        </div>
                     </div>
                     <div className="terminal-body" ref={terminalRef}>
                         {logs.map((log, index) => (
@@ -206,18 +209,34 @@ const App: React.FC = () => {
                     {activeSpeaker === "caller" ? (
                         <div className={`call-screen ${callStatus}`}>
                             <div className="caller-info">
-                                <img src={callerInfo.avatar} alt="Caller" className="caller-avatar" />
+                                <div className="avatar-container">
+                                    <img src={callerInfo.avatar} alt="Caller" className="caller-avatar" />
+                                    {callStatus === "analyzing" && (
+                                        <div className="scanning-animation">
+                                            <div className="scan-line"></div>
+                                        </div>
+                                    )}
+                                </div>
                                 <h2>{callerInfo.name}</h2>
-                                <p>{callerInfo.number}</p>
+                                <p className="caller-number">{callerInfo.number}</p>
+
+                                {callStatus === "incoming" && (
+                                    <div className="call-status">
+                                        <div className="ripple-animation"></div>
+                                        <span>INCOMING CALL</span>
+                                    </div>
+                                )}
                             </div>
 
                             {callStatus === "incoming" && (
                                 <div className="call-buttons">
                                     <button className="decline-btn" onClick={handleDecline}>
-                                        Decline
+                                        <span className="icon">✕</span>
+                                        <span>Decline</span>
                                     </button>
                                     <button className="answer-btn" onClick={handleAnswer}>
-                                        Answer
+                                        <span className="icon">✓</span>
+                                        <span>Answer</span>
                                     </button>
                                 </div>
                             )}
@@ -229,20 +248,34 @@ const App: React.FC = () => {
                                         <div className="wave"></div>
                                         <div className="wave"></div>
                                     </div>
-                                    <p>Analyzing voice patterns...</p>
-                                    <div className="progress-bar">
-                                        <div className="progress" style={{ width: `${progress}%` }}></div>
+                                    <p className="analyzing-text">Analyzing voice patterns...</p>
+                                    <div className="progress-container">
+                                        <div className="progress-bar">
+                                            <div className="progress" style={{ width: `${progress}%` }}></div>
+                                        </div>
+                                        <span className="progress-text">{Math.min(progress, 100).toFixed(0)}%</span>
                                     </div>
                                 </div>
                             )}
 
                             {callStatus === "scam-detected" && (
                                 <div className="scam-alert">
-                                    <div className="warning-icon">⚠️</div>
+                                    <div className="warning-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path
+                                                d="M12 9V11M12 15H12.01M5.07183 19H18.9282C20.4678 19 21.4301 17.3333 20.6603 16L13.7321 4C12.9623 2.66667 11.0378 2.66667 10.268 4L3.33978 16C2.56998 17.3333 3.53223 19 5.07183 19Z"
+                                                stroke="currentColor"
+                                                strokeWidth="2"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                            />
+                                        </svg>
+                                    </div>
                                     <h2>SCAM ALERT</h2>
-                                    <p>Deepfake AI voice detected</p>
+                                    <p className="scam-description">Deepfake AI voice detected</p>
                                     <button className="end-call-btn" onClick={handleDecline}>
-                                        End Call
+                                        <span className="icon">☎</span>
+                                        <span>End Call</span>
                                     </button>
                                 </div>
                             )}
@@ -250,9 +283,22 @@ const App: React.FC = () => {
                     ) : (
                         <div className="call-screen agent-active">
                             <div className="agent-info">
-                                <img src="/aditi-avatar.jpg" alt="Agent Aditi" className="agent-avatar" />
+                                <div className="agent-avatar-container">
+                                    <img src="/aditi-avatar.jpg" alt="Agent Aditi" className="agent-avatar" />
+                                    <div className="verified-badge">
+                                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path
+                                                d="M9 12L11 14L15 10M19.8761 9.12499C20.1184 9.88141 20.2366 10.6808 20.2366 11.5C20.2366 16.5 16.5 20.5 12 20.5C7.5 20.5 3.76343 16.5 3.76343 11.5C3.76343 6.5 7.5 2.5 12 2.5C13.3192 2.5 14.6186 2.88155 15.75 3.5M16.5 7.5C16.5 7.5 16.875 9.5 18 10.5C19.125 11.5 21 10.5 21 10.5"
+                                                stroke="currentColor"
+                                                strokeWidth="2"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                            />
+                                        </svg>
+                                    </div>
+                                </div>
                                 <h2>Agent Aditi</h2>
-                                <p>Security Specialist</p>
+                                <p className="agent-title">Security Specialist</p>
                                 <div className="agent-status">
                                     <div className="pulse-animation"></div>
                                     <span>Active Intervention</span>
@@ -260,7 +306,8 @@ const App: React.FC = () => {
                             </div>
                             <div className="call-controls">
                                 <button className="end-call-btn" onClick={handleDecline}>
-                                    End Intervention
+                                    <span className="icon">☎</span>
+                                    <span>End Intervention</span>
                                 </button>
                             </div>
                         </div>
