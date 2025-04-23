@@ -54,15 +54,6 @@ const App: React.FC = () => {
         }
     }, [logs]);
 
-    const logMemoryUsage = () => {
-        if (Math.random() > 0.8) {
-            addLog(
-                `Memory usage: ${(Math.random() * 100).toFixed(2)}% (${Math.floor(Math.random() * 2048)}MB/${Math.floor(Math.random() * 4096)}MB)`,
-                "debug"
-            );
-        }
-    };
-
     const logFeatureAnalysis = () => {
         const features = ["pitch variance", "spectral centroid", "MFCC coefficients", "formant dispersion", "jitter", "shimmer", "harmonicity"];
         const feature = features[Math.floor(Math.random() * features.length)];
@@ -87,14 +78,6 @@ const App: React.FC = () => {
             addLog("Incoming call detected from " + callerInfo.number, "info");
             addLog("Establishing secure connection...", "info");
             addLog("Connection encrypted (TLS 1.3, AES-256-GCM)", "success");
-
-            const initLogs = setInterval(() => {
-                logMemoryUsage();
-            }, 1500);
-
-            return () => {
-                clearInterval(initLogs);
-            };
         }
 
         if (callStatus === "analyzing") {
@@ -116,7 +99,6 @@ const App: React.FC = () => {
                     if (Math.random() > 0.6) {
                         const randomActions = [
                             logFeatureAnalysis,
-                            logMemoryUsage,
                             logModelUpdate,
                             () => addLog(`Processing frame ${Math.floor(prev * 50)} (checksum: ${generateRandomHex(8)})`),
                             () => addLog(`Comparing to ${Math.floor(Math.random() * 10000)} known samples`),
@@ -175,7 +157,7 @@ const App: React.FC = () => {
                             <div className="terminal-btn maximize"></div>
                         </div>
                         <div className="terminal-title">
-                            <span className="app-name">Digital Arrest</span>
+                            <span className="app-name">Digital</span>
                             <span className="app-version">v2.3.7</span>
                         </div>
                         <div className="terminal-status">

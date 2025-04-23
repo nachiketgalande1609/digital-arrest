@@ -332,7 +332,7 @@ body {
 .call-status {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 16px;
     margin-top: 12px;
     color: var(--accent-primary);
     font-weight: 500;
