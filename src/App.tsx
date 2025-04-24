@@ -268,12 +268,41 @@ const App: React.FC = () => {
 
                             {callStatus === "analyzing" && (
                                 <div className="analysis-container">
+                                    {/* Milestone log stack (cinematic cyber-intel style) */}
+                                    <div className="milestone-log-stack">
+                                        {progress >= 20 && (
+                                            <p className={`milestone-log sky ${progress >= 40 ? "faded faded-4" : ""}`}>
+                                                📡 SIP INVITE intercepted | Src IP: 203.207.64.100 | Call‑ID: ABC123XYZ
+                                            </p>
+                                        )}
+                                        {progress >= 40 && (
+                                            <p className={`milestone-log green ${progress >= 60 ? "faded faded-3" : ""}`}>
+                                                🌐 WHOIS → EZECOM Ltd (AS24560), Phnom Penh | IP flagged in VoIP fraud DB
+                                            </p>
+                                        )}
+                                        {progress >= 60 && (
+                                            <p className={`milestone-log yellow ${progress >= 80 ? "faded faded-2" : ""}`}>
+                                                🔍 VPN Match: ExpressVPN Phnom Penh Exit | MLAT request issued
+                                            </p>
+                                        )}
+                                        {progress >= 80 && (
+                                            <p className={`milestone-log orange ${progress >= 100 ? "faded faded-1" : ""}`}>
+                                                📶 NetFlow: NAT to Smart Axiata 4G Tower #10234 | Geofence alert active
+                                            </p>
+                                        )}
+                                    </div>
+
+                                    {/* Analyzing animation */}
                                     <div className="analyzing-animation">
                                         <div className="wave"></div>
                                         <div className="wave"></div>
                                         <div className="wave"></div>
                                     </div>
+
+                                    {/* Text under animation */}
                                     <p className="analyzing-text">Analyzing voice patterns...</p>
+
+                                    {/* Progress bar */}
                                     <div className="progress-container">
                                         <div className="progress-bar">
                                             <div className="progress" style={{ width: `${progress}%` }}></div>
@@ -285,6 +314,11 @@ const App: React.FC = () => {
 
                             {callStatus === "scam-detected" && (
                                 <div className="scam-alert">
+                                    <div className="milestone-log-stack">
+                                        <p className="milestone-log red-glow">
+                                            📁 Packet capture complete | Case CYB20250421‑0567 filed | Interpol notified
+                                        </p>
+                                    </div>
                                     <div className="warning-icon">
                                         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path
