@@ -164,6 +164,7 @@ body {
     color: var(--text-primary);
     background-color: rgba(0, 0, 0, 0.2);
     scroll-behavior: smooth;
+    width: 65vw;
 }
 
 .log-entry {

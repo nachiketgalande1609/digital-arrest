@@ -84,17 +84,60 @@ const App: React.FC = () => {
             addLog("=== BEGINNING REAL-TIME ANALYSIS ===", "info");
             addLog("Extracting 256-dimensional voice features...", "info");
 
+            const loggedMilestones = new Set();
+
             const analysisInterval = setInterval(() => {
                 setProgress((prev) => {
                     if (prev >= 100) {
                         clearInterval(analysisInterval);
                         setCallStatus("scam-detected");
-                        addLog("WARNING: SYNTHETIC VOICE PATTERNS DETECTED!", "error");
-                        addLog("Confidence: 94.2% (±2.1%)", "error");
-                        addLog("Signature match to known GAN-generated samples", "error");
-                        addLog("Vocal artifact detection: POSITIVE", "error");
+
+                        if (!loggedMilestones.has(100)) {
+                            loggedMilestones.add(100);
+                            addLog("WARNING: SYNTHETIC VOICE PATTERNS DETECTED!", "error");
+                            addLog("Confidence: 94.2% (±2.1%)", "error");
+                            addLog("Signature match to known GAN-generated samples", "error");
+                            addLog("Vocal artifact detection: POSITIVE", "error");
+                            addLog(
+                                "Step 5: Finalized full packet capture; case CYB20250421‑0567 opened with Mumbai Cybercrime Dept and evidence forwarded via Interpol to Cambodia Cyber & Joint Crimes Unit for subscriber identification.",
+                                "error"
+                            );
+                        }
+
                         return 100;
                     }
+
+                    const nextProgress = prev + (Math.random() * 3 + 2);
+
+                    const milestones = [
+                        {
+                            threshold: 20,
+                            message:
+                                "Step 1: Captured VoIP SIP INVITE at edge firewall, extracted source IP 203.207.64.100, logged Call‑ID “ABC123XYZ” and timestamp.",
+                        },
+                        {
+                            threshold: 40,
+                            message:
+                                "Step 2: Ran WHOIS on 203.207.64.100; found allocation to EZECOM Ltd (AS24560), Phnom Penh, Cambodia; flagged in threat‑intel DB for past VoIP fraud reports.",
+                        },
+                        {
+                            threshold: 60,
+                            message:
+                                "Step 3: Cross‑referenced 203.207.64.100 against known VPN exit nodes—matched “ExpressVPN Phnom Penh Exit.” Submitted MLAT request to Cambodian Ministry of Post & Telecom for subscriber logs.",
+                        },
+                        {
+                            threshold: 80,
+                            message:
+                                "Step 4: Analyzed ISP NetFlow—identified NAT of 203.207.64.100:5060 to Smart Axiata 4G tower ID 10234 in Phnom Penh; updated geofence alert to cyber cell dashboard.",
+                        },
+                    ];
+
+                    milestones.forEach(({ threshold, message }) => {
+                        if (prev < threshold && nextProgress >= threshold && !loggedMilestones.has(threshold)) {
+                            addLog(message, "warning");
+                            loggedMilestones.add(threshold);
+                        }
+                    });
 
                     if (Math.random() > 0.6) {
                         const randomActions = [
@@ -106,7 +149,7 @@ const App: React.FC = () => {
                         randomActions[Math.floor(Math.random() * randomActions.length)]();
                     }
 
-                    return prev + (Math.random() * 3 + 2);
+                    return nextProgress;
                 });
             }, 400);
 
