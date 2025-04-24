@@ -39,7 +39,7 @@ const App: React.FC = () => {
     });
     const terminalRef = useRef<HTMLDivElement>(null);
     const ringtoneRef = useRef<HTMLAudioElement | null>(null);
-    const prabhatRef = useRef<HTMLAudioElement | null>(null);
+    const callRef = useRef<HTMLAudioElement | null>(null);
     const aditiRef = useRef<HTMLAudioElement | null>(null);
 
     const addLog = (message: string, type: LogEntry["type"] = "info") => {
@@ -118,9 +118,9 @@ const App: React.FC = () => {
         addLog("User answered call - beginning analysis", "success");
         setCallStatus("analyzing");
 
-        if (prabhatRef.current) {
-            prabhatRef.current.play().catch((err) => console.error("Error playing Prabhat audio:", err));
-            prabhatRef.current.onended = () => {
+        if (callRef.current) {
+            callRef.current.play().catch((err) => console.error("Error playing call audio:", err));
+            callRef.current.onended = () => {
                 if (aditiRef.current) {
                     setActiveSpeaker("aditi");
                     addLog("Agent Aditi has taken over the call", "info");
@@ -146,7 +146,7 @@ const App: React.FC = () => {
     return (
         <>
             <audio ref={ringtoneRef} src="/ringtone.mp3" />
-            <audio ref={prabhatRef} src="/prabhat.mp3" />
+            <audio ref={callRef} src="/initial_call.m4a" />
             <audio ref={aditiRef} src="/aditi.mp3" />
             <div className="app-container">
                 <div className="terminal-panel">
