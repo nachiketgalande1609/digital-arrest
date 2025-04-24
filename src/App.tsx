@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./App.css";
 
-type CallStatus = "incoming" | "analyzing" | "scam-detected";
+type CallStatus = "incoming" | "analyzing" | "scam-detected" | "call-ended";
 type LogEntry = {
     timestamp: string;
     message: string;
@@ -170,6 +170,10 @@ const App: React.FC = () => {
                     aditiRef.current.play().catch((err) => console.error("Error playing Aditi audio:", err));
                     aditiRef.current.onended = () => {
                         setActiveSpeaker("caller");
+                        setCallStatus("call-ended");
+                        addLog("Call session terminated by agent", "success");
+                        addLog("Releasing system resources...", "info");
+                        addLog("Session closed successfully", "success");
                     };
                 }
             };
@@ -184,6 +188,17 @@ const App: React.FC = () => {
         setCallStatus("incoming");
         setProgress(0);
         setLogs([]);
+        setActiveSpeaker("caller");
+
+        // Stop any playing audio
+        if (callRef.current) {
+            callRef.current.pause();
+            callRef.current.currentTime = 0;
+        }
+        if (aditiRef.current) {
+            aditiRef.current.pause();
+            aditiRef.current.currentTime = 0;
+        }
     };
 
     return (
@@ -335,6 +350,37 @@ const App: React.FC = () => {
                                     <button className="end-call-btn" onClick={handleDecline}>
                                         <span className="icon">☎</span>
                                         <span>End Call</span>
+                                    </button>
+                                </div>
+                            )}
+                            {callStatus === "call-ended" && (
+                                <div className="call-ended-screen">
+                                    <div className="call-ended-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path
+                                                d="M16 8L8 16M8 8L16 16M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
+                                                stroke="currentColor"
+                                                strokeWidth="2"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                            />
+                                        </svg>
+                                    </div>
+                                    <h2>Call Ended</h2>
+                                    <p className="call-duration">Duration: 1:24</p>
+                                    <div className="call-summary">
+                                        <div className="summary-item">
+                                            <span className="summary-label">Result:</span>
+                                            <span className="summary-value scam">Scam Detected</span>
+                                        </div>
+                                        <div className="summary-item">
+                                            <span className="summary-label">Action:</span>
+                                            <span className="summary-value">Intercepted by Agent</span>
+                                        </div>
+                                    </div>
+                                    <button className="close-call-btn" onClick={handleDecline}>
+                                        <span className="icon">✕</span>
+                                        <span>Close</span>
                                     </button>
                                 </div>
                             )}
