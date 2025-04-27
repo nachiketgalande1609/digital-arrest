@@ -30,7 +30,7 @@
     text-transform: uppercase;
     letter-spacing: 1.5px;
     margin: 0;
-    font-family: 'Courier New', monospace;
+    font-family: "Courier New", monospace;
     text-shadow: 0 0 5px rgba(0, 255, 157, 0.5);
     position: relative;
     z-index: 2;
@@ -71,16 +71,13 @@
 }
 
 .navbar::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(to bottom,
-            transparent 0%,
-            rgba(0, 255, 157, 0.05) 50%,
-            transparent 100%);
+    background: linear-gradient(to bottom, transparent 0%, rgba(0, 255, 157, 0.05) 50%, transparent 100%);
     animation: scan 4s linear infinite;
     pointer-events: none;
     z-index: 1;

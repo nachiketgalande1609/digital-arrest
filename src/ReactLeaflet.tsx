@@ -160,12 +160,12 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({
         initMap();
         updateMarkers();
 
-        return () => {
-            if (mapRef.current) {
-                mapRef.current.remove();
-                mapRef.current = null;
-            }
-        };
+        // return () => {
+        //     if (mapRef.current) {
+        //         mapRef.current.remove();
+        //         mapRef.current = null;
+        //     }
+        // };
     }, [initMap, updateMarkers]);
 
     // Handle view changes
