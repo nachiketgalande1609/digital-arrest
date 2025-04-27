@@ -1,9 +1,9 @@
 import { useEffect, useRef } from "react";
 
 interface AudioVisualizerProps {
-    audioRef: React.RefObject<HTMLAudioElement>;
+    audioRef: React.RefObject<HTMLAudioElement | null>;
     active?: boolean;
-    type: "victim" | "caller"; // Add this prop to distinguish between victim and caller
+    type: "victim" | "caller";
 }
 
 const AudioVisualizer = ({ audioRef, active = false, type }: AudioVisualizerProps) => {
@@ -17,7 +17,6 @@ const AudioVisualizer = ({ audioRef, active = false, type }: AudioVisualizerProp
     useEffect(() => {
         if (!audioRef.current) return;
 
-        // Initialize audio context and nodes only once
         if (!audioContextRef.current) {
             const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
             audioContextRef.current = new AudioContext();
@@ -26,7 +25,6 @@ const AudioVisualizer = ({ audioRef, active = false, type }: AudioVisualizerProp
             dataArrayRef.current = new Uint8Array(analyserRef.current.frequencyBinCount);
         }
 
-        // Create source node only if it doesn't exist or if the audio element changed
         if (!sourceRef.current || sourceRef.current.mediaElement !== audioRef.current) {
             if (sourceRef.current) {
                 sourceRef.current.disconnect();
@@ -36,7 +34,6 @@ const AudioVisualizer = ({ audioRef, active = false, type }: AudioVisualizerProp
             analyserRef.current!.connect(audioContextRef.current!.destination);
         }
 
-        // Resume audio context if suspended
         if (audioContextRef.current.state === "suspended") {
             audioContextRef.current.resume().catch((err) => console.error("Error resuming audio context:", err));
         }
@@ -57,11 +54,43 @@ const AudioVisualizer = ({ audioRef, active = false, type }: AudioVisualizerProp
                 animationRef.current = requestAnimationFrame(draw);
                 analyser.getByteTimeDomainData(dataArray);
 
+                // Dark cyberpunk background with subtle grid
                 ctx.fillStyle = "#0a0a0a";
                 ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
+                // Draw subtle grid lines
+                ctx.strokeStyle = "rgba(0, 255, 255, 0.05)";
+                ctx.lineWidth = 1;
+                for (let x = 0; x < WIDTH; x += 20) {
+                    ctx.beginPath();
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, HEIGHT);
+                    ctx.stroke();
+                }
+                for (let y = 0; y < HEIGHT; y += 20) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(WIDTH, y);
+                    ctx.stroke();
+                }
+
+                // Draw center line
+                ctx.strokeStyle = "rgba(0, 255, 255, 0.15)";
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(0, HEIGHT / 2);
+                ctx.lineTo(WIDTH, HEIGHT / 2);
+                ctx.stroke();
+
+                // Main waveform settings
+                const primaryColor = type === "victim" ? "#00ffaa" : "#ff5555";
+                const secondaryColor = type === "victim" ? "#007755" : "#aa0000";
+
+                // Draw the main waveform
                 ctx.lineWidth = 2;
-                ctx.strokeStyle = type === "victim" ? "#00ffaa" : "#ff5555";
+                ctx.strokeStyle = primaryColor;
+                ctx.shadowColor = primaryColor;
+                ctx.shadowBlur = 10;
                 ctx.beginPath();
 
                 const sliceWidth = WIDTH / dataArray.length;
@@ -82,6 +111,19 @@ const AudioVisualizer = ({ audioRef, active = false, type }: AudioVisualizerProp
 
                 ctx.lineTo(WIDTH, HEIGHT / 2);
                 ctx.stroke();
+
+                // Draw a secondary inner waveform for depth
+                ctx.lineWidth = 1;
+                ctx.strokeStyle = secondaryColor;
+                ctx.shadowColor = "transparent";
+                ctx.beginPath();
+                x = 0;
+
+                ctx.lineTo(WIDTH, HEIGHT / 2);
+                ctx.stroke();
+
+                // Reset shadow
+                ctx.shadowColor = "transparent";
             };
 
             draw();
@@ -97,13 +139,57 @@ const AudioVisualizer = ({ audioRef, active = false, type }: AudioVisualizerProp
     }, [active, audioRef, type]);
 
     return (
-        <div className="visualizer-container">
-            <canvas ref={canvasRef} width={300} height={80} className="audio-visualizer" />
-            <div className="visualizer-labels">
-                <span className="visualizer-label">
-                    {type === "victim" ? "VICTIM" : "SCAMMER"} {active ? "ACTIVE" : "STANDBY"}
+        <div
+            className="visualizer-container"
+            style={{
+                position: "relative",
+                border: "1px solid rgba(0, 255, 255, 0.2)",
+                borderRadius: "4px",
+                overflow: "hidden",
+                background: "#0a0a0a",
+                boxShadow: "0 0 15px rgba(0, 255, 255, 0.1)",
+            }}
+        >
+            <canvas
+                ref={canvasRef}
+                width={400}
+                height={120}
+                style={{
+                    display: "block",
+                    width: "100%",
+                    height: "100%",
+                }}
+            />
+            <div
+                style={{
+                    position: "absolute",
+                    bottom: "8px",
+                    left: "12px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                }}
+            >
+                <span
+                    style={{
+                        color: type === "victim" ? "#00ffaa" : "#ff5555",
+                        fontFamily: '"Courier New", monospace',
+                        fontSize: "12px",
+                        fontWeight: "bold",
+                        textShadow: `0 0 5px ${type === "victim" ? "rgba(0, 255, 170, 0.7)" : "rgba(255, 85, 85, 0.7)"}`,
+                    }}
+                >
+                    {type === "victim" ? "VICTIM" : "CALLER"} {active ? "ACTIVE" : "STANDBY"}
                 </span>
-                <div className={`visualizer-status ${active ? "active" : ""}`}></div>
+                <div
+                    style={{
+                        width: "10px",
+                        height: "10px",
+                        borderRadius: "50%",
+                        background: active ? (type === "victim" ? "#00ffaa" : "#ff5555") : "#333",
+                        boxShadow: active ? `0 0 5px 2px ${type === "victim" ? "rgba(0, 255, 170, 0.7)" : "rgba(255, 85, 85, 0.7)"}` : "none",
+                    }}
+                ></div>
             </div>
         </div>
     );
