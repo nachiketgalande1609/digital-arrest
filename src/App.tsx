@@ -209,7 +209,7 @@ const App: React.FC = () => {
             <audio ref={aditiRef} src="/aditi.mp3" />
             <div className="app-container">
                 <div className="terminal-panel">
-                    <AudioVisualizer audioRef={activeSpeaker === "caller" ? callRef : callRef} active={callStatus == "analyzing"} />
+                    <AudioVisualizer audioRef={callRef} active={callStatus == "analyzing"} />
                     <div className="terminal-header">
                         <div className="terminal-buttons">
                             <div className="terminal-btn close"></div>
@@ -248,7 +248,7 @@ const App: React.FC = () => {
                 </div>
 
                 <div className="terminal-panel">
-                    <AudioVisualizer audioRef={activeSpeaker === "aditi" ? callRef : aditiRef} active={callStatus == "scam-detected"} />
+                    <AudioVisualizer audioRef={aditiRef} active={callStatus == "scam-detected"} />
                     <div className="terminal-header">
                         <div className="terminal-buttons">
                             <div className="terminal-btn close"></div>
