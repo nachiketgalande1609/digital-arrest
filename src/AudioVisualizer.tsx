@@ -15,7 +15,7 @@ const AudioVisualizer = ({ audioRef, active = false, type }: AudioVisualizerProp
     const sourceRef = useRef<MediaElementAudioSourceNode | null>(null);
 
     useEffect(() => {
-        if (!active || !audioRef.current) return;
+        if (!audioRef.current) return;
 
         // Initialize audio context and nodes only once
         if (!audioContextRef.current) {
@@ -61,7 +61,7 @@ const AudioVisualizer = ({ audioRef, active = false, type }: AudioVisualizerProp
                 ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
                 ctx.lineWidth = 2;
-                ctx.strokeStyle = type === "victim" ? "#00ffaa" : "#ff5555"; // Different colors for victim and caller
+                ctx.strokeStyle = type === "victim" ? "#00ffaa" : "#ff5555";
                 ctx.beginPath();
 
                 const sliceWidth = WIDTH / dataArray.length;
