@@ -53,6 +53,7 @@ const App: React.FC = () => {
     const ringtoneRef = useRef<HTMLAudioElement | null>(null);
     const victimAudioRef = useRef<HTMLAudioElement | null>(null);
     const scammerAudioRef = useRef<HTMLAudioElement | null>(null);
+    const beepRef = useRef<HTMLAudioElement | null>(null);
 
     const addVictimLog = (message: string, type: LogEntry["type"] = "info") => {
         const timestamp = new Date().toISOString().split("T")[1].split(".")[0];
@@ -120,7 +121,6 @@ const App: React.FC = () => {
                 setProgress((prev) => {
                     if (prev >= 100) {
                         clearInterval(analysisInterval);
-                        setCallStatus("scam-detected");
 
                         if (!loggedMilestones.has(100)) {
                             loggedMilestones.add(100);
@@ -180,7 +180,7 @@ const App: React.FC = () => {
 
                     return nextProgress;
                 });
-            }, 1300);
+            }, 1500);
 
             return () => clearInterval(analysisInterval);
         }
@@ -203,12 +203,23 @@ const App: React.FC = () => {
         if (targetAudioRef.current) {
             targetAudioRef.current.src = currentAudio.src;
             targetAudioRef.current.onended = () => {
-                setCurrentAudioIndex((prev) => prev + 1);
+                // Only mark as scam-detected when the last audio file (7_victim) finishes
+                if (currentAudioIndex === audioFiles.length - 1) {
+                    setCallStatus("scam-detected");
+                } else {
+                    setCurrentAudioIndex((prev) => prev + 1);
+                }
             };
 
             targetAudioRef.current.play().catch((err) => {
                 console.error("Error playing audio:", err);
-                setTimeout(() => setCurrentAudioIndex((prev) => prev + 1), 1000);
+                setTimeout(() => {
+                    if (currentAudioIndex === audioFiles.length - 1) {
+                        setCallStatus("scam-detected");
+                    } else {
+                        setCurrentAudioIndex((prev) => prev + 1);
+                    }
+                }, 1000);
             });
 
             // Add log based on who is speaking
@@ -246,10 +257,20 @@ const App: React.FC = () => {
         setCurrentAudioIndex(0);
     };
 
+    useEffect(() => {
+        if (callStatus === "scam-detected" && beepRef.current) {
+            beepRef.current.currentTime = 0; // Rewind to start in case it's already playing
+            beepRef.current.play().catch((err) => {
+                console.error("Error playing beep sound:", err);
+            });
+        }
+    }, [callStatus]);
+
     return (
         <div style={{ width: "100vw" }}>
             <Navbar />
             <audio ref={ringtoneRef} src="/ringtone.mp3" />
+            <audio ref={beepRef} src="/beep.mp3" />
             <audio ref={victimAudioRef} />
             <audio ref={scammerAudioRef} />
             <div className="app-container">
