@@ -8,23 +8,6 @@ const Navbar = () => {
                     <h1 className="navbar-logo">Telangana Cyber Cell</h1>
                     <div className="cyber-glitch"></div>
                 </div>
-                <div className="navbar-links">
-                    <a href="#" className="nav-link">
-                        Home
-                    </a>
-                    <a href="#" className="nav-link">
-                        Services
-                    </a>
-                    <a href="#" className="nav-link">
-                        Cyber Threats
-                    </a>
-                    <a href="#" className="nav-link">
-                        Report
-                    </a>
-                    <a href="#" className="nav-link">
-                        Contact
-                    </a>
-                </div>
                 <div className="cyber-line"></div>
             </div>
         </nav>
