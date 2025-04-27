@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./App.css";
 import AudioVisualizer from "./AudioVisualizer";
+import Navbar from "./Navbar";
 
 type CallStatus = "incoming" | "analyzing" | "scam-detected" | "call-ended";
 type LogEntry = {
@@ -15,10 +16,6 @@ interface CallerInfo {
     avatar: string;
 }
 
-const generateRandomHex = (size: number): string => {
-    return [...Array(size)].map(() => Math.floor(Math.random() * 16).toString(16)).join("");
-};
-
 const generateRandomUUID = (): string => {
     return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
         const r = (Math.random() * 16) | 0,
@@ -32,21 +29,29 @@ const App: React.FC = () => {
     const [progress, setProgress] = useState<number>(0);
     const [victimLogs, setVictimLogs] = useState<LogEntry[]>([]);
     const [scammerLogs, setScammerLogs] = useState<LogEntry[]>([]);
-    const [activeSpeaker, setActiveSpeaker] = useState<"caller" | "victim">("caller");
+    const [activeSpeaker, setActiveSpeaker] = useState<"victim" | "caller">("caller");
     const [currentAudioIndex, setCurrentAudioIndex] = useState<number>(0);
 
-    const audioFiles = ["/1_victim.mp3", "/2_scammer.mp3", "/3_victim.mp3", "/4_scammer.mp3", "/5_victim.mp3", "/6_scammer.mp3", "/7_victim.mp3"];
+    const audioFiles = [
+        { src: "/1_victim.mp3", type: "victim" },
+        { src: "/2_scammer.mp3", type: "caller" },
+        { src: "/3_victim.mp3", type: "victim" },
+        { src: "/4_scammer.mp3", type: "caller" },
+        { src: "/5_victim.mp3", type: "victim" },
+        { src: "/6_scammer.mp3", type: "caller" },
+        { src: "/7_victim.mp3", type: "victim" },
+    ];
 
     const [callerInfo] = useState<CallerInfo>({
         name: "Unknown Caller",
         number: "+1 (555) 123-4567",
         avatar: "https://img.freepik.com/premium-photo/male-customer-service-3d-cartoon-avatar-portrait_839035-522335.jpg",
     });
+
     const victimTerminalRef = useRef<HTMLDivElement>(null);
     const scammerTerminalRef = useRef<HTMLDivElement>(null);
     const ringtoneRef = useRef<HTMLAudioElement | null>(null);
-    const victimAudioRef = useRef<HTMLAudioElement | null>(null);
-    const scammerAudioRef = useRef<HTMLAudioElement | null>(null);
+    const audioPlayerRef = useRef<HTMLAudioElement | null>(null);
 
     const addVictimLog = (message: string, type: LogEntry["type"] = "info") => {
         const timestamp = new Date().toISOString().split("T")[1].split(".")[0];
@@ -180,10 +185,8 @@ const App: React.FC = () => {
         }
     }, [callStatus]);
 
-    const playNextAudio = () => {
-        const nextIndex = currentAudioIndex + 1;
-
-        if (nextIndex >= audioFiles.length) {
+    const playAudioSequence = () => {
+        if (currentAudioIndex >= audioFiles.length) {
             // End of audio files
             setCallStatus("call-ended");
             addVictimLog("Call session completed", "success");
@@ -191,43 +194,43 @@ const App: React.FC = () => {
             return;
         }
 
-        setCurrentAudioIndex(nextIndex);
-        setActiveSpeaker(nextIndex % 2 === 0 ? "victim" : "caller");
+        const currentAudio = audioFiles[currentAudioIndex];
+        setActiveSpeaker(currentAudio.type === "victim" ? "victim" : "caller");
 
-        const isVictim = nextIndex % 2 === 0;
-        const audioRef = isVictim ? victimAudioRef : scammerAudioRef;
-        const logPrefix = isVictim ? "victim" : "scammer";
+        if (audioPlayerRef.current) {
+            audioPlayerRef.current.src = currentAudio.src;
+            audioPlayerRef.current.onended = () => {
+                setCurrentAudioIndex((prev) => prev + 1);
+            };
 
-        if (audioRef.current) {
-            console.log(`Playing ${logPrefix} audio: ${audioFiles[nextIndex]}`);
-            audioRef.current.src = audioFiles[nextIndex];
-            audioRef.current.onended = playNextAudio; // Set handler for next audio
-
-            audioRef.current.play().catch((err) => {
-                console.error(`Error playing ${logPrefix} audio:`, err);
+            audioPlayerRef.current.play().catch((err) => {
+                console.error("Error playing audio:", err);
                 // If error occurs, skip to next after short delay
-                setTimeout(playNextAudio, 1000);
+                setTimeout(() => setCurrentAudioIndex((prev) => prev + 1), 1000);
             });
+
+            // Add log based on who is speaking
+            if (currentAudio.type === "victim") {
+                addVictimLog("Victim speaking - analyzing voice patterns", "info");
+                addScammerLog("Listening to victim response", "info");
+            } else {
+                addVictimLog("Caller speaking - analyzing voice patterns", "info");
+                addScammerLog("Scammer speaking - analyzing tactics", "info");
+            }
         }
     };
+
+    useEffect(() => {
+        if (callStatus === "analyzing") {
+            playAudioSequence();
+        }
+    }, [currentAudioIndex, callStatus]);
 
     const handleAnswer = (): void => {
         addVictimLog("User answered call - beginning analysis", "success");
         addScammerLog("Call answered - initiating analysis", "info");
         setCallStatus("analyzing");
         setCurrentAudioIndex(0); // Reset to first audio file
-        setActiveSpeaker("victim"); // First speaker is victim
-
-        // Start with first victim audio
-        if (victimAudioRef.current) {
-            console.log("Playing initial victim audio");
-            victimAudioRef.current.src = audioFiles[0];
-            victimAudioRef.current.onended = playNextAudio;
-            victimAudioRef.current.play().catch((err) => {
-                console.error("Error playing initial victim audio:", err);
-                setTimeout(playNextAudio, 1000);
-            });
-        }
     };
 
     const handleDecline = (): void => {
@@ -241,25 +244,21 @@ const App: React.FC = () => {
         setCurrentAudioIndex(0);
 
         // Stop any playing audio
-        if (victimAudioRef.current) {
-            victimAudioRef.current.pause();
-            victimAudioRef.current.currentTime = 0;
-        }
-        if (scammerAudioRef.current) {
-            scammerAudioRef.current.pause();
-            scammerAudioRef.current.currentTime = 0;
+        if (audioPlayerRef.current) {
+            audioPlayerRef.current.pause();
+            audioPlayerRef.current.currentTime = 0;
         }
     };
 
     return (
         <div style={{ width: "100vw" }}>
+            <Navbar />
             <audio ref={ringtoneRef} src="/ringtone.mp3" />
-            <audio ref={victimAudioRef} />
-            <audio ref={scammerAudioRef} />
+            <audio ref={audioPlayerRef} />
             <div className="app-container">
-                {/* Victim Terminal */}
+                {/* Victim Terminal (Left) */}
                 <div className="terminal-panel">
-                    <AudioVisualizer audioRef={victimAudioRef} active={callStatus === "analyzing"} />
+                    {/* <AudioVisualizer audioRef={audioPlayerRef} active={activeSpeaker === "victim"} /> */}
                     <div className="terminal-header">
                         <div className="terminal-buttons">
                             <div className="terminal-btn close"></div>
@@ -297,9 +296,9 @@ const App: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Scammer Terminal */}
+                {/* Scammer Terminal (Right) */}
                 <div className="terminal-panel">
-                    <AudioVisualizer audioRef={scammerAudioRef} active={callStatus === "analyzing"} />
+                    <AudioVisualizer audioRef={audioPlayerRef} active={activeSpeaker === "caller"} />
                     <div className="terminal-header">
                         <div className="terminal-buttons">
                             <div className="terminal-btn close"></div>
@@ -336,7 +335,6 @@ const App: React.FC = () => {
                         <span className="cursor">|</span>
                     </div>
                 </div>
-
                 <div className="call-panel">
                     <div className={`call-screen ${callStatus}`}>
                         <div className="caller-info">

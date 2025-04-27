@@ -52,7 +52,7 @@ body {
 .app-container {
     width: 100%;
     display: flex;
-    min-height: 100vh;
+    height: calc(100vh - 60px);
     padding: 20px;
     gap: 20px;
     background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-darker) 100%);
@@ -60,7 +60,6 @@ body {
 
 /* Terminal Panel */
 .terminal-panel {
-    height: calc(100vh - 40px);
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -845,3 +844,4 @@ button .icon {
     background-color: #00ffaa;
     box-shadow: 0 0 8px rgba(0, 255, 170, 0.5);
 }
+
