@@ -50,7 +50,7 @@ body {
 }
 
 .app-container {
-    flex: 1;
+    width: 100%;
     display: flex;
     min-height: 100vh;
     padding: 20px;
@@ -844,12 +844,4 @@ button .icon {
 .visualizer-status.active {
     background-color: #00ffaa;
     box-shadow: 0 0 8px rgba(0, 255, 170, 0.5);
-}
-
-/* Update terminal panel container */
-.terminal-panel {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    margin: 0 10px;
 }

@@ -30,60 +30,83 @@ const generateRandomUUID = (): string => {
 const App: React.FC = () => {
     const [callStatus, setCallStatus] = useState<CallStatus>("incoming");
     const [progress, setProgress] = useState<number>(0);
-    const [logs, setLogs] = useState<LogEntry[]>([]);
-    const [activeSpeaker, setActiveSpeaker] = useState<"caller" | "aditi">("caller");
+    const [victimLogs, setVictimLogs] = useState<LogEntry[]>([]);
+    const [scammerLogs, setScammerLogs] = useState<LogEntry[]>([]);
+    const [activeSpeaker, setActiveSpeaker] = useState<"caller" | "victim">("caller");
+    const [currentAudioIndex, setCurrentAudioIndex] = useState<number>(0);
+
+    const audioFiles = ["/1_victim.mp3", "/2_scammer.mp3", "/3_victim.mp3", "/4_scammer.mp3", "/5_victim.mp3", "/6_scammer.mp3", "/7_victim.mp3"];
 
     const [callerInfo] = useState<CallerInfo>({
         name: "Unknown Caller",
         number: "+1 (555) 123-4567",
         avatar: "https://img.freepik.com/premium-photo/male-customer-service-3d-cartoon-avatar-portrait_839035-522335.jpg",
     });
-    const terminalRef = useRef<HTMLDivElement>(null);
+    const victimTerminalRef = useRef<HTMLDivElement>(null);
+    const scammerTerminalRef = useRef<HTMLDivElement>(null);
     const ringtoneRef = useRef<HTMLAudioElement | null>(null);
-    const callRef = useRef<HTMLAudioElement | null>(null);
-    const aditiRef = useRef<HTMLAudioElement | null>(null);
+    const victimAudioRef = useRef<HTMLAudioElement | null>(null);
+    const scammerAudioRef = useRef<HTMLAudioElement | null>(null);
 
-    const addLog = (message: string, type: LogEntry["type"] = "info") => {
+    const addVictimLog = (message: string, type: LogEntry["type"] = "info") => {
         const timestamp = new Date().toISOString().split("T")[1].split(".")[0];
-        setLogs((prev) => [...prev.slice(-200), { timestamp, message, type }]);
+        setVictimLogs((prev) => [...prev.slice(-200), { timestamp, message, type }]);
     };
 
-    // Auto-scroll terminal to bottom
-    useEffect(() => {
-        if (terminalRef.current) {
-            terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
-        }
-    }, [logs]);
+    const addScammerLog = (message: string, type: LogEntry["type"] = "info") => {
+        const timestamp = new Date().toISOString().split("T")[1].split(".")[0];
+        setScammerLogs((prev) => [...prev.slice(-200), { timestamp, message, type }]);
+    };
 
-    const logFeatureAnalysis = () => {
+    // Auto-scroll terminals to bottom
+    useEffect(() => {
+        if (victimTerminalRef.current) {
+            victimTerminalRef.current.scrollTop = victimTerminalRef.current.scrollHeight;
+        }
+        if (scammerTerminalRef.current) {
+            scammerTerminalRef.current.scrollTop = scammerTerminalRef.current.scrollHeight;
+        }
+    }, [victimLogs, scammerLogs]);
+
+    const logFeatureAnalysis = (isVictim: boolean) => {
         const features = ["pitch variance", "spectral centroid", "MFCC coefficients", "formant dispersion", "jitter", "shimmer", "harmonicity"];
         const feature = features[Math.floor(Math.random() * features.length)];
-        addLog(`Analyzing ${feature}: deviation ${(Math.random() * 10).toFixed(2)}%`, "info");
+        const logFn = isVictim ? addVictimLog : addScammerLog;
+        logFn(`Analyzing ${feature}: deviation ${(Math.random() * 10).toFixed(2)}%`, "info");
     };
 
-    const logModelUpdate = () => {
+    const logModelUpdate = (isVictim: boolean) => {
         if (Math.random() > 0.9) {
-            addLog(`Updating detection model weights (epoch: ${Math.floor(Math.random() * 100)}, loss: ${Math.random().toFixed(4)})`, "debug");
+            const logFn = isVictim ? addVictimLog : addScammerLog;
+            logFn(`Updating detection model weights (epoch: ${Math.floor(Math.random() * 100)}, loss: ${Math.random().toFixed(4)})`, "debug");
         }
     };
 
     // Simulate call flow with reduced logging
     useEffect(() => {
         if (callStatus === "incoming") {
-            addLog("=== DEEPFAKE DETECTION ENGINE v2.3.7 ===", "info");
-            addLog("Initializing system...", "info");
-            addLog(`Session ID: ${generateRandomUUID()}`, "debug");
-            addLog("Loading neural network models...", "info");
-            addLog('Model "voiceprint-v5" loaded (43.7MB, SHA-256: ' + generateRandomHex(64) + ")", "success");
-            addLog('Model "spectral-v3" loaded (28.2MB, SHA-256: ' + generateRandomHex(64) + ")", "success");
-            addLog("Incoming call detected from " + callerInfo.number, "info");
-            addLog("Establishing secure connection...", "info");
-            addLog("Connection encrypted (TLS 1.3, AES-256-GCM)", "success");
+            addVictimLog("=== VICTIM TERMINAL v2.3.7 ===", "info");
+            addVictimLog("Initializing victim-side analysis...", "info");
+            addVictimLog(`Session ID: ${generateRandomUUID()}`, "debug");
+            addVictimLog("Loading voiceprint models...", "info");
+            addVictimLog('Model "voiceprint-v5" loaded (43.7MB)', "success");
+
+            addScammerLog("=== SCAMMER TERMINAL v2.3.7 ===", "info");
+            addScammerLog("Initializing scam detection...", "info");
+            addScammerLog(`Session ID: ${generateRandomUUID()}`, "debug");
+            addScammerLog("Loading threat intelligence...", "info");
+            addScammerLog('Model "spectral-v3" loaded (28.2MB)', "success");
+
+            addVictimLog("Incoming call detected from " + callerInfo.number, "info");
+            addScammerLog("Call initiated to victim", "info");
         }
 
         if (callStatus === "analyzing") {
-            addLog("=== BEGINNING REAL-TIME ANALYSIS ===", "info");
-            addLog("Extracting 256-dimensional voice features...", "info");
+            addVictimLog("=== BEGINNING VICTIM ANALYSIS ===", "info");
+            addScammerLog("=== BEGINNING SCAMMER ANALYSIS ===", "info");
+
+            addVictimLog("Extracting victim voice features...", "info");
+            addScammerLog("Analyzing scammer voice patterns...", "info");
 
             const loggedMilestones = new Set();
 
@@ -95,14 +118,10 @@ const App: React.FC = () => {
 
                         if (!loggedMilestones.has(100)) {
                             loggedMilestones.add(100);
-                            addLog("WARNING: SYNTHETIC VOICE PATTERNS DETECTED!", "error");
-                            addLog("Confidence: 94.2% (±2.1%)", "error");
-                            addLog("Signature match to known GAN-generated samples", "error");
-                            addLog("Vocal artifact detection: POSITIVE", "error");
-                            addLog(
-                                "Step 5: Finalized full packet capture; case CYB20250421‑0567 opened with Mumbai Cybercrime Dept and evidence forwarded via Interpol to Cambodia Cyber & Joint Crimes Unit for subscriber identification.",
-                                "error"
-                            );
+                            addVictimLog("WARNING: Potential scam call detected!", "warning");
+                            addScammerLog("ALERT: Synthetic voice patterns detected!", "error");
+                            addScammerLog("Confidence: 94.2% (±2.1%)", "error");
+                            addScammerLog("Signature match to known GAN-generated samples", "error");
                         }
 
                         return 100;
@@ -113,39 +132,42 @@ const App: React.FC = () => {
                     const milestones = [
                         {
                             threshold: 20,
-                            message:
-                                "Step 1: Captured VoIP SIP INVITE at edge firewall, extracted source IP 203.207.64.100, logged Call‑ID “ABC123XYZ” and timestamp.",
+                            victimMsg: "Step 1: Captured victim voice sample",
+                            scammerMsg: "Step 1: Detected VoIP masking patterns",
                         },
                         {
                             threshold: 40,
-                            message:
-                                "Step 2: Ran WHOIS on 203.207.64.100; found allocation to EZECOM Ltd (AS24560), Phnom Penh, Cambodia; flagged in threat‑intel DB for past VoIP fraud reports.",
+                            victimMsg: "Step 2: Analyzing victim speech patterns",
+                            scammerMsg: "Step 2: Identified Cambodian IP address",
                         },
                         {
                             threshold: 60,
-                            message:
-                                "Step 3: Cross‑referenced 203.207.64.100 against known VPN exit nodes—matched “ExpressVPN Phnom Penh Exit.” Submitted MLAT request to Cambodian Ministry of Post & Telecom for subscriber logs.",
+                            victimMsg: "Step 3: Comparing to victim voice baseline",
+                            scammerMsg: "Step 3: Matched to known scammer tactics",
                         },
                         {
                             threshold: 80,
-                            message:
-                                "Step 4: Analyzed ISP NetFlow—identified NAT of 203.207.64.100:5060 to Smart Axiata 4G tower ID 10234 in Phnom Penh; updated geofence alert to cyber cell dashboard.",
+                            victimMsg: "Step 4: Verifying victim identity",
+                            scammerMsg: "Step 4: Confirmed synthetic voice artifacts",
                         },
                     ];
 
-                    milestones.forEach(({ threshold, message }) => {
+                    milestones.forEach(({ threshold, victimMsg, scammerMsg }) => {
                         if (prev < threshold && nextProgress >= threshold && !loggedMilestones.has(threshold)) {
-                            addLog(message, "warning");
+                            addVictimLog(victimMsg, "warning");
+                            addScammerLog(scammerMsg, "warning");
                             loggedMilestones.add(threshold);
                         }
                     });
 
                     if (Math.random() > 0.6) {
                         const randomActions = [
-                            logFeatureAnalysis,
-                            logModelUpdate,
-                            () => addLog(`Processing frame ${Math.floor(prev * 50)} (checksum: ${generateRandomHex(8)})`),
-                            () => addLog(`Comparing to ${Math.floor(Math.random() * 10000)} known samples`),
+                            () => logFeatureAnalysis(true),
+                            () => logFeatureAnalysis(false),
+                            () => logModelUpdate(true),
+                            () => logModelUpdate(false),
+                            () => addVictimLog(`Processing victim frame ${Math.floor(prev * 50)}`),
+                            () => addScammerLog(`Analyzing scammer sample ${Math.floor(prev * 50)}`),
                         ];
                         randomActions[Math.floor(Math.random() * randomActions.length)]();
                     }
@@ -158,58 +180,86 @@ const App: React.FC = () => {
         }
     }, [callStatus]);
 
-    const handleAnswer = (): void => {
-        addLog("User answered call - beginning analysis", "success");
-        setCallStatus("analyzing");
+    const playNextAudio = () => {
+        const nextIndex = currentAudioIndex + 1;
 
-        if (callRef.current) {
-            callRef.current.play().catch((err) => console.error("Error playing call audio:", err));
-            callRef.current.onended = () => {
-                if (aditiRef.current) {
-                    setActiveSpeaker("aditi");
-                    addLog("Agent Aditi has taken over the call", "info");
-                    aditiRef.current.play().catch((err) => console.error("Error playing Aditi audio:", err));
-                    aditiRef.current.onended = () => {
-                        setActiveSpeaker("caller");
-                        setCallStatus("call-ended");
-                        addLog("Call session terminated by agent", "success");
-                        addLog("Releasing system resources...", "info");
-                        addLog("Session closed successfully", "success");
-                    };
-                }
-            };
+        if (nextIndex >= audioFiles.length) {
+            // End of audio files
+            setCallStatus("call-ended");
+            addVictimLog("Call session completed", "success");
+            addScammerLog("Call session terminated", "info");
+            return;
+        }
+
+        setCurrentAudioIndex(nextIndex);
+        setActiveSpeaker(nextIndex % 2 === 0 ? "victim" : "caller");
+
+        const isVictim = nextIndex % 2 === 0;
+        const audioRef = isVictim ? victimAudioRef : scammerAudioRef;
+        const logPrefix = isVictim ? "victim" : "scammer";
+
+        if (audioRef.current) {
+            console.log(`Playing ${logPrefix} audio: ${audioFiles[nextIndex]}`);
+            audioRef.current.src = audioFiles[nextIndex];
+            audioRef.current.onended = playNextAudio; // Set handler for next audio
+
+            audioRef.current.play().catch((err) => {
+                console.error(`Error playing ${logPrefix} audio:`, err);
+                // If error occurs, skip to next after short delay
+                setTimeout(playNextAudio, 1000);
+            });
+        }
+    };
+
+    const handleAnswer = (): void => {
+        addVictimLog("User answered call - beginning analysis", "success");
+        addScammerLog("Call answered - initiating analysis", "info");
+        setCallStatus("analyzing");
+        setCurrentAudioIndex(0); // Reset to first audio file
+        setActiveSpeaker("victim"); // First speaker is victim
+
+        // Start with first victim audio
+        if (victimAudioRef.current) {
+            console.log("Playing initial victim audio");
+            victimAudioRef.current.src = audioFiles[0];
+            victimAudioRef.current.onended = playNextAudio;
+            victimAudioRef.current.play().catch((err) => {
+                console.error("Error playing initial victim audio:", err);
+                setTimeout(playNextAudio, 1000);
+            });
         }
     };
 
     const handleDecline = (): void => {
-        addLog("Call declined by user - terminating session", "warning");
-        addLog("Releasing GPU memory...", "info");
-        addLog("Closing network connections...", "info");
-        addLog("Session terminated cleanly", "success");
+        addVictimLog("Call declined by user - terminating session", "warning");
+        addScammerLog("Call rejected by target", "warning");
         setCallStatus("incoming");
         setProgress(0);
-        setLogs([]);
+        setVictimLogs([]);
+        setScammerLogs([]);
         setActiveSpeaker("caller");
+        setCurrentAudioIndex(0);
 
         // Stop any playing audio
-        if (callRef.current) {
-            callRef.current.pause();
-            callRef.current.currentTime = 0;
+        if (victimAudioRef.current) {
+            victimAudioRef.current.pause();
+            victimAudioRef.current.currentTime = 0;
         }
-        if (aditiRef.current) {
-            aditiRef.current.pause();
-            aditiRef.current.currentTime = 0;
+        if (scammerAudioRef.current) {
+            scammerAudioRef.current.pause();
+            scammerAudioRef.current.currentTime = 0;
         }
     };
 
     return (
-        <>
+        <div style={{ width: "100vw" }}>
             <audio ref={ringtoneRef} src="/ringtone.mp3" />
-            <audio ref={callRef} src="/File1_Start.mp3" />
-            <audio ref={aditiRef} src="/aditi.mp3" />
+            <audio ref={victimAudioRef} />
+            <audio ref={scammerAudioRef} />
             <div className="app-container">
+                {/* Victim Terminal */}
                 <div className="terminal-panel">
-                    <AudioVisualizer audioRef={callRef} active={callStatus == "analyzing"} />
+                    <AudioVisualizer audioRef={victimAudioRef} active={callStatus === "analyzing"} />
                     <div className="terminal-header">
                         <div className="terminal-buttons">
                             <div className="terminal-btn close"></div>
@@ -217,7 +267,7 @@ const App: React.FC = () => {
                             <div className="terminal-btn maximize"></div>
                         </div>
                         <div className="terminal-title">
-                            <span className="app-name">Digital</span>
+                            <span className="app-name">Victim Terminal</span>
                             <span className="app-version">v2.3.7</span>
                         </div>
                         <div className="terminal-status">
@@ -225,8 +275,8 @@ const App: React.FC = () => {
                             <span>{callStatus.toUpperCase()}</span>
                         </div>
                     </div>
-                    <div className="terminal-body" ref={terminalRef}>
-                        {logs.map((log, index) => (
+                    <div className="terminal-body" ref={victimTerminalRef}>
+                        {victimLogs.map((log, index) => (
                             <div key={index} className={`log-entry ${log.type}`}>
                                 <span className="timestamp">[{log.timestamp}]</span>
                                 <span className="log-message">{log.message}</span>
@@ -242,13 +292,14 @@ const App: React.FC = () => {
                         )}
                     </div>
                     <div className="terminal-input">
-                        <span className="prompt">root@detection-engine:~#</span>
+                        <span className="prompt">victim@analysis:~#</span>
                         <span className="cursor">|</span>
                     </div>
                 </div>
 
+                {/* Scammer Terminal */}
                 <div className="terminal-panel">
-                    <AudioVisualizer audioRef={aditiRef} active={callStatus == "scam-detected"} />
+                    <AudioVisualizer audioRef={scammerAudioRef} active={callStatus === "analyzing"} />
                     <div className="terminal-header">
                         <div className="terminal-buttons">
                             <div className="terminal-btn close"></div>
@@ -256,7 +307,7 @@ const App: React.FC = () => {
                             <div className="terminal-btn maximize"></div>
                         </div>
                         <div className="terminal-title">
-                            <span className="app-name">Digital</span>
+                            <span className="app-name">Scam Detector</span>
                             <span className="app-version">v2.3.7</span>
                         </div>
                         <div className="terminal-status">
@@ -264,8 +315,8 @@ const App: React.FC = () => {
                             <span>{callStatus.toUpperCase()}</span>
                         </div>
                     </div>
-                    <div className="terminal-body" ref={terminalRef}>
-                        {logs.map((log, index) => (
+                    <div className="terminal-body" ref={scammerTerminalRef}>
+                        {scammerLogs.map((log, index) => (
                             <div key={index} className={`log-entry ${log.type}`}>
                                 <span className="timestamp">[{log.timestamp}]</span>
                                 <span className="log-message">{log.message}</span>
@@ -275,192 +326,155 @@ const App: React.FC = () => {
                             <div className="log-entry info">
                                 <span className="timestamp">[{new Date().toISOString().split("T")[1].split(".")[0]}]</span>
                                 <span className="log-message">
-                                    Analysis progress: {Math.min(progress, 100).toFixed(1)}% (ETA: {Math.floor((100 - progress) / 3)}s)
+                                    Detection progress: {Math.min(progress, 100).toFixed(1)}% (ETA: {Math.floor((100 - progress) / 3)}s)
                                 </span>
                             </div>
                         )}
                     </div>
                     <div className="terminal-input">
-                        <span className="prompt">root@detection-engine:~#</span>
+                        <span className="prompt">scam@detector:~#</span>
                         <span className="cursor">|</span>
                     </div>
                 </div>
 
                 <div className="call-panel">
-                    {activeSpeaker === "caller" ? (
-                        <div className={`call-screen ${callStatus}`}>
-                            <div className="caller-info">
-                                <div className="avatar-container">
-                                    <img src={callerInfo.avatar} alt="Caller" className="caller-avatar" />
-                                    {callStatus === "analyzing" && (
-                                        <div className="scanning-animation">
-                                            <div className="scan-line"></div>
-                                        </div>
-                                    )}
-                                </div>
-                                <h2>{callerInfo.name}</h2>
-                                <p className="caller-number">{callerInfo.number}</p>
-
-                                {callStatus === "incoming" && (
-                                    <div className="call-status">
-                                        <div className="ripple-animation"></div>
-                                        <span>INCOMING CALL</span>
+                    <div className={`call-screen ${callStatus}`}>
+                        <div className="caller-info">
+                            <div className="avatar-container">
+                                <img src={callerInfo.avatar} alt="Caller" className="caller-avatar" />
+                                {callStatus === "analyzing" && (
+                                    <div className="scanning-animation">
+                                        <div className="scan-line"></div>
                                     </div>
                                 )}
                             </div>
+                            <h2>{activeSpeaker === "caller" ? callerInfo.name : "Victim"}</h2>
+                            <p className="caller-number">{callerInfo.number}</p>
 
                             {callStatus === "incoming" && (
-                                <div className="call-buttons">
-                                    <button className="decline-btn" onClick={handleDecline}>
-                                        <span className="icon">✕</span>
-                                        <span>Decline</span>
-                                    </button>
-                                    <button className="answer-btn" onClick={handleAnswer}>
-                                        <span className="icon">✓</span>
-                                        <span>Answer</span>
-                                    </button>
-                                </div>
-                            )}
-
-                            {callStatus === "analyzing" && (
-                                <div className="analysis-container">
-                                    {/* Milestone log stack (cinematic cyber-intel style) */}
-                                    <div className="milestone-log-stack">
-                                        {progress >= 20 && (
-                                            <p className={`milestone-log sky ${progress >= 40 ? "faded faded-4" : ""}`}>
-                                                📡 SIP INVITE intercepted | Src IP: 203.207.64.100 | Call‑ID: ABC123XYZ
-                                            </p>
-                                        )}
-                                        {progress >= 40 && (
-                                            <p className={`milestone-log green ${progress >= 60 ? "faded faded-3" : ""}`}>
-                                                🌐 WHOIS → EZECOM Ltd (AS24560), Phnom Penh | IP flagged in VoIP fraud DB
-                                            </p>
-                                        )}
-                                        {progress >= 60 && (
-                                            <p className={`milestone-log yellow ${progress >= 80 ? "faded faded-2" : ""}`}>
-                                                🔍 VPN Match: ExpressVPN Phnom Penh Exit | MLAT request issued
-                                            </p>
-                                        )}
-                                        {progress >= 80 && (
-                                            <p className={`milestone-log orange ${progress >= 100 ? "faded faded-1" : ""}`}>
-                                                📶 NetFlow: NAT to Smart Axiata 4G Tower #10234 | Geofence alert active
-                                            </p>
-                                        )}
-                                    </div>
-
-                                    {/* Analyzing animation */}
-                                    <div className="analyzing-animation">
-                                        <div className="wave"></div>
-                                        <div className="wave"></div>
-                                        <div className="wave"></div>
-                                    </div>
-
-                                    {/* Text under animation */}
-                                    <p className="analyzing-text">Analyzing voice patterns...</p>
-
-                                    {/* Progress bar */}
-                                    <div className="progress-container">
-                                        <div className="progress-bar">
-                                            <div className="progress" style={{ width: `${progress}%` }}></div>
-                                        </div>
-                                        <span className="progress-text">{Math.min(progress, 100).toFixed(0)}%</span>
-                                    </div>
-                                </div>
-                            )}
-
-                            {callStatus === "scam-detected" && (
-                                <div className="scam-alert">
-                                    <div className="milestone-log-stack">
-                                        <p className="milestone-log red-glow">
-                                            📁 Packet capture complete | Case CYB20250421‑0567 filed | Interpol notified
-                                        </p>
-                                    </div>
-                                    <div className="warning-icon">
-                                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path
-                                                d="M12 9V11M12 15H12.01M5.07183 19H18.9282C20.4678 19 21.4301 17.3333 20.6603 16L13.7321 4C12.9623 2.66667 11.0378 2.66667 10.268 4L3.33978 16C2.56998 17.3333 3.53223 19 5.07183 19Z"
-                                                stroke="currentColor"
-                                                strokeWidth="2"
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                            />
-                                        </svg>
-                                    </div>
-                                    <h2>SCAM ALERT</h2>
-                                    <p className="scam-description">Deepfake AI voice detected</p>
-                                    <button className="end-call-btn" onClick={handleDecline}>
-                                        <span className="icon">☎</span>
-                                        <span>End Call</span>
-                                    </button>
-                                </div>
-                            )}
-                            {callStatus === "call-ended" && (
-                                <div className="call-ended-screen">
-                                    <div className="call-ended-icon">
-                                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path
-                                                d="M16 8L8 16M8 8L16 16M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
-                                                stroke="currentColor"
-                                                strokeWidth="2"
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                            />
-                                        </svg>
-                                    </div>
-                                    <h2>Call Ended</h2>
-                                    <p className="call-duration">Duration: 1:24</p>
-                                    <div className="call-summary">
-                                        <div className="summary-item">
-                                            <span className="summary-label">Result:</span>
-                                            <span className="summary-value scam">Scam Detected</span>
-                                        </div>
-                                        <div className="summary-item">
-                                            <span className="summary-label">Action:</span>
-                                            <span className="summary-value">Intercepted by Agent</span>
-                                        </div>
-                                    </div>
-                                    <button className="close-call-btn" onClick={handleDecline}>
-                                        <span className="icon">✕</span>
-                                        <span>Close</span>
-                                    </button>
+                                <div className="call-status">
+                                    <div className="ripple-animation"></div>
+                                    <span>INCOMING CALL</span>
                                 </div>
                             )}
                         </div>
-                    ) : (
-                        <div className="call-screen agent-active">
-                            <div className="agent-info">
-                                <div className="agent-avatar-container">
-                                    <img src="/aditi-avatar.jpg" alt="Agent Aditi" className="agent-avatar" />
-                                    <div className="verified-badge">
-                                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path
-                                                d="M9 12L11 14L15 10M19.8761 9.12499C20.1184 9.88141 20.2366 10.6808 20.2366 11.5C20.2366 16.5 16.5 20.5 12 20.5C7.5 20.5 3.76343 16.5 3.76343 11.5C3.76343 6.5 7.5 2.5 12 2.5C13.3192 2.5 14.6186 2.88155 15.75 3.5M16.5 7.5C16.5 7.5 16.875 9.5 18 10.5C19.125 11.5 21 10.5 21 10.5"
-                                                stroke="currentColor"
-                                                strokeWidth="2"
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                            />
-                                        </svg>
-                                    </div>
-                                </div>
-                                <h2>Agent Aditi</h2>
-                                <p className="agent-title">Security Specialist</p>
-                                <div className="agent-status">
-                                    <div className="pulse-animation"></div>
-                                    <span>Active Intervention</span>
-                                </div>
-                            </div>
-                            <div className="call-controls">
-                                <button className="end-call-btn" onClick={handleDecline}>
-                                    <span className="icon">☎</span>
-                                    <span>End Intervention</span>
+
+                        {callStatus === "incoming" && (
+                            <div className="call-buttons">
+                                <button className="decline-btn" onClick={handleDecline}>
+                                    <span className="icon">✕</span>
+                                    <span>Decline</span>
+                                </button>
+                                <button className="answer-btn" onClick={handleAnswer}>
+                                    <span className="icon">✓</span>
+                                    <span>Answer</span>
                                 </button>
                             </div>
-                        </div>
-                    )}
+                        )}
+
+                        {callStatus === "analyzing" && (
+                            <div className="analysis-container">
+                                <div className="milestone-log-stack">
+                                    {progress >= 20 && (
+                                        <p className={`milestone-log sky ${progress >= 40 ? "faded faded-4" : ""}`}>
+                                            📡 {activeSpeaker === "caller" ? "Scammer" : "Victim"} speaking - analyzing voice patterns
+                                        </p>
+                                    )}
+                                    {progress >= 40 && (
+                                        <p className={`milestone-log green ${progress >= 60 ? "faded faded-3" : ""}`}>
+                                            🌐 Comparing to known {activeSpeaker === "caller" ? "scam" : "legitimate"} voice samples
+                                        </p>
+                                    )}
+                                    {progress >= 60 && (
+                                        <p className={`milestone-log yellow ${progress >= 80 ? "faded faded-2" : ""}`}>
+                                            🔍 Detecting {activeSpeaker === "caller" ? "synthetic" : "natural"} speech characteristics
+                                        </p>
+                                    )}
+                                    {progress >= 80 && (
+                                        <p className={`milestone-log orange ${progress >= 100 ? "faded faded-1" : ""}`}>
+                                            📶 {activeSpeaker === "caller" ? "High" : "Low"} probability of voice manipulation
+                                        </p>
+                                    )}
+                                </div>
+
+                                <div className="analyzing-animation">
+                                    <div className="wave"></div>
+                                    <div className="wave"></div>
+                                    <div className="wave"></div>
+                                </div>
+
+                                <p className="analyzing-text">Analyzing {activeSpeaker === "caller" ? "scammer" : "victim"} voice...</p>
+
+                                <div className="progress-container">
+                                    <div className="progress-bar">
+                                        <div className="progress" style={{ width: `${progress}%` }}></div>
+                                    </div>
+                                    <span className="progress-text">{Math.min(progress, 100).toFixed(0)}%</span>
+                                </div>
+                            </div>
+                        )}
+
+                        {callStatus === "scam-detected" && (
+                            <div className="scam-alert">
+                                <div className="milestone-log-stack">
+                                    <p className="milestone-log red-glow">
+                                        🚨 SCAM DETECTED | Confidence: 94.2% | Synthetic voice patterns identified
+                                    </p>
+                                </div>
+                                <div className="warning-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path
+                                            d="M12 9V11M12 15H12.01M5.07183 19H18.9282C20.4678 19 21.4301 17.3333 20.6603 16L13.7321 4C12.9623 2.66667 11.0378 2.66667 10.268 4L3.33978 16C2.56998 17.3333 3.53223 19 5.07183 19Z"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                        />
+                                    </svg>
+                                </div>
+                                <h2>SCAM ALERT</h2>
+                                <p className="scam-description">Deepfake AI voice detected</p>
+                                <button className="end-call-btn" onClick={handleDecline}>
+                                    <span className="icon">☎</span>
+                                    <span>End Call</span>
+                                </button>
+                            </div>
+                        )}
+                        {callStatus === "call-ended" && (
+                            <div className="call-ended-screen">
+                                <div className="call-ended-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path
+                                            d="M16 8L8 16M8 8L16 16M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                        />
+                                    </svg>
+                                </div>
+                                <h2>Call Ended</h2>
+                                <p className="call-duration">Duration: 1:24</p>
+                                <div className="call-summary">
+                                    <div className="summary-item">
+                                        <span className="summary-label">Result:</span>
+                                        <span className="summary-value scam">Scam Detected</span>
+                                    </div>
+                                    <div className="summary-item">
+                                        <span className="summary-label">Action:</span>
+                                        <span className="summary-value">Call terminated</span>
+                                    </div>
+                                </div>
+                                <button className="close-call-btn" onClick={handleDecline}>
+                                    <span className="icon">✕</span>
+                                    <span>Close</span>
+                                </button>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
-        </>
+        </div>
     );
 };
 
