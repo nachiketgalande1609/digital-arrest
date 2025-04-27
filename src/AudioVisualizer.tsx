@@ -3,9 +3,10 @@ import { useEffect, useRef } from "react";
 interface AudioVisualizerProps {
     audioRef: React.RefObject<HTMLAudioElement>;
     active?: boolean;
+    type: "victim" | "caller"; // Add this prop to distinguish between victim and caller
 }
 
-const AudioVisualizer = ({ audioRef, active = false }: AudioVisualizerProps) => {
+const AudioVisualizer = ({ audioRef, active = false, type }: AudioVisualizerProps) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const animationRef = useRef<number | null>(null);
     const audioContextRef = useRef<AudioContext | null>(null);
@@ -60,7 +61,7 @@ const AudioVisualizer = ({ audioRef, active = false }: AudioVisualizerProps) => 
                 ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
                 ctx.lineWidth = 2;
-                ctx.strokeStyle = "#00ffaa";
+                ctx.strokeStyle = type === "victim" ? "#00ffaa" : "#ff5555"; // Different colors for victim and caller
                 ctx.beginPath();
 
                 const sliceWidth = WIDTH / dataArray.length;
@@ -92,15 +93,16 @@ const AudioVisualizer = ({ audioRef, active = false }: AudioVisualizerProps) => 
             if (animationRef.current) {
                 cancelAnimationFrame(animationRef.current);
             }
-            // We intentionally don't disconnect the source here to maintain audio playback
         };
-    }, [active, audioRef]);
+    }, [active, audioRef, type]);
 
     return (
         <div className="visualizer-container">
             <canvas ref={canvasRef} width={300} height={80} className="audio-visualizer" />
             <div className="visualizer-labels">
-                <span className="visualizer-label">{active ? "ACTIVE" : "STANDBY"}</span>
+                <span className="visualizer-label">
+                    {type === "victim" ? "VICTIM" : "SCAMMER"} {active ? "ACTIVE" : "STANDBY"}
+                </span>
                 <div className={`visualizer-status ${active ? "active" : ""}`}></div>
             </div>
         </div>

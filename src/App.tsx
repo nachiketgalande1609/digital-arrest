@@ -51,7 +51,8 @@ const App: React.FC = () => {
     const victimTerminalRef = useRef<HTMLDivElement>(null);
     const scammerTerminalRef = useRef<HTMLDivElement>(null);
     const ringtoneRef = useRef<HTMLAudioElement | null>(null);
-    const audioPlayerRef = useRef<HTMLAudioElement | null>(null);
+    const victimAudioRef = useRef<HTMLAudioElement | null>(null);
+    const scammerAudioRef = useRef<HTMLAudioElement | null>(null);
 
     const addVictimLog = (message: string, type: LogEntry["type"] = "info") => {
         const timestamp = new Date().toISOString().split("T")[1].split(".")[0];
@@ -187,7 +188,6 @@ const App: React.FC = () => {
 
     const playAudioSequence = () => {
         if (currentAudioIndex >= audioFiles.length) {
-            // End of audio files
             setCallStatus("call-ended");
             addVictimLog("Call session completed", "success");
             addScammerLog("Call session terminated", "info");
@@ -197,15 +197,17 @@ const App: React.FC = () => {
         const currentAudio = audioFiles[currentAudioIndex];
         setActiveSpeaker(currentAudio.type === "victim" ? "victim" : "caller");
 
-        if (audioPlayerRef.current) {
-            audioPlayerRef.current.src = currentAudio.src;
-            audioPlayerRef.current.onended = () => {
+        // Use the appropriate audio ref based on who's speaking
+        const targetAudioRef = currentAudio.type === "victim" ? victimAudioRef : scammerAudioRef;
+
+        if (targetAudioRef.current) {
+            targetAudioRef.current.src = currentAudio.src;
+            targetAudioRef.current.onended = () => {
                 setCurrentAudioIndex((prev) => prev + 1);
             };
 
-            audioPlayerRef.current.play().catch((err) => {
+            targetAudioRef.current.play().catch((err) => {
                 console.error("Error playing audio:", err);
-                // If error occurs, skip to next after short delay
                 setTimeout(() => setCurrentAudioIndex((prev) => prev + 1), 1000);
             });
 
@@ -242,23 +244,18 @@ const App: React.FC = () => {
         setScammerLogs([]);
         setActiveSpeaker("caller");
         setCurrentAudioIndex(0);
-
-        // Stop any playing audio
-        if (audioPlayerRef.current) {
-            audioPlayerRef.current.pause();
-            audioPlayerRef.current.currentTime = 0;
-        }
     };
 
     return (
         <div style={{ width: "100vw" }}>
             <Navbar />
             <audio ref={ringtoneRef} src="/ringtone.mp3" />
-            <audio ref={audioPlayerRef} />
+            <audio ref={victimAudioRef} />
+            <audio ref={scammerAudioRef} />
             <div className="app-container">
                 {/* Victim Terminal (Left) */}
                 <div className="terminal-panel">
-                    {/* <AudioVisualizer audioRef={audioPlayerRef} active={activeSpeaker === "victim"} /> */}
+                    <AudioVisualizer audioRef={victimAudioRef} active={activeSpeaker === "victim"} type="victim" />{" "}
                     <div className="terminal-header">
                         <div className="terminal-buttons">
                             <div className="terminal-btn close"></div>
@@ -298,7 +295,7 @@ const App: React.FC = () => {
 
                 {/* Scammer Terminal (Right) */}
                 <div className="terminal-panel">
-                    <AudioVisualizer audioRef={audioPlayerRef} active={activeSpeaker === "caller"} />
+                    <AudioVisualizer audioRef={scammerAudioRef} active={activeSpeaker === "caller"} type="caller" />{" "}
                     <div className="terminal-header">
                         <div className="terminal-buttons">
                             <div className="terminal-btn close"></div>
