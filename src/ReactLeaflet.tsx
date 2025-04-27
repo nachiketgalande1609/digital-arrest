@@ -22,7 +22,7 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({ zoom, victimLocation, showT
         midpoint?: L.CircleMarker;
         rippleCircles?: L.Circle[];
     }>({});
-    const zoomIntervalRef = useRef<NodeJS.Timeout>();
+    const zoomIntervalRef = useRef<number | null>(null);
     const [currentZoom, setCurrentZoom] = useState(zoom);
 
     // Hyderabad coordinates
@@ -175,7 +175,7 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({ zoom, victimLocation, showT
             }).addTo(mapRef.current);
 
             // Add animated midpoint
-            const midpoint = [(victimLocation[0] + HYDERABAD_COORDS[0]) / 2, (victimLocation[1] + HYDERABAD_COORDS[1]) / 2];
+            const midpoint: [number, number] = [(victimLocation[0] + HYDERABAD_COORDS[0]) / 2, (victimLocation[1] + HYDERABAD_COORDS[1]) / 2];
 
             markersRef.current.midpoint = L.circleMarker(midpoint, {
                 radius: 3 + connectionStrength / 30,
