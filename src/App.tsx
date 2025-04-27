@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import "./App.css";
 import AudioVisualizer from "./AudioVisualizer";
 import Navbar from "./Navbar";
+import ReactLeaflet from "./ReactLeaflet"; // We'll create this component
 
 type CallStatus = "incoming" | "analyzing" | "scam-detected" | "call-ended";
 type LogEntry = {
@@ -266,6 +267,41 @@ const App: React.FC = () => {
         }
     }, [callStatus]);
 
+    const [mapCenter, setMapCenter] = useState<[number, number]>([20.5937, 78.9629]); // Center of India
+    const [mapZoom, setMapZoom] = useState<number>(5);
+    const [showTriangulation, setShowTriangulation] = useState<boolean>(false);
+
+    // Locations for victim and scammer
+    const locations = {
+        victim: [19.076, 72.8777] as [number, number], // Mumbai
+        scammer: [17.385, 78.4867] as [number, number], // Hyderabad
+    };
+
+    // Effect to handle map animation when call status changes
+    useEffect(() => {
+        if (callStatus === "analyzing") {
+            // Zoom in when analysis starts
+            setMapZoom(6);
+            setTimeout(() => setShowTriangulation(true), 1000);
+
+            // Alternate between centers during call
+            const interval = setInterval(() => {
+                setMapCenter((prev) => (prev[0] === locations.victim[0] ? locations.scammer : locations.victim));
+            }, 3000);
+
+            return () => clearInterval(interval);
+        } else if (callStatus === "scam-detected") {
+            // Focus on scammer location when detected
+            setMapCenter(locations.scammer);
+            setMapZoom(10);
+        } else {
+            // Reset when call ends
+            setMapCenter([20.5937, 78.9629]);
+            setMapZoom(5);
+            setShowTriangulation(false);
+        }
+    }, [callStatus]);
+
     return (
         <div style={{ width: "100vw" }}>
             <Navbar />
@@ -274,85 +310,101 @@ const App: React.FC = () => {
             <audio ref={victimAudioRef} />
             <audio ref={scammerAudioRef} />
             <div className="app-container">
-                {/* Victim Terminal (Left) */}
-                <div className="terminal-panel">
-                    <AudioVisualizer audioRef={victimAudioRef} active={activeSpeaker === "victim"} type="victim" />{" "}
-                    <div className="terminal-header">
-                        <div className="terminal-buttons">
-                            <div className="terminal-btn close"></div>
-                            <div className="terminal-btn minimize"></div>
-                            <div className="terminal-btn maximize"></div>
+                <div className="left-column">
+                    <div className="terminal-container">
+                        {/* Victim Terminal (Left) */}
+                        <div className="terminal-panel">
+                            <AudioVisualizer audioRef={victimAudioRef} active={activeSpeaker === "victim"} type="victim" />{" "}
+                            <div className="terminal-header">
+                                <div className="terminal-buttons">
+                                    <div className="terminal-btn close"></div>
+                                    <div className="terminal-btn minimize"></div>
+                                    <div className="terminal-btn maximize"></div>
+                                </div>
+                                <div className="terminal-title">
+                                    <span className="app-name">Victim Terminal</span>
+                                    <span className="app-version">v2.3.7</span>
+                                </div>
+                                <div className="terminal-status">
+                                    <div className={`status-indicator ${callStatus}`}></div>
+                                    <span>{callStatus.toUpperCase()}</span>
+                                </div>
+                            </div>
+                            <div className="terminal-body" ref={victimTerminalRef}>
+                                {victimLogs.map((log, index) => (
+                                    <div key={index} className={`log-entry ${log.type}`}>
+                                        <span className="timestamp">[{log.timestamp}]</span>
+                                        <span className="log-message">{log.message}</span>
+                                    </div>
+                                ))}
+                                {callStatus === "analyzing" && (
+                                    <div className="log-entry info">
+                                        <span className="timestamp">[{new Date().toISOString().split("T")[1].split(".")[0]}]</span>
+                                        <span className="log-message">
+                                            Analysis progress: {Math.min(progress, 100).toFixed(1)}% (ETA: {Math.floor((100 - progress) / 3)}s)
+                                        </span>
+                                    </div>
+                                )}
+                            </div>
+                            <div className="terminal-input">
+                                <span className="prompt">victim@analysis:~#</span>
+                                <span className="cursor">|</span>
+                            </div>
                         </div>
-                        <div className="terminal-title">
-                            <span className="app-name">Victim Terminal</span>
-                            <span className="app-version">v2.3.7</span>
-                        </div>
-                        <div className="terminal-status">
-                            <div className={`status-indicator ${callStatus}`}></div>
-                            <span>{callStatus.toUpperCase()}</span>
+
+                        {/* Scammer Terminal (Right) */}
+                        <div className="terminal-panel">
+                            <AudioVisualizer audioRef={scammerAudioRef} active={activeSpeaker === "caller"} type="caller" />{" "}
+                            <div className="terminal-header">
+                                <div className="terminal-buttons">
+                                    <div className="terminal-btn close"></div>
+                                    <div className="terminal-btn minimize"></div>
+                                    <div className="terminal-btn maximize"></div>
+                                </div>
+                                <div className="terminal-title">
+                                    <span className="app-name">Scam Detector</span>
+                                    <span className="app-version">v2.3.7</span>
+                                </div>
+                                <div className="terminal-status">
+                                    <div className={`status-indicator ${callStatus}`}></div>
+                                    <span>{callStatus.toUpperCase()}</span>
+                                </div>
+                            </div>
+                            <div className="terminal-body" ref={scammerTerminalRef}>
+                                {scammerLogs.map((log, index) => (
+                                    <div key={index} className={`log-entry ${log.type}`}>
+                                        <span className="timestamp">[{log.timestamp}]</span>
+                                        <span className="log-message">{log.message}</span>
+                                    </div>
+                                ))}
+                                {callStatus === "analyzing" && (
+                                    <div className="log-entry info">
+                                        <span className="timestamp">[{new Date().toISOString().split("T")[1].split(".")[0]}]</span>
+                                        <span className="log-message">
+                                            Detection progress: {Math.min(progress, 100).toFixed(1)}% (ETA: {Math.floor((100 - progress) / 3)}s)
+                                        </span>
+                                    </div>
+                                )}
+                            </div>
+                            <div className="terminal-input">
+                                <span className="prompt">scam@detector:~#</span>
+                                <span className="cursor">|</span>
+                            </div>
                         </div>
                     </div>
-                    <div className="terminal-body" ref={victimTerminalRef}>
-                        {victimLogs.map((log, index) => (
-                            <div key={index} className={`log-entry ${log.type}`}>
-                                <span className="timestamp">[{log.timestamp}]</span>
-                                <span className="log-message">{log.message}</span>
-                            </div>
-                        ))}
-                        {callStatus === "analyzing" && (
-                            <div className="log-entry info">
-                                <span className="timestamp">[{new Date().toISOString().split("T")[1].split(".")[0]}]</span>
-                                <span className="log-message">
-                                    Analysis progress: {Math.min(progress, 100).toFixed(1)}% (ETA: {Math.floor((100 - progress) / 3)}s)
-                                </span>
-                            </div>
-                        )}
-                    </div>
-                    <div className="terminal-input">
-                        <span className="prompt">victim@analysis:~#</span>
-                        <span className="cursor">|</span>
+
+                    <div className="map-container">
+                        <ReactLeaflet
+                            center={mapCenter}
+                            zoom={mapZoom}
+                            victimLocation={locations.victim}
+                            scammerLocation={locations.scammer}
+                            showTriangulation={showTriangulation}
+                            isCallActive={callStatus === "analyzing"}
+                        />
                     </div>
                 </div>
 
-                {/* Scammer Terminal (Right) */}
-                <div className="terminal-panel">
-                    <AudioVisualizer audioRef={scammerAudioRef} active={activeSpeaker === "caller"} type="caller" />{" "}
-                    <div className="terminal-header">
-                        <div className="terminal-buttons">
-                            <div className="terminal-btn close"></div>
-                            <div className="terminal-btn minimize"></div>
-                            <div className="terminal-btn maximize"></div>
-                        </div>
-                        <div className="terminal-title">
-                            <span className="app-name">Scam Detector</span>
-                            <span className="app-version">v2.3.7</span>
-                        </div>
-                        <div className="terminal-status">
-                            <div className={`status-indicator ${callStatus}`}></div>
-                            <span>{callStatus.toUpperCase()}</span>
-                        </div>
-                    </div>
-                    <div className="terminal-body" ref={scammerTerminalRef}>
-                        {scammerLogs.map((log, index) => (
-                            <div key={index} className={`log-entry ${log.type}`}>
-                                <span className="timestamp">[{log.timestamp}]</span>
-                                <span className="log-message">{log.message}</span>
-                            </div>
-                        ))}
-                        {callStatus === "analyzing" && (
-                            <div className="log-entry info">
-                                <span className="timestamp">[{new Date().toISOString().split("T")[1].split(".")[0]}]</span>
-                                <span className="log-message">
-                                    Detection progress: {Math.min(progress, 100).toFixed(1)}% (ETA: {Math.floor((100 - progress) / 3)}s)
-                                </span>
-                            </div>
-                        )}
-                    </div>
-                    <div className="terminal-input">
-                        <span className="prompt">scam@detector:~#</span>
-                        <span className="cursor">|</span>
-                    </div>
-                </div>
                 <div className="call-panel">
                     <div className={`call-screen ${callStatus}`}>
                         <div className="caller-info">
