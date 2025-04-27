@@ -151,7 +151,7 @@ const App: React.FC = () => {
 
                     return nextProgress;
                 });
-            }, 400);
+            }, 1300);
 
             return () => clearInterval(analysisInterval);
         }
@@ -204,7 +204,7 @@ const App: React.FC = () => {
     return (
         <>
             <audio ref={ringtoneRef} src="/ringtone.mp3" />
-            <audio ref={callRef} src="/initial_call.m4a" />
+            <audio ref={callRef} src="/recording.mp3" />
             <audio ref={aditiRef} src="/aditi.mp3" />
             <div className="app-container">
                 <div className="terminal-panel">
