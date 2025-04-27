@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./App.css";
+import AudioVisualizer from "./AudioVisualizer";
 
 type CallStatus = "incoming" | "analyzing" | "scam-detected" | "call-ended";
 type LogEntry = {
@@ -204,10 +205,50 @@ const App: React.FC = () => {
     return (
         <>
             <audio ref={ringtoneRef} src="/ringtone.mp3" />
-            <audio ref={callRef} src="/recording.mp3" />
+            <audio ref={callRef} src="/File1_Start.mp3" />
             <audio ref={aditiRef} src="/aditi.mp3" />
             <div className="app-container">
                 <div className="terminal-panel">
+                    <AudioVisualizer audioRef={activeSpeaker === "caller" ? callRef : callRef} active={callStatus == "analyzing"} />
+                    <div className="terminal-header">
+                        <div className="terminal-buttons">
+                            <div className="terminal-btn close"></div>
+                            <div className="terminal-btn minimize"></div>
+                            <div className="terminal-btn maximize"></div>
+                        </div>
+                        <div className="terminal-title">
+                            <span className="app-name">Digital</span>
+                            <span className="app-version">v2.3.7</span>
+                        </div>
+                        <div className="terminal-status">
+                            <div className={`status-indicator ${callStatus}`}></div>
+                            <span>{callStatus.toUpperCase()}</span>
+                        </div>
+                    </div>
+                    <div className="terminal-body" ref={terminalRef}>
+                        {logs.map((log, index) => (
+                            <div key={index} className={`log-entry ${log.type}`}>
+                                <span className="timestamp">[{log.timestamp}]</span>
+                                <span className="log-message">{log.message}</span>
+                            </div>
+                        ))}
+                        {callStatus === "analyzing" && (
+                            <div className="log-entry info">
+                                <span className="timestamp">[{new Date().toISOString().split("T")[1].split(".")[0]}]</span>
+                                <span className="log-message">
+                                    Analysis progress: {Math.min(progress, 100).toFixed(1)}% (ETA: {Math.floor((100 - progress) / 3)}s)
+                                </span>
+                            </div>
+                        )}
+                    </div>
+                    <div className="terminal-input">
+                        <span className="prompt">root@detection-engine:~#</span>
+                        <span className="cursor">|</span>
+                    </div>
+                </div>
+
+                <div className="terminal-panel">
+                    <AudioVisualizer audioRef={activeSpeaker === "aditi" ? callRef : aditiRef} active={callStatus == "scam-detected"} />
                     <div className="terminal-header">
                         <div className="terminal-buttons">
                             <div className="terminal-btn close"></div>
