@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
-import VictimPage from "./VictimPage";
-import TelangalanCyberSite from "./TelanganaCyberSite";
+import "./CyberSite.css";
+import AudioVisualizer from "./components/visualizer/AudioVisualizer";
+import Navbar from "./components/navbar/Navbar";
+import ReactLeaflet from "./ReactLeaflet"; // We'll create this component
+import ScammerDetailsModal from "./components/modal/ScammerDetailsModal";
 
 type CallStatus = "incoming" | "analyzing" | "scam-detected" | "call-ended";
 type LogEntry = {
@@ -23,7 +26,7 @@ const generateRandomUUID = (): string => {
     });
 };
 
-const App: React.FC = () => {
+const TelangalanCyberSite: React.FC = () => {
     const [callStatus, setCallStatus] = useState<CallStatus>("incoming");
     const [progress, setProgress] = useState<number>(0);
     const [victimLogs, setVictimLogs] = useState<LogEntry[]>([]);
@@ -305,10 +308,130 @@ const App: React.FC = () => {
 
     return (
         <div style={{ width: "100vw" }}>
-            <VictimPage />
-            <TelangalanCyberSite />
+            <Navbar />
+            <audio ref={ringtoneRef} src="/ringtone.mp3" />
+            <audio ref={beepRef} src="/beep.mp3" />
+            <audio ref={victimAudioRef} />
+            <audio ref={scammerAudioRef} />
+            <div className="cyber-main-container">
+                <div className="cyber-left-panel">
+                    <div className="cyber-terminal-wrapper">
+                        {/* Victim Terminal (Left) */}
+                        <div className="cyber-terminal-window">
+                            <AudioVisualizer audioRef={victimAudioRef} active={activeSpeaker === "victim"} type="victim" />
+                            <div className="cyber-terminal-topbar">
+                                <div className="cyber-terminal-controls">
+                                    <div className="cyber-terminal-btn cyber-terminal-btn-close"></div>
+                                    <div className="cyber-terminal-btn cyber-terminal-btn-minimize"></div>
+                                    <div className="cyber-terminal-btn cyber-terminal-btn-maximize"></div>
+                                </div>
+                                <div className="cyber-terminal-titlebar">
+                                    <span className="cyber-terminal-appname">Victim Terminal</span>
+                                    <span className="cyber-terminal-version">v2.3.7</span>
+                                </div>
+                                <div className="cyber-terminal-state">
+                                    <div
+                                        className={`cyber-status-indicator ${
+                                            callStatus === "incoming"
+                                                ? "cyber-status-incoming"
+                                                : callStatus === "analyzing"
+                                                ? "cyber-status-analyzing"
+                                                : callStatus === "scam-detected"
+                                                ? "cyber-status-detected"
+                                                : ""
+                                        }`}
+                                    ></div>
+                                    <span>{callStatus.toUpperCase()}</span>
+                                </div>
+                            </div>
+                            <div className="cyber-terminal-content cyber-terminal-scroll" ref={victimTerminalRef}>
+                                {victimLogs.map((log, index) => (
+                                    <div key={index} className={`cyber-log-entry ${log.type}`}>
+                                        <span className="cyber-log-time">[{log.timestamp}]</span>
+                                        <span className="cyber-log-message">{log.message}</span>
+                                    </div>
+                                ))}
+                                {callStatus === "analyzing" && (
+                                    <div className="cyber-log-entry info">
+                                        <span className="cyber-log-time">[{new Date().toISOString().split("T")[1].split(".")[0]}]</span>
+                                        <span className="cyber-log-message">
+                                            Analysis progress: {Math.min(progress, 100).toFixed(1)}% (ETA: {Math.floor((100 - progress) / 3)}s)
+                                        </span>
+                                    </div>
+                                )}
+                            </div>
+                            <div className="cyber-terminal-input">
+                                <span className="cyber-prompt">victim@analysis:~#</span>
+                                <span className="cyber-cursor">|</span>
+                            </div>
+                        </div>
+
+                        {/* Scammer Terminal (Right) */}
+                        <div className="cyber-terminal-window">
+                            <AudioVisualizer audioRef={scammerAudioRef} active={activeSpeaker === "caller"} type="caller" />
+                            <div className="cyber-terminal-topbar">
+                                <div className="cyber-terminal-controls">
+                                    <div className="cyber-terminal-btn cyber-terminal-btn-close"></div>
+                                    <div className="cyber-terminal-btn cyber-terminal-btn-minimize"></div>
+                                    <div className="cyber-terminal-btn cyber-terminal-btn-maximize"></div>
+                                </div>
+                                <div className="cyber-terminal-titlebar">
+                                    <span className="cyber-terminal-appname">Scam Detector</span>
+                                    <span className="cyber-terminal-version">v2.3.7</span>
+                                </div>
+                                <div className="cyber-terminal-state">
+                                    <div
+                                        className={`cyber-status-indicator ${
+                                            callStatus === "incoming"
+                                                ? "cyber-status-incoming"
+                                                : callStatus === "analyzing"
+                                                ? "cyber-status-analyzing"
+                                                : callStatus === "scam-detected"
+                                                ? "cyber-status-detected"
+                                                : ""
+                                        }`}
+                                    ></div>
+                                    <span>{callStatus.toUpperCase()}</span>
+                                </div>
+                            </div>
+                            <div className="cyber-terminal-content cyber-terminal-scroll" ref={scammerTerminalRef}>
+                                {scammerLogs.map((log, index) => (
+                                    <div key={index} className={`cyber-log-entry ${log.type}`}>
+                                        <span className="cyber-log-time">[{log.timestamp}]</span>
+                                        <span className="cyber-log-message">{log.message}</span>
+                                    </div>
+                                ))}
+                                {callStatus === "analyzing" && (
+                                    <div className="cyber-log-entry info">
+                                        <span className="cyber-log-time">[{new Date().toISOString().split("T")[1].split(".")[0]}]</span>
+                                        <span className="cyber-log-message">
+                                            Detection progress: {Math.min(progress, 100).toFixed(1)}% (ETA: {Math.floor((100 - progress) / 3)}s)
+                                        </span>
+                                    </div>
+                                )}
+                            </div>
+                            <div className="cyber-terminal-input">
+                                <span className="cyber-prompt">scam@detector:~#</span>
+                                <span className="cyber-cursor">|</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="map-container">
+                        <ReactLeaflet
+                            center={mapCenter}
+                            zoom={mapZoom}
+                            victimLocation={locations.victim}
+                            scammerLocation={locations.scammer}
+                            showTriangulation={showTriangulation}
+                            isCallActive={callStatus === "analyzing"}
+                        />
+                    </div>
+                </div>
+            </div>
+            {showScammerDetails && <ScammerDetailsModal onClose={() => setShowScammerDetails(false)} />}
         </div>
     );
 };
 
-export default App;
+export default TelangalanCyberSite;
