@@ -34,10 +34,32 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
     const [scammerLogs, setScammerLogs] = useState<Array<{ timestamp: string; message: string; type: string }>>([]);
     const victimTerminalRef = useRef<HTMLDivElement>(null);
     const scammerTerminalRef = useRef<HTMLDivElement>(null);
+    const loggingIntervalRef = useRef<number | null>(null);
 
     // Generate timestamp for logs
     const getTimestamp = () => {
         return new Date().toISOString().split("T")[1].split(".")[0];
+    };
+
+    // Generate random scammer details for ongoing logging
+    const generateScammerDetails = () => {
+        const locations = [
+            "Kolkata, West Bengal",
+            "Delhi NCR",
+            "Mumbai, Maharashtra",
+            "Chennai, Tamil Nadu",
+            "Hyderabad, Telangana",
+            "Bangalore, Karnataka",
+        ];
+        const networks = ["Jio Mobile Network", "Airtel Mobile Network", "Vi Mobile Network", "BSNL Landline", "Unknown VoIP Provider"];
+        const names = ["Ramesh Kumar", "Priya Sharma", "Vikram Singh", "Anjali Patel", "Rajesh Iyer"];
+
+        return {
+            location: locations[Math.floor(Math.random() * locations.length)],
+            network: networks[Math.floor(Math.random() * networks.length)],
+            name: names[Math.floor(Math.random() * names.length)],
+            callDuration: `${Math.floor(Math.random() * 10) + 1}m ${Math.floor(Math.random() * 60)}s`,
+        };
     };
 
     // Initialize logs when component mounts
@@ -84,7 +106,37 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
                 { timestamp: getTimestamp(), message: "Terminating call for your safety", type: "warning" },
                 { timestamp: getTimestamp(), message: "Call ended", type: "info" },
             ]);
+
+            // Start ongoing logging interval
+            loggingIntervalRef.current = setInterval(() => {
+                const details = generateScammerDetails();
+
+                const newScammerLogs = [
+                    { timestamp: getTimestamp(), message: `Tracking scammer movement: ${details.location}`, type: "info" },
+                    { timestamp: getTimestamp(), message: `Network analysis: ${details.network}`, type: "info" },
+                    { timestamp: getTimestamp(), message: `Probable scammer identity: ${details.name}`, type: "warning" },
+                    { timestamp: getTimestamp(), message: `Call duration analyzed: ${details.callDuration}`, type: "info" },
+                    { timestamp: getTimestamp(), message: "Updating cyber crime database...", type: "success" },
+                ];
+
+                setScammerLogs((prev) => [...prev, ...newScammerLogs]);
+
+                // Add occasional victim logs
+                if (Math.random() > 0.7) {
+                    setVictimLogs((prev) => [
+                        ...prev,
+                        { timestamp: getTimestamp(), message: "Cyber crime report generated", type: "info" },
+                        { timestamp: getTimestamp(), message: "Local authorities notified", type: "success" },
+                    ]);
+                }
+            }, 5000); // Log every 5 seconds
         }
+
+        return () => {
+            if (loggingIntervalRef.current) {
+                window.clearInterval(loggingIntervalRef.current);
+            }
+        };
     }, [callStatus]);
 
     // Auto-scroll terminals when new logs are added

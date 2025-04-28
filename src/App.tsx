@@ -70,8 +70,6 @@ const App: React.FC = () => {
         avatar: "https://img.freepik.com/premium-photo/male-customer-service-3d-cartoon-avatar-portrait_839035-522335.jpg",
     });
 
-    const victimTerminalRef = useRef<HTMLDivElement | null>(null);
-    const scammerTerminalRef = useRef<HTMLDivElement | null>(null);
     const ringtoneRef = useRef<HTMLAudioElement | null>(null);
     const victimAudioRef = useRef<HTMLAudioElement | null>(null);
     const scammerAudioRef = useRef<HTMLAudioElement | null>(null);
@@ -86,16 +84,6 @@ const App: React.FC = () => {
         const timestamp = new Date().toISOString().split("T")[1].split(".")[0];
         setScammerLogs((prev) => [...prev.slice(-200), { timestamp, message, type }]);
     };
-
-    // Auto-scroll terminals to bottom
-    useEffect(() => {
-        if (victimTerminalRef.current) {
-            victimTerminalRef.current.scrollTop = victimTerminalRef.current.scrollHeight;
-        }
-        if (scammerTerminalRef.current) {
-            scammerTerminalRef.current.scrollTop = scammerTerminalRef.current.scrollHeight;
-        }
-    }, [victimLogs, scammerLogs]);
 
     const logFeatureAnalysis = (isVictim: boolean) => {
         const features = ["pitch variance", "spectral centroid", "MFCC coefficients", "formant dispersion", "jitter", "shimmer", "harmonicity"];
