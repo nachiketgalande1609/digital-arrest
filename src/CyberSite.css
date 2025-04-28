@@ -78,7 +78,7 @@ body {
     flex-direction: column;
     flex: 1;
     gap: 20px;
-    height: calc(100vh - 100px);
+    height: calc(100vh - 120px);
 }
 
 .cyber-terminal-wrapper {

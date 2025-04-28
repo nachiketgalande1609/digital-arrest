@@ -43,14 +43,7 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
 
     // Generate random scammer details for ongoing logging
     const generateScammerDetails = () => {
-        const locations = [
-            "Kolkata, West Bengal",
-            "Delhi NCR",
-            "Mumbai, Maharashtra",
-            "Chennai, Tamil Nadu",
-            "Hyderabad, Telangana",
-            "Bangalore, Karnataka",
-        ];
+        const locations = ["Hyderabad, Telangana"];
         const networks = ["Jio Mobile Network", "Airtel Mobile Network", "Vi Mobile Network", "BSNL Landline", "Unknown VoIP Provider"];
         const names = ["Ramesh Kumar", "Priya Sharma", "Vikram Singh", "Anjali Patel", "Rajesh Iyer"];
 
