@@ -31,6 +31,7 @@ const App: React.FC = () => {
     const [activeSpeaker, setActiveSpeaker] = useState<"victim" | "caller">("caller");
     const [currentAudioIndex, setCurrentAudioIndex] = useState<number>(0);
     const [showScammerDetails, setShowScammerDetails] = useState<boolean>(false);
+    const [currentScreen, setCurrentScreen] = useState<"victim" | "cyber">("victim");
 
     const audioFiles = [
         { src: "/1_victim.mp3", type: "victim" },
@@ -224,8 +225,26 @@ const App: React.FC = () => {
         if (targetAudioRef.current) {
             targetAudioRef.current.src = currentAudio.src;
             targetAudioRef.current.onended = () => {
-                // Only mark as scam-detected when the last audio file (7_victim) finishes
-                if (currentAudioIndex === audioFiles.length - 1) {
+                // Special handling for the 7_victim.mp3 (index 6)
+                if (currentAudioIndex === 6) {
+                    setCallStatus("scam-detected");
+                    if (beepRef.current) {
+                        beepRef.current.currentTime = 0;
+                        beepRef.current.play().catch(console.error);
+                        // Switch to cyber site after beep plays
+                        beepRef.current.onended = () => {
+                            setCurrentScreen("cyber");
+                            // Continue with next audio
+                            setCurrentAudioIndex((prev) => prev + 1);
+                        };
+                    } else {
+                        // If beep fails, still switch screens
+                        setCurrentScreen("cyber");
+                        setCurrentAudioIndex((prev) => prev + 1);
+                    }
+                }
+                // For other audio files, just continue
+                else if (currentAudioIndex === audioFiles.length - 1) {
                     setCallStatus("scam-detected");
                 } else {
                     setCurrentAudioIndex((prev) => prev + 1);
@@ -235,7 +254,11 @@ const App: React.FC = () => {
             targetAudioRef.current.play().catch((err) => {
                 console.error("Error playing audio:", err);
                 setTimeout(() => {
-                    if (currentAudioIndex === audioFiles.length - 1) {
+                    if (currentAudioIndex === 6) {
+                        setCallStatus("scam-detected");
+                        setCurrentScreen("cyber");
+                        setCurrentAudioIndex((prev) => prev + 1);
+                    } else if (currentAudioIndex === audioFiles.length - 1) {
                         setCallStatus("scam-detected");
                     } else {
                         setCurrentAudioIndex((prev) => prev + 1);
@@ -280,8 +303,6 @@ const App: React.FC = () => {
 
     useEffect(() => {
         if (callStatus === "scam-detected" && beepRef.current) {
-            setShowScammerDetails(true);
-
             beepRef.current.currentTime = 0; // Rewind to start in case it's already playing
             beepRef.current.play().catch((err) => {
                 console.error("Error playing beep sound:", err);
@@ -326,42 +347,44 @@ const App: React.FC = () => {
 
     return (
         <>
-            <VictimPage
-                ringtoneRef={ringtoneRef}
-                beepRef={beepRef}
-                victimAudioRef={victimAudioRef}
-                scammerAudioRef={scammerAudioRef}
-                callStatus={callStatus}
-                scammerLogs={scammerLogs}
-                scammerTerminalRef={scammerTerminalRef}
-                progress={progress}
-                callerInfo={callerInfo}
-                activeSpeaker={activeSpeaker}
-                handleDecline={handleDecline}
-                handleAnswer={handleAnswer}
-                showScammerDetails={showScammerDetails}
-                setShowScammerDetails={setShowScammerDetails}
-            />
+            {currentScreen === "victim" && (
+                <VictimPage
+                    ringtoneRef={ringtoneRef}
+                    beepRef={beepRef}
+                    victimAudioRef={victimAudioRef}
+                    scammerAudioRef={scammerAudioRef}
+                    callStatus={callStatus}
+                    scammerLogs={scammerLogs}
+                    scammerTerminalRef={scammerTerminalRef}
+                    progress={progress}
+                    callerInfo={callerInfo}
+                    activeSpeaker={activeSpeaker}
+                    handleDecline={handleDecline}
+                    handleAnswer={handleAnswer}
+                />
+            )}
 
-            <TelangalanCyberSite
-                ringtoneRef={ringtoneRef}
-                beepRef={beepRef}
-                victimAudioRef={victimAudioRef}
-                scammerAudioRef={scammerAudioRef}
-                activeSpeaker={activeSpeaker}
-                callStatus={callStatus}
-                victimTerminalRef={victimTerminalRef}
-                victimLogs={victimLogs}
-                scammerTerminalRef={scammerTerminalRef}
-                progress={progress}
-                scammerLogs={scammerLogs}
-                mapCenter={mapCenter}
-                mapZoom={mapZoom}
-                locations={locations}
-                showTriangulation={showTriangulation}
-                showScammerDetails={showScammerDetails}
-                setShowScammerDetails={setShowScammerDetails}
-            />
+            {currentScreen === "cyber" && (
+                <TelangalanCyberSite
+                    ringtoneRef={ringtoneRef}
+                    beepRef={beepRef}
+                    victimAudioRef={victimAudioRef}
+                    scammerAudioRef={scammerAudioRef}
+                    activeSpeaker={activeSpeaker}
+                    callStatus={callStatus}
+                    victimTerminalRef={victimTerminalRef}
+                    victimLogs={victimLogs}
+                    scammerTerminalRef={scammerTerminalRef}
+                    progress={progress}
+                    scammerLogs={scammerLogs}
+                    mapCenter={mapCenter}
+                    mapZoom={mapZoom}
+                    locations={locations}
+                    showTriangulation={showTriangulation}
+                    showScammerDetails={showScammerDetails}
+                    setShowScammerDetails={setShowScammerDetails}
+                />
+            )}
         </>
     );
 };

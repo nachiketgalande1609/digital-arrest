@@ -45,6 +45,10 @@
     font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
+.screen-transition {
+    transition: opacity 0.5s ease-in-out;
+}
+
 body {
     background-color: var(--bg-dark);
     color: var(--text-primary);

@@ -15,8 +15,6 @@ interface VictimPageProps {
     activeSpeaker: "caller" | "victim";
     handleDecline: () => void;
     handleAnswer: () => void;
-    showScammerDetails: boolean;
-    setShowScammerDetails: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const VictimPage: React.FC<VictimPageProps> = ({
@@ -32,8 +30,6 @@ const VictimPage: React.FC<VictimPageProps> = ({
     activeSpeaker,
     handleDecline,
     handleAnswer,
-    showScammerDetails,
-    setShowScammerDetails,
 }) => {
     return (
         <div style={{ width: "100vw" }}>
@@ -220,7 +216,6 @@ const VictimPage: React.FC<VictimPageProps> = ({
                     </div>
                 </div>
             </div>
-            {showScammerDetails && <ScammerDetailsModal onClose={() => setShowScammerDetails(false)} />}
         </div>
     );
 };
