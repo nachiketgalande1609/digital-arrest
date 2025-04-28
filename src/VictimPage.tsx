@@ -1,6 +1,5 @@
 import React from "react";
 import "./App.css";
-import ScammerDetailsModal from "./components/modal/ScammerDetailsModal";
 
 interface VictimPageProps {
     ringtoneRef: React.RefObject<HTMLAudioElement | null>;
@@ -158,11 +157,6 @@ const VictimPage: React.FC<VictimPageProps> = ({
 
                         {callStatus === "scam-detected" && (
                             <div className="scam-alert">
-                                <div className="milestone-log-stack">
-                                    <p className="milestone-log red-glow">
-                                        🚨 SCAM DETECTED | Confidence: 94.2% | Synthetic voice patterns identified
-                                    </p>
-                                </div>
                                 <div className="warning-icon">
                                     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path
@@ -174,8 +168,8 @@ const VictimPage: React.FC<VictimPageProps> = ({
                                         />
                                     </svg>
                                 </div>
-                                <h2>SCAM ALERT</h2>
-                                <p className="scam-description">Deepfake AI voice detected</p>
+                                <h1>SCAM ALERT</h1>
+                                <h2>Transfering the Call to Telangana Cyber Bureau</h2>
                                 <button className="end-call-btn" onClick={handleDecline}>
                                     <span className="icon">☎</span>
                                     <span>End Call</span>
