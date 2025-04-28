@@ -208,7 +208,11 @@ const App: React.FC = () => {
         }
     }, [callStatus]);
 
+    const [isBeepPlaying, setIsBeepPlaying] = useState(false);
+
     const playAudioSequence = () => {
+        if (isBeepPlaying) return;
+
         if (currentAudioIndex >= audioFiles.length) {
             setCallStatus("call-ended");
             addVictimLog("Call session completed", "success");
@@ -229,13 +233,17 @@ const App: React.FC = () => {
                 if (currentAudioIndex === 6) {
                     setCallStatus("scam-detected");
                     if (beepRef.current) {
+                        setIsBeepPlaying(true);
                         beepRef.current.currentTime = 0;
                         beepRef.current.play().catch(console.error);
                         // Switch to cyber site after beep plays
                         beepRef.current.onended = () => {
-                            setCurrentScreen("cyber");
-                            // Continue with next audio
-                            setCurrentAudioIndex((prev) => prev + 1);
+                            setIsBeepPlaying(false);
+                            setTimeout(() => {
+                                setCurrentScreen("cyber");
+                                // Continue with next audio
+                                setCurrentAudioIndex((prev) => prev + 1);
+                            }, 1000);
                         };
                     } else {
                         // If beep fails, still switch screens
@@ -343,15 +351,13 @@ const App: React.FC = () => {
 
     return (
         <>
+            <audio ref={ringtoneRef} src="/ringtone.mp3" />
+            <audio ref={beepRef} src="/beep.mp3" />
+            <audio ref={victimAudioRef} />
+            <audio ref={scammerAudioRef} />
             {currentScreen === "victim" && (
                 <VictimPage
-                    ringtoneRef={ringtoneRef}
-                    beepRef={beepRef}
-                    victimAudioRef={victimAudioRef}
-                    scammerAudioRef={scammerAudioRef}
                     callStatus={callStatus}
-                    scammerLogs={scammerLogs}
-                    scammerTerminalRef={scammerTerminalRef}
                     progress={progress}
                     callerInfo={callerInfo}
                     activeSpeaker={activeSpeaker}
@@ -362,8 +368,6 @@ const App: React.FC = () => {
 
             {currentScreen === "cyber" && (
                 <TelangalanCyberSite
-                    ringtoneRef={ringtoneRef}
-                    beepRef={beepRef}
                     victimAudioRef={victimAudioRef}
                     scammerAudioRef={scammerAudioRef}
                     activeSpeaker={activeSpeaker}

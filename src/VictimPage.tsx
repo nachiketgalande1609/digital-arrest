@@ -1,14 +1,14 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./App.css";
 
+interface LogEntry {
+    timestamp: string;
+    message: string;
+    type: string;
+}
+
 interface VictimPageProps {
-    ringtoneRef: React.RefObject<HTMLAudioElement | null>;
-    beepRef: React.RefObject<HTMLAudioElement | null>;
-    victimAudioRef: React.RefObject<HTMLAudioElement | null>;
-    scammerAudioRef: React.RefObject<HTMLAudioElement | null>;
     callStatus: "incoming" | "analyzing" | "scam-detected" | "call-ended";
-    scammerLogs: Array<{ timestamp: string; message: string; type: string }>;
-    scammerTerminalRef: React.RefObject<HTMLDivElement | null>;
     progress: number;
     callerInfo: { avatar: string; name: string; number: string };
     activeSpeaker: "caller" | "victim";
@@ -16,26 +16,111 @@ interface VictimPageProps {
     handleAnswer: () => void;
 }
 
-const VictimPage: React.FC<VictimPageProps> = ({
-    ringtoneRef,
-    beepRef,
-    victimAudioRef,
-    scammerAudioRef,
-    callStatus,
-    scammerLogs,
-    scammerTerminalRef,
-    progress,
-    callerInfo,
-    activeSpeaker,
-    handleDecline,
-    handleAnswer,
-}) => {
+const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInfo, activeSpeaker, handleDecline, handleAnswer }) => {
+    const [logs, setLogs] = useState<LogEntry[]>([]);
+    const scammerTerminalRef = useRef<HTMLDivElement>(null);
+    const lastLogTimestamp = useRef<Date | null>(null);
+    const loggedSteps = useRef<Set<number>>(new Set());
+
+    // Helper function to add a new log entry with enhanced context
+    const addLog = (message: string, type: string = "info") => {
+        const timestamp = new Date().toISOString().split("T")[1].split(".")[0];
+        const now = new Date();
+
+        // Only log if enough time has passed since the last log (e.g., 1 second)
+        if (!lastLogTimestamp.current || now.getTime() - lastLogTimestamp.current.getTime() > 1000) {
+            setLogs((prev) => [...prev, { timestamp, message, type }]);
+            lastLogTimestamp.current = now;
+        }
+    };
+
+    // Scroll to bottom of terminal when logs update
+    useEffect(() => {
+        if (scammerTerminalRef.current) {
+            scammerTerminalRef.current.scrollTop = scammerTerminalRef.current.scrollHeight;
+        }
+    }, [logs]);
+
+    // Initialize logs when component mounts
+    useEffect(() => {
+        const initialLogs: LogEntry[] = [
+            { timestamp: new Date().toISOString().split("T")[1].split(".")[0], message: "Initializing scam detection system...", type: "system" },
+            { timestamp: new Date().toISOString().split("T")[1].split(".")[0], message: "Loading voice pattern databases...", type: "system" },
+            {
+                timestamp: new Date().toISOString().split("T")[1].split(".")[0],
+                message: "Connecting to Telangana Cyber Bureau API...",
+                type: "system",
+            },
+            {
+                timestamp: new Date().toISOString().split("T")[1].split(".")[0],
+                message: "System ready - waiting for incoming calls",
+                type: "success",
+            },
+        ];
+        setLogs(initialLogs);
+    }, []);
+
+    // Handle call status changes with detailed logging
+    useEffect(() => {
+        switch (callStatus) {
+            case "incoming":
+                addLog(`Incoming call detected from ${callerInfo.number}. Starting call screening process...`, "warning");
+                addLog(`Caller info: ${callerInfo.name} (${callerInfo.number})`, "info");
+                break;
+            case "analyzing":
+                addLog(`Analyzing voice patterns for ${activeSpeaker}...`, "info");
+                addLog("Comparing to known scam patterns and databases...", "info");
+                break;
+            case "scam-detected":
+                addLog("Pattern matches known IRS scam template.", "danger");
+                addLog("Alerting authorities and terminating call immediately.", "warning");
+                break;
+            case "call-ended":
+                addLog("Call terminated by user.", "info");
+                addLog("Saving analysis results to database for further investigation.", "system");
+                break;
+        }
+    }, [callStatus, callerInfo.number, activeSpeaker]);
+
+    // Handle progress updates with enhanced messages
+    useEffect(() => {
+        if (callStatus === "analyzing" && progress > 0 && progress <= 100) {
+            if (progress >= 20 && progress < 40 && !loggedSteps.current.has(1)) {
+                addLog(
+                    "Step 1 (2025‑04‑21T00:34:02Z): Captured VoIP SIP INVITE at edge firewall, extracted source IP 203.207.64.100, logged Call‑ID “ABC123XYZ” and timestamp.",
+                    "warning"
+                );
+                loggedSteps.current.add(1);
+            } else if (progress >= 40 && progress < 60 && !loggedSteps.current.has(2)) {
+                addLog(
+                    "Step 2 (2025‑04‑21T00:34:48Z): Ran WHOIS on 203.207.64.100; found allocation to EZECOM Ltd (AS24560), Phnom Penh, Cambodia; flagged in threat‑intel DB for past VoIP fraud reports.",
+                    "warning"
+                );
+                loggedSteps.current.add(2);
+            } else if (progress >= 60 && progress < 80 && !loggedSteps.current.has(3)) {
+                addLog(
+                    "Step 3 (2025‑04‑21T00:35:10Z): Cross‑referenced 203.207.64.100 against known VPN exit nodes—matched “ExpressVPN Phnom Penh Exit.” Submitted MLAT request to Cambodian Ministry of Post & Telecom for subscriber logs.",
+                    "warning"
+                );
+                loggedSteps.current.add(3);
+            } else if (progress >= 80 && progress < 90 && !loggedSteps.current.has(4)) {
+                addLog(
+                    "Step 4 (2025‑04‑21T00:35:34Z): Analyzed ISP NetFlow—identified NAT of 203.207.64.100:5060 to Smart Axiata 4G tower ID 10234 in Phnom Penh; updated geofence alert to cyber cell dashboard.",
+                    "warning"
+                );
+                loggedSteps.current.add(4);
+            } else if (progress >= 90 && progress <= 100 && !loggedSteps.current.has(5)) {
+                addLog(
+                    "Step 5 (2025‑04‑21T00:35:58Z): Finalized full packet capture; case CYB20250421‑0567 opened with Mumbai Cybercrime Dept and evidence forwarded via Interpol to Cambodia Cyber & Joint Crimes Unit for subscriber identification.",
+                    "error"
+                );
+                loggedSteps.current.add(5);
+            }
+        }
+    }, [progress, callStatus]);
+
     return (
         <div style={{ width: "100vw" }}>
-            <audio ref={ringtoneRef} src="/ringtone.mp3" />
-            <audio ref={beepRef} src="/beep.mp3" />
-            <audio ref={victimAudioRef} />
-            <audio ref={scammerAudioRef} />
             <div className="victim-container">
                 <div className="terminal-container">
                     {/* Single Terminal */}
@@ -56,7 +141,7 @@ const VictimPage: React.FC<VictimPageProps> = ({
                             </div>
                         </div>
                         <div className="terminal-body" ref={scammerTerminalRef}>
-                            {scammerLogs.map((log, index) => (
+                            {logs.map((log, index) => (
                                 <div key={index} className={`log-entry ${log.type}`}>
                                     <span className="timestamp">[{log.timestamp}]</span>
                                     <span className="log-message">{log.message}</span>
@@ -78,6 +163,7 @@ const VictimPage: React.FC<VictimPageProps> = ({
                     </div>
                 </div>
 
+                {/* Rest of your existing JSX remains the same */}
                 <div className="call-panel">
                     <div className={`call-screen ${callStatus}`}>
                         <div className="caller-info">
@@ -115,27 +201,29 @@ const VictimPage: React.FC<VictimPageProps> = ({
 
                         {callStatus === "analyzing" && (
                             <div className="analysis-container">
-                                <div className="milestone-log-stack">
-                                    {progress >= 20 && (
-                                        <p className={`milestone-log sky ${progress >= 40 ? "faded faded-4" : ""}`}>
+                                <div className="milestone-log">
+                                    {progress < 20 && <p className="milestone-log sky">🔍 Starting voice analysis...</p>}
+                                    {progress >= 20 && progress < 40 && (
+                                        <p className="milestone-log sky">
                                             📡 {activeSpeaker === "caller" ? "Scammer" : "Victim"} speaking - analyzing voice patterns
                                         </p>
                                     )}
-                                    {progress >= 40 && (
-                                        <p className={`milestone-log green ${progress >= 60 ? "faded faded-3" : ""}`}>
+                                    {progress >= 40 && progress < 60 && (
+                                        <p className="milestone-log green">
                                             🌐 Comparing to known {activeSpeaker === "caller" ? "scam" : "legitimate"} voice samples
                                         </p>
                                     )}
-                                    {progress >= 60 && (
-                                        <p className={`milestone-log yellow ${progress >= 80 ? "faded faded-2" : ""}`}>
+                                    {progress >= 60 && progress < 80 && (
+                                        <p className="milestone-log yellow">
                                             🔍 Detecting {activeSpeaker === "caller" ? "synthetic" : "natural"} speech characteristics
                                         </p>
                                     )}
-                                    {progress >= 80 && (
-                                        <p className={`milestone-log orange ${progress >= 100 ? "faded faded-1" : ""}`}>
+                                    {progress >= 80 && progress < 100 && (
+                                        <p className="milestone-log orange">
                                             📶 {activeSpeaker === "caller" ? "High" : "Low"} probability of voice manipulation
                                         </p>
                                     )}
+                                    {progress >= 100 && <p className="milestone-log red">✅ Analysis complete</p>}
                                 </div>
 
                                 <div className="analyzing-animation">

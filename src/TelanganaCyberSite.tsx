@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React from "react";
 import "./CyberSite.css";
 import AudioVisualizer from "./components/visualizer/AudioVisualizer";
 import Navbar from "./components/navbar/Navbar";
@@ -6,8 +6,6 @@ import ReactLeaflet from "./ReactLeaflet"; // We'll create this component
 import ScammerDetailsModal from "./components/modal/ScammerDetailsModal";
 
 interface TelangalanCyberSiteProps {
-    ringtoneRef: React.RefObject<HTMLAudioElement | null>;
-    beepRef: React.RefObject<HTMLAudioElement | null>;
     victimAudioRef: React.RefObject<HTMLAudioElement | null>;
     scammerAudioRef: React.RefObject<HTMLAudioElement | null>;
     activeSpeaker: "caller" | "victim";
@@ -26,8 +24,6 @@ interface TelangalanCyberSiteProps {
 }
 
 const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
-    ringtoneRef,
-    beepRef,
     victimAudioRef,
     scammerAudioRef,
     activeSpeaker,
@@ -47,10 +43,6 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
     return (
         <div style={{ width: "100vw" }}>
             <Navbar />
-            <audio ref={ringtoneRef} src="/ringtone.mp3" />
-            <audio ref={beepRef} src="/beep.mp3" />
-            <audio ref={victimAudioRef} />
-            <audio ref={scammerAudioRef} />
             <div className="cyber-main-container">
                 <div className="cyber-left-panel">
                     <div className="cyber-terminal-wrapper">
