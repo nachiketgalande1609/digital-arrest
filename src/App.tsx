@@ -42,25 +42,25 @@ const App: React.FC = () => {
         { src: "/6_scammer.mp3", type: "caller" },
         { src: "/7_victim.mp3", type: "victim" },
         { src: "/8_scammer.m4a", type: "victim" },
-        { src: "/9_victim.mp3", type: "victim" },
+        { src: "/9_deepfake.mp3", type: "victim" },
         { src: "/10_scammer.m4a", type: "victim" },
-        { src: "/11_victim.mp3", type: "victim" },
+        { src: "/11_deepfake.mp3", type: "victim" },
         { src: "/12_scammer.m4a", type: "victim" },
-        { src: "/13_victim.mp3", type: "victim" },
+        { src: "/13_deepfake.mp3", type: "victim" },
         { src: "/14_scammer.m4a", type: "victim" },
-        { src: "/15_victim.mp3", type: "victim" },
+        { src: "/15_deepfake.mp3", type: "victim" },
         { src: "/16_scammer.m4a", type: "victim" },
-        { src: "/17_victim.mp3", type: "victim" },
+        { src: "/17_deepfake.mp3", type: "victim" },
         { src: "/18_scammer.m4a", type: "victim" },
-        { src: "/19_victim.mp3", type: "victim" },
+        { src: "/19_deepfake.mp3", type: "victim" },
         { src: "/20_scammer.m4a", type: "victim" },
-        { src: "/21_victim.mp3", type: "victim" },
+        { src: "/21_deepfake.mp3", type: "victim" },
         { src: "/22_scammer.m4a", type: "victim" },
-        { src: "/23_victim.mp3", type: "victim" },
+        { src: "/23_deepfake.mp3", type: "victim" },
         { src: "/24_scammer.m4a", type: "victim" },
-        { src: "/25_victim.mp3", type: "victim" },
+        { src: "/25_deepfake.mp3", type: "victim" },
         { src: "/26_scammer.m4a", type: "victim" },
-        { src: "/27_victim.mp3", type: "victim" },
+        { src: "/27_deepfake.mp3", type: "victim" },
         { src: "/28_scammer.m4a", type: "victim" },
     ];
 
@@ -242,7 +242,6 @@ const App: React.FC = () => {
                         setCurrentScreen("cyber");
                         setCurrentAudioIndex((prev) => prev + 1);
                     }
-                    setCallStatus("scam-detected");
                 } else {
                     setCurrentAudioIndex((prev) => prev + 1);
                 }
@@ -275,7 +274,7 @@ const App: React.FC = () => {
     };
 
     useEffect(() => {
-        if (callStatus === "analyzing") {
+        if (callStatus === "analyzing" || callStatus === "scam-detected") {
             playAudioSequence();
         }
     }, [currentAudioIndex, callStatus]);
