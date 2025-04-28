@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./App.css";
-import AudioVisualizer from "./AudioVisualizer";
-import Navbar from "./Navbar";
+import AudioVisualizer from "./components/visualizer/AudioVisualizer";
+import Navbar from "./components/navbar/Navbar";
 import ReactLeaflet from "./ReactLeaflet"; // We'll create this component
+import ScammerDetailsModal from "./components/modal/ScammerDetailsModal";
 
 type CallStatus = "incoming" | "analyzing" | "scam-detected" | "call-ended";
 type LogEntry = {
@@ -32,6 +33,7 @@ const App: React.FC = () => {
     const [scammerLogs, setScammerLogs] = useState<LogEntry[]>([]);
     const [activeSpeaker, setActiveSpeaker] = useState<"victim" | "caller">("caller");
     const [currentAudioIndex, setCurrentAudioIndex] = useState<number>(0);
+    const [showScammerDetails, setShowScammerDetails] = useState<boolean>(false);
 
     const audioFiles = [
         { src: "/1_victim.mp3", type: "victim" },
@@ -260,6 +262,8 @@ const App: React.FC = () => {
 
     useEffect(() => {
         if (callStatus === "scam-detected" && beepRef.current) {
+            setShowScammerDetails(true);
+
             beepRef.current.currentTime = 0; // Rewind to start in case it's already playing
             beepRef.current.play().catch((err) => {
                 console.error("Error playing beep sound:", err);
@@ -542,6 +546,7 @@ const App: React.FC = () => {
                     </div>
                 </div>
             </div>
+            {showScammerDetails && <ScammerDetailsModal onClose={() => setShowScammerDetails(false)} />}
         </div>
     );
 };
