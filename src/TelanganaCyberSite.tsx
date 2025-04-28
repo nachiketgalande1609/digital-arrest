@@ -6,20 +6,20 @@ import ReactLeaflet from "./ReactLeaflet"; // We'll create this component
 import ScammerDetailsModal from "./components/modal/ScammerDetailsModal";
 
 interface TelangalanCyberSiteProps {
-    ringtoneRef: React.RefObject<HTMLAudioElement>;
-    beepRef: React.RefObject<HTMLAudioElement>;
-    victimAudioRef: React.RefObject<HTMLAudioElement>;
-    scammerAudioRef: React.RefObject<HTMLAudioElement>;
+    ringtoneRef: React.RefObject<HTMLAudioElement | null>;
+    beepRef: React.RefObject<HTMLAudioElement | null>;
+    victimAudioRef: React.RefObject<HTMLAudioElement | null>;
+    scammerAudioRef: React.RefObject<HTMLAudioElement | null>;
     activeSpeaker: "caller" | "victim";
     callStatus: "incoming" | "analyzing" | "scam-detected" | "call-ended";
-    victimTerminalRef: React.RefObject<HTMLDivElement>;
+    victimTerminalRef: React.RefObject<HTMLDivElement | null>;
     victimLogs: Array<{ timestamp: string; message: string; type: string }>;
-    scammerTerminalRef: React.RefObject<HTMLDivElement>;
+    scammerTerminalRef: React.RefObject<HTMLDivElement | null>;
     progress: number;
     scammerLogs: Array<{ timestamp: string; message: string; type: string }>;
-    mapCenter: { lat: number; lng: number };
+    mapCenter: [number, number];
     mapZoom: number;
-    locations: Array<{ lat: number; lng: number; label: string }>;
+    locations: { victim: [number, number]; scammer: [number, number] };
     showTriangulation: boolean;
     showScammerDetails: boolean;
     setShowScammerDetails: React.Dispatch<React.SetStateAction<boolean>>;
@@ -149,7 +149,7 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
 
                     <div className="map-container">
                         <ReactLeaflet
-                            center={[mapCenter.lat, mapCenter.lng]}
+                            center={[mapCenter[0], mapCenter[1]]}
                             zoom={mapZoom}
                             victimLocation={locations.victim}
                             scammerLocation={locations.scammer}

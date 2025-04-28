@@ -70,8 +70,8 @@ const App: React.FC = () => {
         avatar: "https://img.freepik.com/premium-photo/male-customer-service-3d-cartoon-avatar-portrait_839035-522335.jpg",
     });
 
-    const victimTerminalRef = useRef<HTMLDivElement>(null);
-    const scammerTerminalRef = useRef<HTMLDivElement>(null);
+    const victimTerminalRef = useRef<HTMLDivElement | null>(null);
+    const scammerTerminalRef = useRef<HTMLDivElement | null>(null);
     const ringtoneRef = useRef<HTMLAudioElement | null>(null);
     const victimAudioRef = useRef<HTMLAudioElement | null>(null);
     const scammerAudioRef = useRef<HTMLAudioElement | null>(null);
@@ -242,9 +242,6 @@ const App: React.FC = () => {
                         setCurrentScreen("cyber");
                         setCurrentAudioIndex((prev) => prev + 1);
                     }
-                }
-                // For other audio files, just continue
-                else if (currentAudioIndex === audioFiles.length - 1) {
                     setCallStatus("scam-detected");
                 } else {
                     setCurrentAudioIndex((prev) => prev + 1);

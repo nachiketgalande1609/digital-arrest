@@ -3,13 +3,13 @@ import "./App.css";
 import ScammerDetailsModal from "./components/modal/ScammerDetailsModal";
 
 interface VictimPageProps {
-    ringtoneRef: React.RefObject<HTMLAudioElement>;
-    beepRef: React.RefObject<HTMLAudioElement>;
-    victimAudioRef: React.RefObject<HTMLAudioElement>;
-    scammerAudioRef: React.RefObject<HTMLAudioElement>;
+    ringtoneRef: React.RefObject<HTMLAudioElement | null>;
+    beepRef: React.RefObject<HTMLAudioElement | null>;
+    victimAudioRef: React.RefObject<HTMLAudioElement | null>;
+    scammerAudioRef: React.RefObject<HTMLAudioElement | null>;
     callStatus: "incoming" | "analyzing" | "scam-detected" | "call-ended";
     scammerLogs: Array<{ timestamp: string; message: string; type: string }>;
-    scammerTerminalRef: React.RefObject<HTMLDivElement>;
+    scammerTerminalRef: React.RefObject<HTMLDivElement | null>;
     progress: number;
     callerInfo: { avatar: string; name: string; number: string };
     activeSpeaker: "caller" | "victim";
