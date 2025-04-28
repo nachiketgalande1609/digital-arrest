@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./CyberSite.css";
 import AudioVisualizer from "./components/visualizer/AudioVisualizer";
 import Navbar from "./components/navbar/Navbar";
-import ReactLeaflet from "./ReactLeaflet"; // We'll create this component
+import ReactLeaflet from "./ReactLeaflet";
 import ScammerDetailsModal from "./components/modal/ScammerDetailsModal";
 
 interface TelangalanCyberSiteProps {
@@ -10,11 +10,6 @@ interface TelangalanCyberSiteProps {
     scammerAudioRef: React.RefObject<HTMLAudioElement | null>;
     activeSpeaker: "caller" | "victim";
     callStatus: "incoming" | "analyzing" | "scam-detected" | "call-ended";
-    victimTerminalRef: React.RefObject<HTMLDivElement | null>;
-    victimLogs: Array<{ timestamp: string; message: string; type: string }>;
-    scammerTerminalRef: React.RefObject<HTMLDivElement | null>;
-    progress: number;
-    scammerLogs: Array<{ timestamp: string; message: string; type: string }>;
     mapCenter: [number, number];
     mapZoom: number;
     locations: { victim: [number, number]; scammer: [number, number] };
@@ -28,11 +23,6 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
     scammerAudioRef,
     activeSpeaker,
     callStatus,
-    victimTerminalRef,
-    victimLogs,
-    scammerTerminalRef,
-    progress,
-    scammerLogs,
     mapCenter,
     mapZoom,
     locations,
@@ -40,6 +30,73 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
     showScammerDetails,
     setShowScammerDetails,
 }) => {
+    const [victimLogs, setVictimLogs] = useState<Array<{ timestamp: string; message: string; type: string }>>([]);
+    const [scammerLogs, setScammerLogs] = useState<Array<{ timestamp: string; message: string; type: string }>>([]);
+    const victimTerminalRef = useRef<HTMLDivElement>(null);
+    const scammerTerminalRef = useRef<HTMLDivElement>(null);
+
+    // Generate timestamp for logs
+    const getTimestamp = () => {
+        return new Date().toISOString().split("T")[1].split(".")[0];
+    };
+
+    // Initialize logs when component mounts
+    useEffect(() => {
+        // Victim logs
+        const initialVictimLogs = [
+            { timestamp: getTimestamp(), message: "Incoming call detected", type: "info" },
+            { timestamp: getTimestamp(), message: "Caller ID: +91 98765 43210", type: "info" },
+            { timestamp: getTimestamp(), message: "Answering call...", type: "info" },
+            { timestamp: getTimestamp(), message: "Call connected", type: "success" },
+            { timestamp: getTimestamp(), message: "Call analysis initiated", type: "warning" },
+        ];
+
+        // Scammer logs
+        const initialScammerLogs = [
+            { timestamp: getTimestamp(), message: "Call pattern analysis started", type: "info" },
+            { timestamp: getTimestamp(), message: "Voice signature captured", type: "success" },
+            { timestamp: getTimestamp(), message: "Keyword detection active", type: "info" },
+            { timestamp: getTimestamp(), message: "Suspicious keywords detected: 'bank account', 'OTP', 'refund'", type: "warning" },
+        ];
+
+        setVictimLogs(initialVictimLogs);
+        setScammerLogs(initialScammerLogs);
+    }, [callStatus]);
+
+    // Add scam detection logs when callStatus changes to scam-detected
+    useEffect(() => {
+        if (callStatus === "scam-detected") {
+            const scamDetectedLogs = [
+                { timestamp: getTimestamp(), message: "WARNING: High probability scam call detected!", type: "error" },
+                { timestamp: getTimestamp(), message: "Caller matches known scam patterns", type: "error" },
+                { timestamp: getTimestamp(), message: "Voice signature matches known scammer database", type: "error" },
+                { timestamp: getTimestamp(), message: "Location triangulation complete", type: "info" },
+                { timestamp: getTimestamp(), message: "Scammer location pinpointed", type: "success" },
+                { timestamp: getTimestamp(), message: "Alerting authorities...", type: "info" },
+            ];
+
+            setScammerLogs((prev) => [...prev, ...scamDetectedLogs]);
+
+            // Add corresponding victim logs
+            setVictimLogs((prev) => [
+                ...prev,
+                { timestamp: getTimestamp(), message: "WARNING: Potential scam detected!", type: "error" },
+                { timestamp: getTimestamp(), message: "Terminating call for your safety", type: "warning" },
+                { timestamp: getTimestamp(), message: "Call ended", type: "info" },
+            ]);
+        }
+    }, [callStatus]);
+
+    // Auto-scroll terminals when new logs are added
+    useEffect(() => {
+        if (victimTerminalRef.current) {
+            victimTerminalRef.current.scrollTop = victimTerminalRef.current.scrollHeight;
+        }
+        if (scammerTerminalRef.current) {
+            scammerTerminalRef.current.scrollTop = scammerTerminalRef.current.scrollHeight;
+        }
+    }, [victimLogs, scammerLogs]);
+
     return (
         <div style={{ width: "100vw" }}>
             <Navbar />
@@ -81,14 +138,6 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
                                         <span className="cyber-log-message">{log.message}</span>
                                     </div>
                                 ))}
-                                {callStatus === "analyzing" && (
-                                    <div className="cyber-log-entry info">
-                                        <span className="cyber-log-time">[{new Date().toISOString().split("T")[1].split(".")[0]}]</span>
-                                        <span className="cyber-log-message">
-                                            Analysis progress: {Math.min(progress, 100).toFixed(1)}% (ETA: {Math.floor((100 - progress) / 3)}s)
-                                        </span>
-                                    </div>
-                                )}
                             </div>
                         </div>
 
@@ -127,14 +176,6 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
                                         <span className="cyber-log-message">{log.message}</span>
                                     </div>
                                 ))}
-                                {callStatus === "analyzing" && (
-                                    <div className="cyber-log-entry info">
-                                        <span className="cyber-log-time">[{new Date().toISOString().split("T")[1].split(".")[0]}]</span>
-                                        <span className="cyber-log-message">
-                                            Detection progress: {Math.min(progress, 100).toFixed(1)}% (ETA: {Math.floor((100 - progress) / 3)}s)
-                                        </span>
-                                    </div>
-                                )}
                             </div>
                         </div>
                     </div>
