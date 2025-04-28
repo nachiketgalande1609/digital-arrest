@@ -360,10 +360,6 @@ const TelangalanCyberSite: React.FC = () => {
                                     </div>
                                 )}
                             </div>
-                            <div className="cyber-terminal-input">
-                                <span className="cyber-prompt">victim@analysis:~#</span>
-                                <span className="cyber-cursor">|</span>
-                            </div>
                         </div>
 
                         {/* Scammer Terminal (Right) */}
@@ -409,10 +405,6 @@ const TelangalanCyberSite: React.FC = () => {
                                         </span>
                                     </div>
                                 )}
-                            </div>
-                            <div className="cyber-terminal-input">
-                                <span className="cyber-prompt">scam@detector:~#</span>
-                                <span className="cyber-cursor">|</span>
                             </div>
                         </div>
                     </div>
