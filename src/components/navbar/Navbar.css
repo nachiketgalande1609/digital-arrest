@@ -6,16 +6,17 @@
     left: 0;
     right: 0;
     z-index: 1000;
-    height: 60px;
+    height: 80px;
 }
 
 .navbar-container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 2rem;
+    padding: 30px 2rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    height: 100%;
 }
 
 .navbar-left {
@@ -25,14 +26,18 @@
 }
 
 .navbar-logo-img {
-    height: 40px;
-    width: auto;
+    height: 80px;
+    width: 80px !important;
+    object-fit: cover;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1) width: auto;
 }
 
 .navbar-title {
-    color: #9c5f34;
+    color: #5b361b;
+
     font-size: 1.5rem;
-    font-weight: 600;
+    font-weight: 800;
     margin: 0;
 }
 

@@ -6,7 +6,10 @@ const Navbar = () => {
             <div className="navbar-container">
                 <div className="navbar-left">
                     <img src="/logo.png" alt="Telangana Cyber Cell Logo" className="navbar-logo-img" />
-                    <h1 className="navbar-title">Telangana Cyber Cell</h1>
+                    <div>
+                        <h1 className="navbar-title">Telangana</h1>
+                        <h1 className="navbar-title">Cyber Security Bureau</h1>
+                    </div>
                 </div>
             </div>
         </nav>
