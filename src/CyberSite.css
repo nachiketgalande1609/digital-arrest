@@ -18,6 +18,11 @@
     --cyber-transition: all 0.2s ease;
 }
 
+body {
+    width: 100%;
+    overflow-x: hidden;
+}
+
 .cyber-terminal-scroll::-webkit-scrollbar {
     width: 6px;
 }

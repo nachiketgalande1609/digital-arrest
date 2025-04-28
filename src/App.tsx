@@ -304,7 +304,7 @@ const App: React.FC = () => {
     }, [callStatus]);
 
     return (
-        <div style={{ width: "100vw" }}>
+        <>
             <VictimPage
                 ringtoneRef={ringtoneRef}
                 beepRef={beepRef}
@@ -341,7 +341,7 @@ const App: React.FC = () => {
                 showScammerDetails={showScammerDetails}
                 setShowScammerDetails={setShowScammerDetails}
             />
-        </div>
+        </>
     );
 };
 
