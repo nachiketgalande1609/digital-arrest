@@ -305,8 +305,42 @@ const App: React.FC = () => {
 
     return (
         <div style={{ width: "100vw" }}>
-            <VictimPage />
-            <TelangalanCyberSite />
+            <VictimPage
+                ringtoneRef={ringtoneRef}
+                beepRef={beepRef}
+                victimAudioRef={victimAudioRef}
+                scammerAudioRef={scammerAudioRef}
+                callStatus={callStatus}
+                scammerLogs={scammerLogs}
+                scammerTerminalRef={scammerTerminalRef}
+                progress={progress}
+                callerInfo={callerInfo}
+                activeSpeaker={activeSpeaker}
+                handleDecline={handleDecline}
+                handleAnswer={handleAnswer}
+                showScammerDetails={showScammerDetails}
+                setShowScammerDetails={setShowScammerDetails}
+            />
+
+            <TelangalanCyberSite
+                ringtoneRef={ringtoneRef}
+                beepRef={beepRef}
+                victimAudioRef={victimAudioRef}
+                scammerAudioRef={scammerAudioRef}
+                activeSpeaker={activeSpeaker}
+                callStatus={callStatus}
+                victimTerminalRef={victimTerminalRef}
+                victimLogs={victimLogs}
+                scammerTerminalRef={scammerTerminalRef}
+                progress={progress}
+                scammerLogs={scammerLogs}
+                mapCenter={mapCenter}
+                mapZoom={mapZoom}
+                locations={locations}
+                showTriangulation={showTriangulation}
+                showScammerDetails={showScammerDetails}
+                setShowScammerDetails={setShowScammerDetails}
+            />
         </div>
     );
 };

@@ -1,231 +1,40 @@
-import React, { useState, useEffect, useRef } from "react";
+import React from "react";
 import "./App.css";
 import ScammerDetailsModal from "./components/modal/ScammerDetailsModal";
 
-type CallStatus = "incoming" | "analyzing" | "scam-detected" | "call-ended";
-type LogEntry = {
-    timestamp: string;
-    message: string;
-    type: "info" | "warning" | "error" | "success" | "debug";
-};
-
-interface CallerInfo {
-    name: string;
-    number: string;
-    avatar: string;
+interface VictimPageProps {
+    ringtoneRef: React.RefObject<HTMLAudioElement>;
+    beepRef: React.RefObject<HTMLAudioElement>;
+    victimAudioRef: React.RefObject<HTMLAudioElement>;
+    scammerAudioRef: React.RefObject<HTMLAudioElement>;
+    callStatus: "incoming" | "analyzing" | "scam-detected" | "call-ended";
+    scammerLogs: Array<{ timestamp: string; message: string; type: string }>;
+    scammerTerminalRef: React.RefObject<HTMLDivElement>;
+    progress: number;
+    callerInfo: { avatar: string; name: string; number: string };
+    activeSpeaker: "caller" | "victim";
+    handleDecline: () => void;
+    handleAnswer: () => void;
+    showScammerDetails: boolean;
+    setShowScammerDetails: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const generateRandomUUID = (): string => {
-    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
-        const r = (Math.random() * 16) | 0,
-            v = c === "x" ? r : (r & 0x3) | 0x8;
-        return v.toString(16);
-    });
-};
-
-const VictimPage: React.FC = () => {
-    const [callStatus, setCallStatus] = useState<CallStatus>("incoming");
-    const [progress, setProgress] = useState<number>(0);
-    const [scammerLogs, setScammerLogs] = useState<LogEntry[]>([]);
-    const [activeSpeaker, setActiveSpeaker] = useState<"victim" | "caller">("caller");
-    const [currentAudioIndex, setCurrentAudioIndex] = useState<number>(0);
-    const [showScammerDetails, setShowScammerDetails] = useState<boolean>(false);
-
-    const audioFiles = [
-        { src: "/1_victim.mp3", type: "victim" },
-        { src: "/2_scammer.mp3", type: "caller" },
-        { src: "/3_victim.mp3", type: "victim" },
-        { src: "/4_scammer.mp3", type: "caller" },
-        { src: "/5_victim.mp3", type: "victim" },
-        { src: "/6_scammer.mp3", type: "caller" },
-        { src: "/7_victim.mp3", type: "victim" },
-    ];
-
-    const [callerInfo] = useState<CallerInfo>({
-        name: "Unknown Caller",
-        number: "+1 (555) 123-4567",
-        avatar: "https://img.freepik.com/premium-photo/male-customer-service-3d-cartoon-avatar-portrait_839035-522335.jpg",
-    });
-
-    const scammerTerminalRef = useRef<HTMLDivElement>(null);
-    const ringtoneRef = useRef<HTMLAudioElement | null>(null);
-    const victimAudioRef = useRef<HTMLAudioElement | null>(null);
-    const scammerAudioRef = useRef<HTMLAudioElement | null>(null);
-    const beepRef = useRef<HTMLAudioElement | null>(null);
-
-    const addScammerLog = (message: string, type: LogEntry["type"] = "info") => {
-        const timestamp = new Date().toISOString().split("T")[1].split(".")[0];
-        setScammerLogs((prev) => [...prev.slice(-200), { timestamp, message, type }]);
-    };
-
-    const logFeatureAnalysis = () => {
-        const features = ["pitch variance", "spectral centroid", "MFCC coefficients", "formant dispersion", "jitter", "shimmer", "harmonicity"];
-        const feature = features[Math.floor(Math.random() * features.length)];
-        addScammerLog(`Analyzing ${feature}: deviation ${(Math.random() * 10).toFixed(2)}%`, "info");
-    };
-
-    const logModelUpdate = () => {
-        if (Math.random() > 0.9) {
-            addScammerLog(`Updating detection model weights (epoch: ${Math.floor(Math.random() * 100)}, loss: ${Math.random().toFixed(4)})`, "debug");
-        }
-    };
-
-    // Simulate call flow with reduced logging
-    useEffect(() => {
-        if (callStatus === "incoming") {
-            addScammerLog("=== SCAM DETECTOR TERMINAL v2.3.7 ===", "info");
-            addScammerLog("Initializing scam detection...", "info");
-            addScammerLog(`Session ID: ${generateRandomUUID()}`, "debug");
-            addScammerLog("Loading threat intelligence...", "info");
-            addScammerLog('Model "spectral-v3" loaded (28.2MB)', "success");
-            addScammerLog("Call initiated to victim", "info");
-        }
-
-        if (callStatus === "analyzing") {
-            addScammerLog("=== BEGINNING SCAMMER ANALYSIS ===", "info");
-            addScammerLog("Analyzing scammer voice patterns...", "info");
-
-            const loggedMilestones = new Set();
-
-            const analysisInterval = setInterval(() => {
-                setProgress((prev) => {
-                    if (prev >= 100) {
-                        clearInterval(analysisInterval);
-
-                        if (!loggedMilestones.has(100)) {
-                            loggedMilestones.add(100);
-                            addScammerLog("ALERT: Synthetic voice patterns detected!", "error");
-                            addScammerLog("Confidence: 94.2% (±2.1%)", "error");
-                            addScammerLog("Signature match to known GAN-generated samples", "error");
-                        }
-
-                        return 100;
-                    }
-
-                    const nextProgress = prev + (Math.random() * 3 + 2);
-
-                    const milestones = [
-                        {
-                            threshold: 20,
-                            scammerMsg: "Step 1: Detected VoIP masking patterns",
-                        },
-                        {
-                            threshold: 40,
-                            scammerMsg: "Step 2: Identified Cambodian IP address",
-                        },
-                        {
-                            threshold: 60,
-                            scammerMsg: "Step 3: Matched to known scammer tactics",
-                        },
-                        {
-                            threshold: 80,
-                            scammerMsg: "Step 4: Confirmed synthetic voice artifacts",
-                        },
-                    ];
-
-                    milestones.forEach(({ threshold, scammerMsg }) => {
-                        if (prev < threshold && nextProgress >= threshold && !loggedMilestones.has(threshold)) {
-                            addScammerLog(scammerMsg, "warning");
-                            loggedMilestones.add(threshold);
-                        }
-                    });
-
-                    if (Math.random() > 0.6) {
-                        const randomActions = [
-                            () => logFeatureAnalysis(),
-                            () => logModelUpdate(),
-                            () => addScammerLog(`Analyzing scammer sample ${Math.floor(prev * 50)}`),
-                        ];
-                        randomActions[Math.floor(Math.random() * randomActions.length)]();
-                    }
-
-                    return nextProgress;
-                });
-            }, 1500);
-
-            return () => clearInterval(analysisInterval);
-        }
-    }, [callStatus]);
-
-    const playAudioSequence = () => {
-        if (currentAudioIndex >= audioFiles.length) {
-            setCallStatus("call-ended");
-            addScammerLog("Call session terminated", "info");
-            return;
-        }
-
-        const currentAudio = audioFiles[currentAudioIndex];
-        setActiveSpeaker(currentAudio.type === "victim" ? "victim" : "caller");
-
-        const targetAudioRef = currentAudio.type === "victim" ? victimAudioRef : scammerAudioRef;
-
-        if (targetAudioRef.current) {
-            targetAudioRef.current.src = currentAudio.src;
-            targetAudioRef.current.onended = () => {
-                if (currentAudioIndex === audioFiles.length - 1) {
-                    setCallStatus("scam-detected");
-                } else {
-                    setCurrentAudioIndex((prev) => prev + 1);
-                }
-            };
-
-            targetAudioRef.current.play().catch((err) => {
-                console.error("Error playing audio:", err);
-                setTimeout(() => {
-                    if (currentAudioIndex === audioFiles.length - 1) {
-                        setCallStatus("scam-detected");
-                    } else {
-                        setCurrentAudioIndex((prev) => prev + 1);
-                    }
-                }, 1000);
-            });
-
-            if (currentAudio.type === "victim") {
-                addScammerLog("Listening to victim response", "info");
-            } else {
-                addScammerLog("Scammer speaking - analyzing tactics", "info");
-            }
-        }
-    };
-
-    useEffect(() => {
-        if (callStatus === "analyzing") {
-            playAudioSequence();
-        }
-    }, [currentAudioIndex, callStatus]);
-
-    const handleAnswer = (): void => {
-        addScammerLog("Call answered - initiating analysis", "info");
-        setCallStatus("analyzing");
-        setCurrentAudioIndex(0);
-    };
-
-    const handleDecline = (): void => {
-        addScammerLog("Call rejected by target", "warning");
-        setCallStatus("incoming");
-        setProgress(0);
-        setScammerLogs([]);
-        setActiveSpeaker("caller");
-        setCurrentAudioIndex(0);
-    };
-
-    useEffect(() => {
-        if (callStatus === "scam-detected" && beepRef.current) {
-            setShowScammerDetails(true);
-            beepRef.current.currentTime = 0;
-            beepRef.current.play().catch((err) => {
-                console.error("Error playing beep sound:", err);
-            });
-        }
-    }, [callStatus]);
-
-    // Auto-scroll terminal to bottom
-    useEffect(() => {
-        if (scammerTerminalRef.current) {
-            scammerTerminalRef.current.scrollTop = scammerTerminalRef.current.scrollHeight;
-        }
-    }, [scammerLogs]);
-
+const VictimPage: React.FC<VictimPageProps> = ({
+    ringtoneRef,
+    beepRef,
+    victimAudioRef,
+    scammerAudioRef,
+    callStatus,
+    scammerLogs,
+    scammerTerminalRef,
+    progress,
+    callerInfo,
+    activeSpeaker,
+    handleDecline,
+    handleAnswer,
+    showScammerDetails,
+    setShowScammerDetails,
+}) => {
     return (
         <div style={{ width: "100vw" }}>
             <audio ref={ringtoneRef} src="/ringtone.mp3" />
