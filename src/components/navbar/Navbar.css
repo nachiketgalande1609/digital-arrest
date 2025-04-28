@@ -10,7 +10,7 @@
 }
 
 .navbar-container {
-    max-width: 1200px;
+    max-width: 100%;
     margin: 0 auto;
     padding: 30px 2rem;
     display: flex;
@@ -122,4 +122,207 @@
     height: 1px;
     background: linear-gradient(90deg, transparent, #00ff9d, transparent);
     box-shadow: 0 0 10px rgba(0, 255, 157, 0.5);
+}
+
+/* Add these to your existing Navbar.css */
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.cyber-status-container {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.time-display {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    font-family: 'Courier New', monospace;
+}
+
+.cyber-time {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #5b361b;
+    letter-spacing: 1px;
+}
+
+.cyber-date {
+    font-size: 0.8rem;
+    color: #5b361b;
+    opacity: 0.8;
+}
+
+.threat-level-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.threat-label {
+    font-size: 0.8rem;
+    color: #5b361b;
+    white-space: nowrap;
+}
+
+.threat-levels {
+    display: flex;
+    gap: 0.2rem;
+}
+
+.threat-level {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #ccc;
+    transition: all 0.3s ease;
+}
+
+.threat-level.active {
+    background-color: #f44336;
+}
+
+.threat-level.active.high {
+    background-color: #f44336;
+    animation: pulse 1.5s infinite;
+}
+
+.cyber-alert {
+    position: relative;
+    padding: 0.5rem 1rem;
+    background-color: transparent;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: transparent;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.cyber-alert.active {
+    border-color: #f44336;
+    color: #f44336;
+    background-color: rgba(244, 67, 54, 0.1);
+}
+
+.alert-pulse {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(244, 67, 54, 0.3);
+    border-radius: 4px;
+    opacity: 0;
+    transform: scale(0);
+}
+
+.cyber-alert.active .alert-pulse {
+    animation: alertPulse 2s infinite;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+.profile-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: rgba(91, 54, 27, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #5b361b;
+    transition: all 0.3s ease;
+}
+
+.user-profile:hover .profile-avatar {
+    background-color: rgba(0, 168, 255, 0.2);
+    color: #00a8ff;
+}
+
+.profile-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #5b361b;
+}
+
+.profile-role {
+    font-size: 0.7rem;
+    color: #5b361b;
+    opacity: 0.7;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.1);
+        opacity: 0.7;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes alertPulse {
+    0% {
+        transform: scale(0.8);
+        opacity: 0.7;
+    }
+
+    70% {
+        transform: scale(1.3);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1.3);
+        opacity: 0;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+
+    .threat-label,
+    .cyber-alert,
+    .profile-role {
+        display: none;
+    }
+
+    .cyber-status-container {
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .cyber-date {
+        display: none;
+    }
+
+    .cyber-time {
+        font-size: 0.9rem;
+    }
+
+    .profile-name {
+        display: none;
+    }
 }
