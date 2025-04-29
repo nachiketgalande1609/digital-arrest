@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import VictimPage from "./VictimPage";
 import TelangalanCyberSite from "./TelanganaCyberSite";
+import PhoneInterface from "./PhoneInterface";
 
 type CallStatus = "incoming" | "analyzing" | "scam-detected" | "call-ended";
 type LogEntry = {
@@ -32,6 +33,8 @@ const App: React.FC = () => {
     const [currentAudioIndex, setCurrentAudioIndex] = useState<number>(0);
     const [showScammerDetails, setShowScammerDetails] = useState<boolean>(false);
     const [currentScreen, setCurrentScreen] = useState<"victim" | "cyber">("victim");
+
+    const [showPhoneInterface, setShowPhoneInterface] = useState(true);
 
     const audioFiles = [
         { src: "/1_victim.mp3", type: "victim" },
@@ -343,30 +346,46 @@ const App: React.FC = () => {
             <audio ref={beepRef} src="/beep.mp3" />
             <audio ref={victimAudioRef} />
             <audio ref={scammerAudioRef} />
-            {currentScreen === "victim" && (
-                <VictimPage
-                    callStatus={callStatus}
-                    progress={progress}
+            {showPhoneInterface ? (
+                <PhoneInterface
+                    onAnswer={() => {
+                        setShowPhoneInterface(false);
+                        handleAnswer();
+                    }}
+                    onReject={() => {
+                        setShowPhoneInterface(false);
+                        handleDecline();
+                    }}
                     callerInfo={callerInfo}
-                    activeSpeaker={activeSpeaker}
-                    handleDecline={handleDecline}
-                    handleAnswer={handleAnswer}
                 />
-            )}
+            ) : (
+                <>
+                    {currentScreen === "victim" && (
+                        <VictimPage
+                            callStatus={callStatus}
+                            progress={progress}
+                            callerInfo={callerInfo}
+                            activeSpeaker={activeSpeaker}
+                            handleDecline={handleDecline}
+                            handleAnswer={handleAnswer}
+                        />
+                    )}
 
-            {currentScreen === "cyber" && (
-                <TelangalanCyberSite
-                    victimAudioRef={victimAudioRef}
-                    scammerAudioRef={scammerAudioRef}
-                    activeSpeaker={activeSpeaker}
-                    callStatus={callStatus}
-                    mapCenter={mapCenter}
-                    mapZoom={mapZoom}
-                    locations={locations}
-                    showTriangulation={showTriangulation}
-                    showScammerDetails={showScammerDetails}
-                    setShowScammerDetails={setShowScammerDetails}
-                />
+                    {currentScreen === "cyber" && (
+                        <TelangalanCyberSite
+                            victimAudioRef={victimAudioRef}
+                            scammerAudioRef={scammerAudioRef}
+                            activeSpeaker={activeSpeaker}
+                            callStatus={callStatus}
+                            mapCenter={mapCenter}
+                            mapZoom={mapZoom}
+                            locations={locations}
+                            showTriangulation={showTriangulation}
+                            showScammerDetails={showScammerDetails}
+                            setShowScammerDetails={setShowScammerDetails}
+                        />
+                    )}
+                </>
             )}
         </>
     );

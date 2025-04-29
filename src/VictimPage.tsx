@@ -16,7 +16,7 @@ interface VictimPageProps {
     handleAnswer: () => void;
 }
 
-const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInfo, activeSpeaker, handleDecline, handleAnswer }) => {
+const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInfo, activeSpeaker, handleDecline }) => {
     const [logs, setLogs] = useState<LogEntry[]>([]);
     const scammerTerminalRef = useRef<HTMLDivElement>(null);
     const lastLogTimestamp = useRef<Date | null>(null);
@@ -185,19 +185,6 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
                                 </div>
                             )}
                         </div>
-
-                        {callStatus === "incoming" && (
-                            <div className="call-buttons">
-                                <button className="decline-btn" onClick={handleDecline}>
-                                    <span className="icon">✕</span>
-                                    <span>Decline</span>
-                                </button>
-                                <button className="answer-btn" onClick={handleAnswer}>
-                                    <span className="icon">✓</span>
-                                    <span>Answer</span>
-                                </button>
-                            </div>
-                        )}
 
                         {callStatus === "analyzing" && (
                             <div className="analysis-container">
