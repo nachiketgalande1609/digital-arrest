@@ -303,7 +303,6 @@ body {
 
 .avatar-container {
     position: relative;
-    width: 120px;
     height: 120px;
     margin-bottom: 20px;
 }
@@ -357,6 +356,7 @@ body {
     font-size: 22px;
     font-weight: 600;
     margin-bottom: 4px;
+    margin-top: 50px;
 }
 
 .caller-number {
@@ -670,11 +670,11 @@ button .icon {
 
 @keyframes scan {
     0% {
-        transform: translateY(-100%);
+        transform: translateY(0%);
     }
 
     100% {
-        transform: translateY(200%);
+        transform: translateY(900%);
     }
 }
 

@@ -5,6 +5,7 @@ interface LogEntry {
     timestamp: string;
     message: string;
     type: string;
+    progress?: number;
 }
 
 interface VictimPageProps {
@@ -19,20 +20,36 @@ interface VictimPageProps {
 const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInfo, activeSpeaker, handleDecline }) => {
     const [logs, setLogs] = useState<LogEntry[]>([]);
     const scammerTerminalRef = useRef<HTMLDivElement>(null);
-    const lastLogTimestamp = useRef<Date | null>(null);
-    const loggedSteps = useRef<Set<number>>(new Set());
+    const [currentStep, setCurrentStep] = useState<number>(0);
+    const [stepProgress, setStepProgress] = useState<number>(0);
 
-    // Helper function to add a new log entry with enhanced context
-    const addLog = (message: string, type: string = "info") => {
-        const timestamp = new Date().toISOString().split("T")[1].split(".")[0];
-        const now = new Date();
-
-        // Only log if enough time has passed since the last log (e.g., 1 second)
-        if (!lastLogTimestamp.current || now.getTime() - lastLogTimestamp.current.getTime() > 1000) {
-            setLogs((prev) => [...prev, { timestamp, message, type }]);
-            lastLogTimestamp.current = now;
-        }
-    };
+    // Steps with their descriptions
+    const steps = [
+        {
+            title: "Connecting to audio fingerprinting service...",
+            message: "Establishing secure connection to voice analysis API",
+        },
+        {
+            title: "Analyzing call metadata...",
+            message: "Extracting SIP headers and network routing information",
+        },
+        {
+            title: "Checking threat intelligence databases...",
+            message: "Querying known scam number registries",
+        },
+        {
+            title: "Running voice pattern analysis...",
+            message: "Comparing to known scammer voice profiles",
+        },
+        {
+            title: "Validating caller identity...",
+            message: "Cross-referencing with telecom provider records",
+        },
+        {
+            title: "Finalizing scam probability assessment...",
+            message: "Compiling all detection indicators",
+        },
+    ];
 
     // Scroll to bottom of terminal when logs update
     useEffect(() => {
@@ -44,77 +61,111 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
     // Initialize logs when component mounts
     useEffect(() => {
         const initialLogs: LogEntry[] = [
-            { timestamp: new Date().toISOString().split("T")[1].split(".")[0], message: "Initializing scam detection system...", type: "system" },
-            { timestamp: new Date().toISOString().split("T")[1].split(".")[0], message: "Loading voice pattern databases...", type: "system" },
             {
                 timestamp: new Date().toISOString().split("T")[1].split(".")[0],
-                message: "Connecting to Telangana Cyber Bureau API...",
+                message: "Initializing digital arrest detection system...",
                 type: "system",
             },
             {
                 timestamp: new Date().toISOString().split("T")[1].split(".")[0],
-                message: "System ready - waiting for incoming call",
+                message: "Loading AI voice pattern recognition models...",
+                type: "system",
+            },
+            {
+                timestamp: new Date().toISOString().split("T")[1].split(".")[0],
+                message: "Connected to Audio Fingerprinting Service real-time threat feed",
+                type: "success",
+            },
+            {
+                timestamp: new Date().toISOString().split("T")[1].split(".")[0],
+                message: "System ready - awaiting call events",
                 type: "success",
             },
         ];
         setLogs(initialLogs);
     }, []);
 
-    // Handle call status changes with detailed logging
+    // Handle call status changes
     useEffect(() => {
-        switch (callStatus) {
-            case "incoming":
-                addLog(`Incoming call detected from ${callerInfo.number}. Starting call screening process...`, "warning");
-                addLog(`Caller info: ${callerInfo.name} (${callerInfo.number})`, "info");
-                break;
-            case "analyzing":
-                addLog(`Analyzing voice patterns for ${activeSpeaker}...`, "info");
-                addLog("Comparing to known scam patterns and databases...", "info");
-                break;
-            case "scam-detected":
-                addLog("Pattern matches known IRS scam template.", "danger");
-                addLog("Alerting authorities and terminating call immediately.", "warning");
-                break;
-            case "call-ended":
-                addLog("Call terminated by user.", "info");
-                addLog("Saving analysis results to database for further investigation.", "system");
-                break;
+        if (callStatus === "incoming") {
+            const newLogs = [
+                ...logs,
+                {
+                    timestamp: new Date().toISOString().split("T")[1].split(".")[0],
+                    message: `Incoming call detected from ${callerInfo.number}`,
+                    type: "warning",
+                },
+                {
+                    timestamp: new Date().toISOString().split("T")[1].split(".")[0],
+                    message: `Caller identified as ${callerInfo.name}`,
+                    type: "info",
+                },
+                {
+                    timestamp: new Date().toISOString().split("T")[1].split(".")[0],
+                    message: "Starting comprehensive scam analysis protocol",
+                    type: "system",
+                },
+            ];
+            setLogs(newLogs);
+            setCurrentStep(0);
+            setStepProgress(0);
         }
-    }, [callStatus, callerInfo.number, activeSpeaker]);
+    }, [callStatus]);
 
-    // Handle progress updates with enhanced messages
+    // Handle progress updates
     useEffect(() => {
-        if (callStatus === "analyzing" && progress > 0 && progress <= 100) {
-            if (progress >= 20 && progress < 40 && !loggedSteps.current.has(1)) {
-                addLog(
-                    "Step 1 (2025‑04‑21T00:34:02Z): Captured VoIP SIP INVITE at edge firewall, extracted source IP 203.207.64.100, logged Call‑ID “ABC123XYZ” and timestamp.",
-                    "warning"
-                );
-                loggedSteps.current.add(1);
-            } else if (progress >= 40 && progress < 60 && !loggedSteps.current.has(2)) {
-                addLog(
-                    "Step 2 (2025‑04‑21T00:34:48Z): Ran WHOIS on 203.207.64.100; found allocation to EZECOM Ltd (AS24560), Phnom Penh, Cambodia; flagged in threat‑intel DB for past VoIP fraud reports.",
-                    "warning"
-                );
-                loggedSteps.current.add(2);
-            } else if (progress >= 60 && progress < 80 && !loggedSteps.current.has(3)) {
-                addLog(
-                    "Step 3 (2025‑04‑21T00:35:10Z): Cross‑referenced 203.207.64.100 against known VPN exit nodes—matched “ExpressVPN Phnom Penh Exit.” Submitted MLAT request to Cambodian Ministry of Post & Telecom for subscriber logs.",
-                    "warning"
-                );
-                loggedSteps.current.add(3);
-            } else if (progress >= 80 && progress < 90 && !loggedSteps.current.has(4)) {
-                addLog(
-                    "Step 4 (2025‑04‑21T00:35:34Z): Analyzed ISP NetFlow—identified NAT of 203.207.64.100:5060 to Smart Axiata 4G tower ID 10234 in Phnom Penh; updated geofence alert to cyber cell dashboard.",
-                    "warning"
-                );
-                loggedSteps.current.add(4);
-            } else if (progress >= 90 && progress <= 100 && !loggedSteps.current.has(5)) {
-                addLog(
-                    "Step 5 (2025‑04‑21T00:35:58Z): Finalized full packet capture; case CYB20250421‑0567 opened with Mumbai Cybercrime Dept and evidence forwarded via Interpol to Cambodia Cyber & Joint Crimes Unit for subscriber identification.",
-                    "error"
-                );
-                loggedSteps.current.add(5);
+        if (callStatus === "analyzing") {
+            const step = Math.floor(progress / (100 / steps.length));
+
+            if (step !== currentStep) {
+                setCurrentStep(step);
+                setStepProgress(0);
+
+                if (step < steps.length) {
+                    const newLogs = [
+                        ...logs,
+                        {
+                            timestamp: new Date().toISOString().split("T")[1].split(".")[0],
+                            message: `[STEP ${step + 1}/${steps.length}] ${steps[step].title}`,
+                            type: "info",
+                            progress: 0,
+                        },
+                    ];
+                    setLogs(newLogs);
+                }
+            }
+
+            // Calculate progress within current step
+            const stepStart = (100 / steps.length) * currentStep;
+            const stepEnd = (100 / steps.length) * (currentStep + 1);
+            const currentStepProgress = ((progress - stepStart) / (stepEnd - stepStart)) * 100;
+
+            setStepProgress(currentStepProgress);
+
+            // Update progress in the current step log
+            if (logs.length > 0 && currentStep < steps.length) {
+                const lastLog = logs[logs.length - 1];
+                if (lastLog.message.includes(`[STEP ${currentStep + 1}/${steps.length}]`)) {
+                    const updatedLogs = [...logs];
+                    updatedLogs[updatedLogs.length - 1] = {
+                        ...lastLog,
+                        progress: currentStepProgress,
+                    };
+                    setLogs(updatedLogs);
+                }
+            }
+
+            // Add detailed message when step completes
+            if (currentStepProgress >= 100 && currentStep < steps.length) {
+                const newLogs = [
+                    ...logs,
+                    {
+                        timestamp: new Date().toISOString().split("T")[1].split(".")[0],
+                        message: steps[currentStep].message,
+                        type: "success",
+                    },
+                ];
+                setLogs(newLogs);
             }
         }
     }, [progress, callStatus]);
@@ -123,7 +174,6 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
         <div style={{ width: "100vw" }}>
             <div className="victim-container">
                 <div className="terminal-container">
-                    {/* Single Terminal */}
                     <div className="terminal-panel">
                         <div className="terminal-header">
                             <div className="terminal-buttons">
@@ -145,16 +195,13 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
                                 <div key={index} className={`log-entry ${log.type}`}>
                                     <span className="timestamp">[{log.timestamp}]</span>
                                     <span className="log-message">{log.message}</span>
+                                    {log.progress !== undefined && (
+                                        <div className="terminal-progress-container">
+                                            <div className="terminal-progress-bar" style={{ width: `${log.progress}%` }}></div>
+                                        </div>
+                                    )}
                                 </div>
                             ))}
-                            {callStatus === "analyzing" && (
-                                <div className="log-entry info">
-                                    <span className="timestamp">[{new Date().toISOString().split("T")[1].split(".")[0]}]</span>
-                                    <span className="log-message">
-                                        Detection progress: {Math.min(progress, 100).toFixed(1)}% (ETA: {Math.floor((100 - progress) / 3)}s)
-                                    </span>
-                                </div>
-                            )}
                         </div>
                         <div className="terminal-input">
                             <span className="prompt">scam@detector:~#</span>
@@ -169,11 +216,6 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
                         <div className="caller-info">
                             <div className="avatar-container">
                                 <img src={callerInfo.avatar} alt="Caller" className="caller-avatar" />
-                                {callStatus === "analyzing" && (
-                                    <div className="scanning-animation">
-                                        <div className="scan-line"></div>
-                                    </div>
-                                )}
                             </div>
                             <h2>{activeSpeaker === "caller" ? callerInfo.name : "Victim"}</h2>
                             <p className="caller-number">{callerInfo.number}</p>
@@ -189,28 +231,12 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
                         {callStatus === "analyzing" && (
                             <div className="analysis-container">
                                 <div className="milestone-log">
-                                    {progress < 20 && <p className="milestone-log sky">🔍 Starting voice analysis...</p>}
-                                    {progress >= 20 && progress < 40 && (
-                                        <p className="milestone-log sky">
-                                            📡 {activeSpeaker === "caller" ? "Scammer" : "Victim"} speaking - analyzing voice patterns
-                                        </p>
-                                    )}
-                                    {progress >= 40 && progress < 60 && (
-                                        <p className="milestone-log green">
-                                            🌐 Comparing to known {activeSpeaker === "caller" ? "scam" : "legitimate"} voice samples
-                                        </p>
-                                    )}
-                                    {progress >= 60 && progress < 80 && (
-                                        <p className="milestone-log yellow">
-                                            🔍 Detecting {activeSpeaker === "caller" ? "synthetic" : "natural"} speech characteristics
-                                        </p>
-                                    )}
-                                    {progress >= 80 && progress < 100 && (
-                                        <p className="milestone-log orange">
-                                            📶 {activeSpeaker === "caller" ? "High" : "Low"} probability of voice manipulation
-                                        </p>
-                                    )}
-                                    {progress >= 100 && <p className="milestone-log red">✅ Analysis complete</p>}
+                                    {currentStep === 0 && <p className="milestone-log sky">🔍 Starting comprehensive analysis...</p>}
+                                    {currentStep === 1 && <p className="milestone-log sky">📡 Analyzing call metadata and routing</p>}
+                                    {currentStep === 2 && <p className="milestone-log green">🌐 Checking threat databases</p>}
+                                    {currentStep === 3 && <p className="milestone-log yellow">🔍 Running voice pattern analysis</p>}
+                                    {currentStep === 4 && <p className="milestone-log orange">📶 Validating caller identity</p>}
+                                    {currentStep >= 5 && <p className="milestone-log red">✅ Finalizing assessment</p>}
                                 </div>
 
                                 <div className="analyzing-animation">
@@ -219,7 +245,11 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
                                     <div className="wave"></div>
                                 </div>
 
-                                <p className="analyzing-text">Analyzing {activeSpeaker === "caller" ? "scammer" : "victim"} voice...</p>
+                                <p className="analyzing-text">
+                                    {currentStep < steps.length
+                                        ? `Step ${currentStep + 1}: ${steps[currentStep].title}`
+                                        : "Compiling final results..."}
+                                </p>
 
                                 <div className="progress-container">
                                     <div className="progress-bar">
