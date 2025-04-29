@@ -5,12 +5,13 @@
     height: 100vh;
     width: 100vw;
     background-color: #404558;
-    perspective: 1000px;
+    overflow: hidden;
+    position: relative;
 }
 
 .phone {
-    width: 375px;
-    height: 780px;
+    width: 325px;
+    height: 680px;
     background: #111;
     border-radius: 60px;
     padding: 0px 0px;
@@ -24,6 +25,7 @@
     position: relative;
     overflow: hidden;
     transform-style: preserve-3d;
+    transition: transform 0.3s ease;
 }
 
 .phone-notch {
@@ -311,7 +313,37 @@
 .ringtone-start-btn {
     position: absolute;
     bottom: 20px;
-    left: 20px;
-    background-color: rgb(0, 0, 0, 0.2);
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.2);
     color: #909090;
+    padding: 10px 20px;
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
+    z-index: 1000;
+}
+
+@media (max-width: 400px) {
+    .phone {
+        border-radius: 30px;
+    }
+
+    .caller-avatar-container {
+        width: 120px;
+        height: 120px;
+    }
+
+    .caller-name {
+        font-size: 24px;
+    }
+
+    .call-actions {
+        gap: 30px;
+    }
+
+    .action-icon {
+        width: 60px;
+        height: 60px;
+    }
 }

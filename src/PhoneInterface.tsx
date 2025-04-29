@@ -15,6 +15,7 @@ interface PhoneInterfaceProps {
 const PhoneInterface: React.FC<PhoneInterfaceProps> = ({ onAnswer, onReject, callerInfo, setRinging }) => {
     const [currentTime, setCurrentTime] = useState("");
     const [showRingtoneButton, setShowRingtoneButton] = useState(true);
+    const [phoneScale, setPhoneScale] = useState(1);
 
     useEffect(() => {
         // Set initial time
@@ -27,7 +28,24 @@ const PhoneInterface: React.FC<PhoneInterfaceProps> = ({ onAnswer, onReject, cal
             setCurrentTime(now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }));
         }, 60000);
 
-        return () => clearInterval(interval);
+        // Handle window resize
+        const handleResize = () => {
+            const scale = Math.min(
+                window.innerWidth / 400,
+                window.innerHeight / 850,
+                1.2 // Maximum scale (120% of original size)
+            );
+            setPhoneScale(scale);
+        };
+
+        // Initial scale calculation
+        handleResize();
+        window.addEventListener("resize", handleResize);
+
+        return () => {
+            clearInterval(interval);
+            window.removeEventListener("resize", handleResize);
+        };
     }, []);
 
     const handleRingtoneStart = () => {
@@ -42,7 +60,13 @@ const PhoneInterface: React.FC<PhoneInterfaceProps> = ({ onAnswer, onReject, cal
                     Start Ringtone
                 </button>
             )}
-            <div className="phone">
+            <div
+                className="phone"
+                style={{
+                    transform: `scale(${phoneScale})`,
+                    transformOrigin: "center center",
+                }}
+            >
                 {/* Phone notch */}
                 <div className="phone-notch"></div>
 
