@@ -53,7 +53,7 @@
 .status-bar {
     display: flex;
     justify-content: space-between;
-    padding: 12px 24px;
+    padding: 8px 24px;
     color: white;
     font-size: 15px;
     font-weight: 600;
@@ -61,7 +61,9 @@
     backdrop-filter: blur(10px);
     z-index: 2;
     border-radius: 20px;
-    margin: 10px;
+    margin-top: 8px;
+    margin-left: 10px;
+    margin-right: 10px;
 }
 
 .status-icons {
@@ -291,4 +293,17 @@
     top: 120px;
     width: 6px;
     height: 80px;
+}
+
+.caller-avatar {
+    position: relative;
+}
+
+.whatsapp-icon {
+    position: absolute;
+    bottom: -10px;
+    right: -10px;
+    width: 60px;
+    height: 60px;
+    z-index: 1000;
 }

@@ -90,6 +90,8 @@ const PhoneInterface: React.FC<PhoneInterfaceProps> = ({ onAnswer, onReject, cal
                                         </div>
                                     )}
                                 </div>
+                                <img src="/whatsapp.png" alt="WhatsApp Icon" className="whatsapp-icon" />
+
                                 <div className="pulse-ring"></div>
                                 <div className="pulse-ring delay"></div>
                             </div>
