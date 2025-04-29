@@ -37,9 +37,28 @@ const PhoneInterface: React.FC<PhoneInterfaceProps> = ({ onAnswer, onReject, cal
                     <div className="status-bar">
                         <span className="time">{currentTime}</span>
                         <div className="status-icons">
-                            <span className="icon network">📶</span>
-                            <span className="icon wifi">📶</span>
-                            <span className="icon battery">🔋 87%</span>
+                            <span className="icon network">
+                                <svg viewBox="0 0 24 24" width="16" height="16">
+                                    <path fill="currentColor" d="M1,21H21V1M19,5.83V19H5.83" />
+                                </svg>
+                            </span>
+                            <span className="icon wifi">
+                                <svg viewBox="0 0 24 24" width="16" height="16">
+                                    <path
+                                        fill="currentColor"
+                                        d="M12,3C7.79,3 3.7,4.41 0.38,7C4.41,12.06 7.89,16.37 12,21.5C16.08,16.42 20.24,11.24 23.65,7C20.32,4.41 16.22,3 12,3Z"
+                                    />
+                                </svg>
+                            </span>
+                            <span className="icon battery">
+                                <svg viewBox="0 0 24 24" width="18" height="16">
+                                    <path
+                                        fill="currentColor"
+                                        d="M16,20H8V6H16M16.67,4H15V2H9V4H7.33A1.33,1.33 0 0,0 6,5.33V20.67C6,21.4 6.6,22 7.33,22H16.67A1.33,1.33 0 0,0 18,20.67V5.33C18,4.6 17.4,4 16.67,4Z"
+                                    />
+                                </svg>
+                                87%
+                            </span>
                         </div>
                     </div>
 

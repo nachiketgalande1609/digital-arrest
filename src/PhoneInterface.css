@@ -14,10 +14,10 @@
     height: 780px;
     background: #111;
     border-radius: 60px;
-    padding: 10px 2px;
+    padding: 0px 2px;
     box-shadow:
         0 0 0 12px #1a1a1a,
-        0 0 0 14px #333,
+        0 0 0 14px #5b5b5b,
         0 30px 60px rgba(0, 0, 0, 0.7),
         inset 0 0 15px rgba(255, 255, 255, 0.05);
     position: relative;
@@ -32,8 +32,8 @@
     left: 50%;
     transform: translateX(-50%);
     width: 160px;
-    height: 20px;
-    background: #111;
+    height: 10px;
+    background: #2e2e2e;
     border-bottom-left-radius: 18px;
     border-bottom-right-radius: 18px;
     z-index: 10;
