@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Dispatch, SetStateAction } from "react";
 import "./PhoneInterface.css";
 
 interface PhoneInterfaceProps {
@@ -8,13 +8,13 @@ interface PhoneInterfaceProps {
         name: string;
         number: string;
         avatar: string;
-        callType: "voice" | "video";
     };
+    setRinging: Dispatch<SetStateAction<boolean>>;
 }
 
-const PhoneInterface: React.FC<PhoneInterfaceProps> = ({ onAnswer, onReject, callerInfo }) => {
-    const [isRinging, setIsRinging] = useState(true);
+const PhoneInterface: React.FC<PhoneInterfaceProps> = ({ onAnswer, onReject, callerInfo, setRinging }) => {
     const [currentTime, setCurrentTime] = useState("");
+    const [showRingtoneButton, setShowRingtoneButton] = useState(true);
 
     useEffect(() => {
         // Set initial time
@@ -30,8 +30,18 @@ const PhoneInterface: React.FC<PhoneInterfaceProps> = ({ onAnswer, onReject, cal
         return () => clearInterval(interval);
     }, []);
 
+    const handleRingtoneStart = () => {
+        setRinging(true);
+        setShowRingtoneButton(false);
+    };
+
     return (
         <div className="whatsapp-call-container">
+            {showRingtoneButton && (
+                <button className="ringtone-start-btn" onClick={handleRingtoneStart}>
+                    Start Ringtone
+                </button>
+            )}
             <div className="phone">
                 {/* Phone notch */}
                 <div className="phone-notch"></div>
@@ -70,7 +80,7 @@ const PhoneInterface: React.FC<PhoneInterfaceProps> = ({ onAnswer, onReject, cal
                     </div>
 
                     {/* Call screen */}
-                    <div className={`call-screen ${isRinging ? "ringing" : ""}`}>
+                    <div className={`call-screen ringing`}>
                         {/* Top gradient overlay */}
                         <div className="top-gradient"></div>
 
@@ -79,16 +89,6 @@ const PhoneInterface: React.FC<PhoneInterfaceProps> = ({ onAnswer, onReject, cal
                             <div className="caller-avatar-container">
                                 <div className="caller-avatar">
                                     <img src={callerInfo.avatar} alt="Caller" />
-                                    {callerInfo.callType === "video" && (
-                                        <div className="video-icon">
-                                            <svg viewBox="0 0 24 24" width="24" height="24">
-                                                <path
-                                                    fill="currentColor"
-                                                    d="M17,10.5V7A1,1 0 0,0 16,6H4A1,1 0 0,0 3,7V17A1,1 0 0,0 4,18H16A1,1 0 0,0 17,17V13.5L21,17.5V6.5L17,10.5Z"
-                                                />
-                                            </svg>
-                                        </div>
-                                    )}
                                 </div>
                                 <img src="/whatsapp.png" alt="WhatsApp Icon" className="whatsapp-icon" />
 
@@ -98,9 +98,7 @@ const PhoneInterface: React.FC<PhoneInterfaceProps> = ({ onAnswer, onReject, cal
 
                             <h1 className="caller-name">{callerInfo.name}</h1>
                             <p className="caller-number">{callerInfo.number}</p>
-                            <p className="call-status">
-                                {isRinging ? "Ringing" : callerInfo.callType === "video" ? "WhatsApp video call..." : "WhatsApp call..."}
-                            </p>
+                            <p className="call-status">Ringing</p>
                         </div>
 
                         {/* Call actions */}

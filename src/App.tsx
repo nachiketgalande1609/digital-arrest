@@ -20,6 +20,7 @@ const App: React.FC = () => {
     const [currentScreen, setCurrentScreen] = useState<"victim" | "cyber">("victim");
 
     const [showPhoneInterface, setShowPhoneInterface] = useState(true);
+    const [ringing, setRinging] = useState(false);
 
     const audioFiles = [
         { src: "/1_victim.mp3", type: "victim" },
@@ -155,9 +156,21 @@ const App: React.FC = () => {
         }
     }, [currentAudioIndex, callStatus]);
 
+    useEffect(() => {
+        if (ringing && ringtoneRef.current) {
+            ringtoneRef.current.play().catch((err) => {
+                console.error("Error playing ringtone:", err);
+            });
+        } else if (!ringing && ringtoneRef.current) {
+            ringtoneRef.current.pause();
+            ringtoneRef.current.currentTime = 0; // Reset to start
+        }
+    }, [ringing]);
+
     const handleAnswer = (): void => {
         setCallStatus("analyzing");
         setCurrentAudioIndex(0); // Reset to first audio file
+        setRinging(false); // Stop the ringtone when call is answered
     };
 
     const handleDecline = (): void => {
@@ -228,6 +241,7 @@ const App: React.FC = () => {
                         handleDecline();
                     }}
                     callerInfo={callerInfo}
+                    setRinging={setRinging}
                 />
             ) : (
                 <>

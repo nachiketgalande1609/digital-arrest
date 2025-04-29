@@ -307,3 +307,11 @@
     height: 60px;
     z-index: 1000;
 }
+
+.ringtone-start-btn {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    background-color: rgb(0, 0, 0, 0.2);
+    color: #909090;
+}
