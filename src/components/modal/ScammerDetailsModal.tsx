@@ -55,14 +55,13 @@ const ScammerDetailsModal: React.FC<{ onClose: () => void }> = ({ onClose }) => 
     return (
         <div className="cyber-modal-overlay">
             <div className="cyber-modal">
-                {/* <div className="cyber-modal-header">
+                <div className="cyber-modal-header">
                     <div className="case-id-badge">{scammerData.id}</div>
                     <h2>
                         <span className="threat-level-badge">{scammerData.threatLevel}</span>
                         {scammerData.name}
                     </h2>
-                    
-                </div> */}
+                </div>
 
                 <div className="cyber-close-btn" onClick={onClose}>
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -73,15 +72,15 @@ const ScammerDetailsModal: React.FC<{ onClose: () => void }> = ({ onClose }) => 
                 <div className="cyber-modal-body">
                     <div className="cyber-stats-grid">
                         <div className="cyber-stat-card critical">
-                            <div className="stat-label">Voice Synthetic Score</div>
-                            <div className="stat-value">{scammerData.voiceBiometrics.syntheticScore}%</div>
+                            <div className="stat-label">Location Confidence</div>
+                            <div className="stat-value">92%</div>
                             <div className="stat-bar">
-                                <div className="stat-bar-fill" style={{ width: `${scammerData.voiceBiometrics.syntheticScore}%` }}></div>
+                                <div className="stat-bar-fill" style={{ width: `92%` }}></div>
                             </div>
                         </div>
 
                         <div className="cyber-stat-card high">
-                            <div className="stat-label">Biometric Match</div>
+                            <div className="stat-label">Identity Match</div>
                             <div className="stat-value">{scammerData.voiceBiometrics.match}%</div>
                             <div className="stat-bar">
                                 <div className="stat-bar-fill" style={{ width: `${scammerData.voiceBiometrics.match}%` }}></div>
@@ -95,7 +94,7 @@ const ScammerDetailsModal: React.FC<{ onClose: () => void }> = ({ onClose }) => 
                     </div>
 
                     <div className="cyber-detail-section">
-                        <h3 className="section-title">OPERATIONAL INTELLIGENCE</h3>
+                        <h3 className="section-title">LOCATION TRACKING</h3>
                         <div className="cyber-detail-grid">
                             <div className="detail-item">
                                 <span className="detail-label">Last Known Location</span>
@@ -126,28 +125,10 @@ const ScammerDetailsModal: React.FC<{ onClose: () => void }> = ({ onClose }) => 
                                 <span className="tech-label">Device Fingerprint</span>
                                 <span className="tech-value">{scammerData.technicalFootprint.deviceFingerprint}</span>
                             </div>
-                            {/* <div className="tech-item full-width">
-                                <span className="tech-label">Infrastructure</span>
-                                <div className="tech-tags">
-                                    {scammerData.technicalFootprint.infrastructure.map((item, i) => (
-                                        <span key={i} className="tech-tag">
-                                            {item}
-                                        </span>
-                                    ))}
-                                </div>
-                            </div> */}
-                        </div>
-                    </div>
-
-                    <div className="cyber-detail-section">
-                        <h3 className="section-title">VOICE BIOMETRICS</h3>
-                        <div className="cyber-bio-features">
-                            {scammerData.voiceBiometrics.gANFeatures.map((feature, i) => (
-                                <div key={i} className="bio-feature">
-                                    <span className="bio-feature-icon">⟁</span>
-                                    <span className="bio-feature-text">{feature}</span>
-                                </div>
-                            ))}
+                            <div className="tech-item">
+                                <span className="tech-label">Call Pattern</span>
+                                <span className="tech-value">{scammerData.technicalFootprint.callPattern}</span>
+                            </div>
                         </div>
                     </div>
 
@@ -162,15 +143,14 @@ const ScammerDetailsModal: React.FC<{ onClose: () => void }> = ({ onClose }) => 
                         </div>
                     </div>
                 </div>
-                {/* 
+
                 <div className="cyber-modal-footer">
                     <div className="cyber-actions">
-                        <button className="cyber-action-btn primary">INITIATE TRACING</button>
+                        <button className="cyber-action-btn primary">INITIATE TRACKING</button>
                         <button className="cyber-action-btn secondary">FREEZE ASSETS</button>
                         <button className="cyber-action-btn tertiary">ISSUE WARRANT</button>
                     </div>
-                    <div className="cyber-timestamp">Last updated: {new Date().toISOString().replace("T", " ").substring(0, 19)}</div>
-                </div> */}
+                </div>
             </div>
         </div>
     );
