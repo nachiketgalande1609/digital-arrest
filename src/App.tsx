@@ -41,27 +41,27 @@ const App: React.FC = () => {
         { src: "/5_victim.mp3", type: "victim" },
         { src: "/6_scammer.mp3", type: "caller" },
         { src: "/7_victim.mp3", type: "victim" },
-        { src: "/8_scammer.m4a", type: "victim" },
+        { src: "/8_scammer.m4a", type: "caller" },
         { src: "/9_deepfake.mp3", type: "victim" },
-        { src: "/10_scammer.m4a", type: "victim" },
+        { src: "/10_scammer.m4a", type: "caller" },
         { src: "/11_deepfake.mp3", type: "victim" },
-        { src: "/12_scammer.m4a", type: "victim" },
+        { src: "/12_scammer.m4a", type: "caller" },
         { src: "/13_deepfake.mp3", type: "victim" },
-        { src: "/14_scammer.m4a", type: "victim" },
+        { src: "/14_scammer.m4a", type: "caller" },
         { src: "/15_deepfake.mp3", type: "victim" },
-        { src: "/16_scammer.m4a", type: "victim" },
+        { src: "/16_scammer.m4a", type: "caller" },
         { src: "/17_deepfake.mp3", type: "victim" },
-        { src: "/18_scammer.m4a", type: "victim" },
+        { src: "/18_scammer.m4a", type: "caller" },
         { src: "/19_deepfake.mp3", type: "victim" },
-        { src: "/20_scammer.m4a", type: "victim" },
+        { src: "/20_scammer.m4a", type: "caller" },
         { src: "/21_deepfake.mp3", type: "victim" },
-        { src: "/22_scammer.m4a", type: "victim" },
+        { src: "/22_scammer.m4a", type: "caller" },
         { src: "/23_deepfake.mp3", type: "victim" },
-        { src: "/24_scammer.m4a", type: "victim" },
+        { src: "/24_scammer.m4a", type: "caller" },
         { src: "/25_deepfake.mp3", type: "victim" },
-        { src: "/26_scammer.m4a", type: "victim" },
+        { src: "/26_scammer.m4a", type: "caller" },
         { src: "/27_deepfake.mp3", type: "victim" },
-        { src: "/28_scammer.m4a", type: "victim" },
+        { src: "/28_scammer.m4a", type: "caller" },
     ];
 
     const [callerInfo] = useState<CallerInfo>({
@@ -218,7 +218,7 @@ const App: React.FC = () => {
             targetAudioRef.current.src = currentAudio.src;
             targetAudioRef.current.onended = () => {
                 // Special handling for the 7_victim.mp3 (index 6)
-                if (currentAudioIndex === 2) {
+                if (currentAudioIndex === 6) {
                     setCallStatus("scam-detected");
                     if (beepRef.current) {
                         setIsBeepPlaying(true);

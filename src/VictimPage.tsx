@@ -53,7 +53,7 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
             },
             {
                 timestamp: new Date().toISOString().split("T")[1].split(".")[0],
-                message: "System ready - waiting for incoming calls",
+                message: "System ready - waiting for incoming call",
                 type: "success",
             },
         ];
@@ -132,7 +132,7 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
                                 <div className="terminal-btn maximize"></div>
                             </div>
                             <div className="terminal-title">
-                                <span className="app-name">Scam Detector</span>
+                                <span className="app-name">Digital Arrest</span>
                                 <span className="app-version">v2.3.7</span>
                             </div>
                             <div className="terminal-status">
