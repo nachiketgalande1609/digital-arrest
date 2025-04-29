@@ -5,6 +5,8 @@ const Navbar = () => {
     const [currentTime, setCurrentTime] = useState(new Date());
     const [isAlertActive, setIsAlertActive] = useState(false);
     const [cyberThreatLevel, setCyberThreatLevel] = useState(3); // 1-5 scale
+    const [tracingStatus, setTracingStatus] = useState("ACTIVE");
+    const [tracingProgress, setTracingProgress] = useState(68);
 
     useEffect(() => {
         // Update time every second
@@ -25,10 +27,28 @@ const Navbar = () => {
             setCyberThreatLevel(Math.floor(Math.random() * 3) + 2); // Random between 2-4
         }, 20000);
 
+        // Simulate tracing progress changes
+        const tracingInterval = setInterval(() => {
+            setTracingProgress((prev) => {
+                // Random fluctuation between -2 and +5
+                const change = Math.floor(Math.random() * 8) - 2;
+                const newValue = prev + change;
+                // Keep within 30-95 range
+                return Math.min(95, Math.max(30, newValue));
+            });
+
+            // Occasionally change status
+            if (Math.random() > 0.9) {
+                const statuses = ["ACTIVE", "TRIANGULATING", "SIGNAL LOCKED", "ANALYZING"];
+                setTracingStatus(statuses[Math.floor(Math.random() * statuses.length)]);
+            }
+        }, 5000);
+
         return () => {
             clearInterval(timer);
             clearInterval(alertInterval);
             clearInterval(threatInterval);
+            clearInterval(tracingInterval);
         };
     }, []);
 
@@ -61,6 +81,17 @@ const Navbar = () => {
                 </div>
 
                 <div className="navbar-right">
+                    <div className="tracing-status-container">
+                        <div className="tracing-label">
+                            <span className="status-text">TRACING:</span>
+                            <span className={`status-value ${tracingStatus === "SIGNAL LOCKED" ? "locked" : ""}`}>{tracingStatus}</span>
+                        </div>
+                        <div className="tracing-progress-bar">
+                            <div className="tracing-progress-fill" style={{ width: `${tracingProgress}%` }}></div>
+                        </div>
+                        <div className="tracing-percentage">{tracingProgress}%</div>
+                    </div>
+
                     <div className="threat-level-container">
                         <span className="threat-label">Threat Level:</span>
                         <div className="threat-levels">
