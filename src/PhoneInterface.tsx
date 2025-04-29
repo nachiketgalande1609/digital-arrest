@@ -8,14 +8,19 @@ interface PhoneInterfaceProps {
         name: string;
         number: string;
         avatar: string;
+        callType: "voice" | "video";
     };
 }
 
 const PhoneInterface: React.FC<PhoneInterfaceProps> = ({ onAnswer, onReject, callerInfo }) => {
     const [isRinging, setIsRinging] = useState(true);
-    const [currentTime, setCurrentTime] = useState("12:34");
+    const [currentTime, setCurrentTime] = useState("");
 
     useEffect(() => {
+        // Set initial time
+        const now = new Date();
+        setCurrentTime(now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }));
+
         // Update time every minute
         const interval = setInterval(() => {
             const now = new Date();
@@ -26,27 +31,30 @@ const PhoneInterface: React.FC<PhoneInterfaceProps> = ({ onAnswer, onReject, cal
     }, []);
 
     return (
-        <div className="phone-container">
+        <div className="whatsapp-call-container">
             <div className="phone">
                 {/* Phone notch */}
                 <div className="phone-notch"></div>
 
                 {/* Phone screen */}
                 <div className="phone-screen">
-                    {/* Phone status bar */}
+                    {/* Status bar */}
                     <div className="status-bar">
                         <span className="time">{currentTime}</span>
                         <div className="status-icons">
-                            <span className="icon network">
+                            <span className="icon">
                                 <svg viewBox="0 0 24 24" width="16" height="16">
-                                    <path fill="currentColor" d="M1,21H21V1M19,5.83V19H5.83" />
+                                    <path
+                                        fill="currentColor"
+                                        d="M17,9H7V7H17M17,13H7V11H17M14,17H7V15H14M12,3A1,1 0 0,1 13,4A1,1 0 0,1 12,5A1,1 0 0,1 11,4A1,1 0 0,1 12,3M19,3H14.82C14.4,1.84 13.3,1 12,1C10.7,1 9.6,1.84 9.18,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3Z"
+                                    />
                                 </svg>
                             </span>
                             <span className="icon wifi">
                                 <svg viewBox="0 0 24 24" width="16" height="16">
                                     <path
                                         fill="currentColor"
-                                        d="M12,3C7.79,3 3.7,4.41 0.38,7C4.41,12.06 7.89,16.37 12,21.5C16.08,16.42 20.24,11.24 23.65,7C20.32,4.41 16.22,3 12,3Z"
+                                        d="M12,21L15.6,16.2C14.6,15.45 13.35,15 12,15C10.65,15 9.4,15.45 8.4,16.2L12,21M12,3C7.95,3 4.21,4.34 1.2,6.6L3,9C5.5,7.12 8.62,6 12,6C15.38,6 18.5,7.12 21,9L22.8,6.6C19.79,4.34 16.05,3 12,3M12,9C9.3,9 6.81,9.89 4.8,11.4L6.6,13.8C8.1,12.67 9.97,12 12,12C14.03,12 15.9,12.67 17.4,13.8L19.2,11.4C17.19,9.89 14.7,9 12,9Z"
                                     />
                                 </svg>
                             </span>
@@ -57,25 +65,30 @@ const PhoneInterface: React.FC<PhoneInterfaceProps> = ({ onAnswer, onReject, cal
                                         d="M16,20H8V6H16M16.67,4H15V2H9V4H7.33A1.33,1.33 0 0,0 6,5.33V20.67C6,21.4 6.6,22 7.33,22H16.67A1.33,1.33 0 0,0 18,20.67V5.33C18,4.6 17.4,4 16.67,4Z"
                                     />
                                 </svg>
-                                87%
                             </span>
                         </div>
                     </div>
 
                     {/* Call screen */}
                     <div className={`call-screen ${isRinging ? "ringing" : ""}`}>
+                        {/* Top gradient overlay */}
+                        <div className="top-gradient"></div>
+
+                        {/* Caller info */}
                         <div className="caller-info">
                             <div className="caller-avatar-container">
                                 <div className="caller-avatar">
                                     <img src={callerInfo.avatar} alt="Caller" />
-                                    <div className="call-platform-icon">
-                                        <svg viewBox="0 0 24 24" width="24" height="24">
-                                            <path
-                                                fill="currentColor"
-                                                d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-6.29-3.91a1.38 1.38 0 0 0 .166-.675c0-.338-.133-.654-.373-.887a1.255 1.255 0 0 0-.892-.375 1.267 1.267 0 0 0-.927.392c-.244.249-.38.567-.38.91 0 .342.136.658.38.906.244.248.569.387.912.387.343 0 .668-.139.912-.388zm4.237 0a1.38 1.38 0 0 0 .166-.675c0-.338-.133-.654-.373-.887a1.255 1.255 0 0 0-.892-.375 1.267 1.267 0 0 0-.927.392c-.244.249-.38.567-.38.91 0 .342.136.658.38.906.244.248.569.387.912.387.343 0 .668-.139.912-.388z"
-                                            />
-                                        </svg>
-                                    </div>
+                                    {callerInfo.callType === "video" && (
+                                        <div className="video-icon">
+                                            <svg viewBox="0 0 24 24" width="24" height="24">
+                                                <path
+                                                    fill="currentColor"
+                                                    d="M17,10.5V7A1,1 0 0,0 16,6H4A1,1 0 0,0 3,7V17A1,1 0 0,0 4,18H16A1,1 0 0,0 17,17V13.5L21,17.5V6.5L17,10.5Z"
+                                                />
+                                            </svg>
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="pulse-ring"></div>
                                 <div className="pulse-ring delay"></div>
@@ -83,9 +96,12 @@ const PhoneInterface: React.FC<PhoneInterfaceProps> = ({ onAnswer, onReject, cal
 
                             <h1 className="caller-name">{callerInfo.name}</h1>
                             <p className="caller-number">{callerInfo.number}</p>
-                            <p className="call-status">{isRinging ? "Ringing" : "Incoming call"}</p>
+                            <p className="call-status">
+                                {isRinging ? "Ringing" : callerInfo.callType === "video" ? "WhatsApp video call..." : "WhatsApp call..."}
+                            </p>
                         </div>
 
+                        {/* Call actions */}
                         <div className="call-actions">
                             <button className="action-btn decline" onClick={onReject}>
                                 <div className="action-icon">
@@ -101,7 +117,7 @@ const PhoneInterface: React.FC<PhoneInterfaceProps> = ({ onAnswer, onReject, cal
 
                             <button className="action-btn answer" onClick={onAnswer}>
                                 <div className="action-icon">
-                                    <svg viewBox="0 0 24 24" width="33" height="28">
+                                    <svg viewBox="0 0 24 24" width="28" height="28">
                                         <path
                                             fill="currentColor"
                                             d="M6.62,10.79C8.06,13.62 10.38,15.94 13.21,17.38L15.41,15.18C15.69,14.9 16.08,14.82 16.43,14.93C17.55,15.3 18.75,15.5 20,15.5A1,1 0 0,1 21,16.5V20A1,1 0 0,1 20,21A17,17 0 0,1 3,4A1,1 0 0,1 4,3H7.5A1,1 0 0,1 8.5,4C8.5,5.25 8.7,6.45 9.07,7.57C9.18,7.92 9.1,8.31 8.82,8.59L6.62,10.79Z"
@@ -111,10 +127,13 @@ const PhoneInterface: React.FC<PhoneInterfaceProps> = ({ onAnswer, onReject, cal
                                 <span className="action-label">Answer</span>
                             </button>
                         </div>
-                    </div>
 
-                    {/* Phone home indicator */}
-                    <div className="home-indicator"></div>
+                        {/* Bottom gradient overlay */}
+                        <div className="bottom-gradient"></div>
+
+                        {/* Phone home indicator */}
+                        <div className="home-indicator"></div>
+                    </div>
                 </div>
 
                 {/* Phone side buttons */}
