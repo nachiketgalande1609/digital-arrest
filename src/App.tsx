@@ -72,16 +72,13 @@ const App: React.FC = () => {
                 setProgress((prev) => {
                     if (prev >= 100) {
                         clearInterval(analysisInterval);
-
                         if (!loggedMilestones.has(100)) {
                             loggedMilestones.add(100);
                         }
-
                         return 100;
                     }
 
                     const nextProgress = prev + (Math.random() * 3 + 2);
-
                     return nextProgress;
                 });
             }, 1500);
