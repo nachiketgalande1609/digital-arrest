@@ -72,6 +72,10 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
             { timestamp: getTimestamp(), message: "Voice signature captured", type: "success" },
             { timestamp: getTimestamp(), message: "Keyword detection active", type: "info" },
             { timestamp: getTimestamp(), message: "Suspicious keywords detected: 'bank account', 'OTP', 'refund'", type: "warning" },
+            { timestamp: getTimestamp(), message: "AI Response System activated", type: "info" },
+            { timestamp: getTimestamp(), message: "Analyzing scammer's psychological profile...", type: "info" },
+            { timestamp: getTimestamp(), message: "Detecting emotional triggers in scammer's speech patterns", type: "info" },
+            { timestamp: getTimestamp(), message: "Calculating optimal engagement strategy...", type: "info" },
         ];
 
         setVictimLogs(initialVictimLogs);
@@ -83,30 +87,45 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
         if (callStatus === "scam-detected") {
             const scamDetectedLogs = [
                 { timestamp: getTimestamp(), message: "WARNING: High probability scam call detected!", type: "error" },
+                { timestamp: getTimestamp(), message: "AI formulating response strategy to maximize engagement time", type: "info" },
+                { timestamp: getTimestamp(), message: "Using mirroring technique: Repeating scammer's phrases to build rapport", type: "info" },
+                { timestamp: getTimestamp(), message: "Applying time-pressure tactic: Pretending urgency to keep scammer focused", type: "info" },
+                { timestamp: getTimestamp(), message: "Voice analysis complete - scammer shows signs of frustration", type: "warning" },
+                { timestamp: getTimestamp(), message: "Adjusting tone to appear more vulnerable to maintain scammer's interest", type: "info" },
                 { timestamp: getTimestamp(), message: "Caller matches known scam patterns", type: "error" },
                 { timestamp: getTimestamp(), message: "Voice signature matches known scammer database", type: "error" },
                 { timestamp: getTimestamp(), message: "Location triangulation complete", type: "info" },
                 { timestamp: getTimestamp(), message: "Scammer location pinpointed", type: "success" },
                 { timestamp: getTimestamp(), message: "Alerting authorities...", type: "info" },
+                { timestamp: getTimestamp(), message: "AI maintaining conversation while tracking completes", type: "info" },
             ];
 
             setScammerLogs((prev) => [...prev, ...scamDetectedLogs]);
 
-            // Add corresponding victim logs
-            setVictimLogs((prev) => [
-                ...prev,
-                { timestamp: getTimestamp(), message: "WARNING: Potential scam detected!", type: "error" },
-                { timestamp: getTimestamp(), message: "Terminating call for your safety", type: "warning" },
-                { timestamp: getTimestamp(), message: "Call ended", type: "info" },
-            ]);
-
-            // Start ongoing logging interval
+            // Modified ongoing logging interval
             loggingIntervalRef.current = setInterval(() => {
                 const details = generateScammerDetails();
+                const tactics = [
+                    "Using confirmation bias: Pretending to believe scammer's story",
+                    "Applying foot-in-door technique: Agreeing to small requests first",
+                    "Creating false urgency: Claiming to need to act quickly",
+                    "Mirroring scammer's speech patterns to build connection",
+                    "Introducing slight confusion to prolong the conversation",
+                    "Feigning technical difficulties to buy more time",
+                    "Pretending to be elderly to trigger scammer's exploitation patterns",
+                ];
 
                 const newScammerLogs = [
                     { timestamp: getTimestamp(), message: `Tracking scammer movement: ${details.location}`, type: "info" },
                     { timestamp: getTimestamp(), message: `Network analysis: ${details.network}`, type: "info" },
+                    { timestamp: getTimestamp(), message: `AI tactic: ${tactics[Math.floor(Math.random() * tactics.length)]}`, type: "info" },
+                    { timestamp: getTimestamp(), message: "Analyzing scammer's response to psychological tactics...", type: "info" },
+                    {
+                        timestamp: getTimestamp(),
+                        message: `Scammer emotional state: ${["frustrated", "engaged", "impatient", "excited"][Math.floor(Math.random() * 4)]}`,
+                        type: "warning",
+                    },
+                    { timestamp: getTimestamp(), message: "Adjusting conversation strategy based on scammer's reactions", type: "info" },
                     { timestamp: getTimestamp(), message: `Probable scammer identity: ${details.name}`, type: "warning" },
                     { timestamp: getTimestamp(), message: `Call duration analyzed: ${details.callDuration}`, type: "info" },
                     { timestamp: getTimestamp(), message: "Updating cyber crime database...", type: "success" },
