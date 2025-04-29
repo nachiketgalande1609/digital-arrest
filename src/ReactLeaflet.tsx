@@ -3,16 +3,14 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 interface ReactLeafletProps {
-    center: [number, number];
-    zoom: number;
-    victimLocation: [number, number];
-    scammerLocation: [number, number];
-    showTriangulation: boolean;
     connectionStrength?: number; // 0-100
     isCallActive?: boolean;
+    victimLocation: [number, number]; // [lat, lng]
+    scammerLocation: [number, number]; // [lat, lng]
 }
 
-const ReactLeaflet: React.FC<ReactLeafletProps> = ({ zoom, victimLocation, showTriangulation, connectionStrength = 80, isCallActive = false }) => {
+const ReactLeaflet: React.FC<ReactLeafletProps> = ({ connectionStrength = 80, isCallActive = false, victimLocation, scammerLocation }) => {
+    const showTriangulation = true;
     const mapRef = useRef<L.Map | null>(null);
     const mapContainerRef = useRef<HTMLDivElement>(null);
     const markersRef = useRef<{
@@ -23,10 +21,7 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({ zoom, victimLocation, showT
         rippleCircles?: L.Circle[];
     }>({});
     const zoomIntervalRef = useRef<number | null>(null);
-    const [currentZoom, setCurrentZoom] = useState(zoom);
-
-    // Hyderabad coordinates
-    const HYDERABAD_COORDS: [number, number] = [17.385, 78.4867];
+    const [currentZoom, setCurrentZoom] = useState(5);
 
     // Create custom icons
     const createIcons = useCallback(() => {
@@ -56,7 +51,7 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({ zoom, victimLocation, showT
         };
     }, [isCallActive]);
 
-    // Create rippling circles around Hyderabad
+    // Create rippling circles around scammer location
     const createRippleCircles = useCallback(() => {
         if (!mapRef.current) return;
 
@@ -72,7 +67,7 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({ zoom, victimLocation, showT
 
         // Create 3 concentric circles with different radii and colors
         for (let i = 0; i < 3; i++) {
-            const circle = L.circle(HYDERABAD_COORDS, {
+            const circle = L.circle(scammerLocation, {
                 radius: 500 + i * 300, // 500m, 800m, 1100m
                 color: colors[i],
                 fillColor: colors[i],
@@ -85,7 +80,7 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({ zoom, victimLocation, showT
         }
 
         markersRef.current.rippleCircles = rippleCircles;
-    }, []);
+    }, [scammerLocation]);
 
     // Initialize map
     const initMap = useCallback(() => {
@@ -96,7 +91,7 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({ zoom, victimLocation, showT
             attributionControl: false,
             fadeAnimation: true,
             zoomAnimation: true,
-        }).setView(HYDERABAD_COORDS, currentZoom);
+        }).setView(scammerLocation, currentZoom);
 
         // Add tile layer with dark mode variant
         L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
@@ -111,7 +106,7 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({ zoom, victimLocation, showT
             .addTo(mapRef.current);
 
         createRippleCircles();
-    }, [currentZoom, createRippleCircles]);
+    }, [currentZoom, createRippleCircles, scammerLocation]);
 
     // Update markers and triangulation
     const updateMarkers = useCallback(() => {
@@ -132,7 +127,7 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({ zoom, victimLocation, showT
         }).addTo(mapRef.current).bindPopup(`
       <div class="map-popup">
         <strong>Victim Location</strong><br>
-        Mumbai, India<br>
+        ${victimLocation[0].toFixed(4)}, ${victimLocation[1].toFixed(4)}<br>
         <div class="signal-strength">
           <span>Signal:</span>
           <div class="strength-bars">
@@ -145,14 +140,14 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({ zoom, victimLocation, showT
       </div>
     `);
 
-        // Add new scammer marker (always at Hyderabad)
-        markersRef.current.scammer = L.marker(HYDERABAD_COORDS, {
+        // Add new scammer marker
+        markersRef.current.scammer = L.marker(scammerLocation, {
             icon: icons.scammer,
             zIndexOffset: 1000,
         }).addTo(mapRef.current).bindPopup(`
       <div class="map-popup">
         <strong>Suspected Scammer</strong><br>
-        Hyderabad, India<br>
+        ${scammerLocation[0].toFixed(4)}, ${scammerLocation[1].toFixed(4)}<br>
         <div class="risk-meter">
           <span>Risk Level:</span>
           <div class="meter">
@@ -162,11 +157,11 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({ zoom, victimLocation, showT
       </div>
     `);
 
-        // Add triangulation if enabled (from victim to Hyderabad)
+        // Add triangulation if enabled (from victim to scammer)
         if (showTriangulation) {
             const lineColor = connectionStrength > 70 ? "#ff3b30" : connectionStrength > 40 ? "#ff9500" : "#ffcc00";
 
-            markersRef.current.triangulation = L.polyline([victimLocation, HYDERABAD_COORDS], {
+            markersRef.current.triangulation = L.polyline([victimLocation, scammerLocation], {
                 color: lineColor,
                 dashArray: connectionStrength > 50 ? "10, 5" : "5, 5",
                 weight: 1 + connectionStrength / 50,
@@ -175,7 +170,7 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({ zoom, victimLocation, showT
             }).addTo(mapRef.current);
 
             // Add animated midpoint
-            const midpoint: [number, number] = [(victimLocation[0] + HYDERABAD_COORDS[0]) / 2, (victimLocation[1] + HYDERABAD_COORDS[1]) / 2];
+            const midpoint: [number, number] = [(victimLocation[0] + scammerLocation[0]) / 2, (victimLocation[1] + scammerLocation[1]) / 2];
 
             markersRef.current.midpoint = L.circleMarker(midpoint, {
                 radius: 3 + connectionStrength / 30,
@@ -185,7 +180,7 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({ zoom, victimLocation, showT
                 className: "triangulation-midpoint",
             }).addTo(mapRef.current);
         }
-    }, [victimLocation, showTriangulation, createIcons, connectionStrength]);
+    }, [victimLocation, scammerLocation, showTriangulation, createIcons, connectionStrength]);
 
     // Auto-zoom functionality
     const startAutoZoom = useCallback(() => {
@@ -206,12 +201,12 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({ zoom, victimLocation, showT
             }
 
             setCurrentZoom(zoomLevel);
-            mapRef.current?.setView(HYDERABAD_COORDS, zoomLevel, {
+            mapRef.current?.setView(scammerLocation, zoomLevel, {
                 animate: true,
                 duration: 1,
             });
         }, 3000); // Change zoom level every 3 seconds
-    }, [currentZoom]);
+    }, [currentZoom, scammerLocation]);
 
     useEffect(() => {
         initMap();
@@ -225,16 +220,16 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({ zoom, victimLocation, showT
         };
     }, [initMap, updateMarkers, startAutoZoom]);
 
-    // Handle view changes (but keep centered on Hyderabad)
+    // Handle view changes (but keep centered on the midpoint)
     useEffect(() => {
         if (mapRef.current) {
-            mapRef.current.setView(HYDERABAD_COORDS, currentZoom, {
+            mapRef.current.setView(scammerLocation, currentZoom, {
                 animate: true,
                 duration: 1,
                 easeLinearity: 0.25,
             });
         }
-    }, [currentZoom]);
+    }, [currentZoom, scammerLocation]);
 
     return <div ref={mapContainerRef} className={`leaflet-map ${isCallActive ? "call-active" : ""}`} />;
 };

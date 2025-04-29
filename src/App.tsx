@@ -108,7 +108,7 @@ const App: React.FC = () => {
             targetAudioRef.current.src = currentAudio.src;
             targetAudioRef.current.onended = () => {
                 // Special handling for the 7_victim.mp3 (index 6)
-                if (currentAudioIndex === 6) {
+                if (currentAudioIndex === 2) {
                     setCallStatus("scam-detected");
                     if (beepRef.current) {
                         setIsBeepPlaying(true);
@@ -189,41 +189,6 @@ const App: React.FC = () => {
         }
     }, [callStatus]);
 
-    const [mapCenter, setMapCenter] = useState<[number, number]>([20.5937, 78.9629]); // Center of India
-    const [mapZoom, setMapZoom] = useState<number>(5);
-    const [showTriangulation, setShowTriangulation] = useState<boolean>(false);
-
-    // Locations for victim and scammer
-    const locations = {
-        victim: [19.076, 72.8777] as [number, number], // Mumbai
-        scammer: [17.385, 78.4867] as [number, number], // Hyderabad
-    };
-
-    // Effect to handle map animation when call status changes
-    useEffect(() => {
-        if (callStatus === "analyzing") {
-            // Zoom in when analysis starts
-            setMapZoom(6);
-            setTimeout(() => setShowTriangulation(true), 1000);
-
-            // Alternate between centers during call
-            const interval = setInterval(() => {
-                setMapCenter((prev) => (prev[0] === locations.victim[0] ? locations.scammer : locations.victim));
-            }, 3000);
-
-            return () => clearInterval(interval);
-        } else if (callStatus === "scam-detected") {
-            // Focus on scammer location when detected
-            setMapCenter(locations.scammer);
-            setMapZoom(10);
-        } else {
-            // Reset when call ends
-            setMapCenter([20.5937, 78.9629]);
-            setMapZoom(5);
-            setShowTriangulation(false);
-        }
-    }, [callStatus]);
-
     return (
         <>
             <audio ref={ringtoneRef} src="/ringtone.mp3" />
@@ -262,10 +227,6 @@ const App: React.FC = () => {
                             scammerAudioRef={scammerAudioRef}
                             activeSpeaker={activeSpeaker}
                             callStatus={callStatus}
-                            mapCenter={mapCenter}
-                            mapZoom={mapZoom}
-                            locations={locations}
-                            showTriangulation={showTriangulation}
                             showScammerDetails={showScammerDetails}
                             setShowScammerDetails={setShowScammerDetails}
                         />
