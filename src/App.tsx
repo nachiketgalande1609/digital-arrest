@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import VictimPage from "./VictimPage";
 import TelangalanCyberSite from "./TelanganaCyberSite";
 import PhoneInterface from "./PhoneInterface";
+import ScammerDetailsModal from "./components/modal/ScammerDetailsModal";
 
 type CallStatus = "incoming" | "analyzing" | "scam-detected" | "call-ended";
 
@@ -16,8 +17,8 @@ const App: React.FC = () => {
     const [progress, setProgress] = useState<number>(0);
     const [activeSpeaker, setActiveSpeaker] = useState<"victim" | "caller">("caller");
     const [currentAudioIndex, setCurrentAudioIndex] = useState<number>(0);
-    const [showScammerDetails, setShowScammerDetails] = useState<boolean>(false);
     const [currentScreen, setCurrentScreen] = useState<"victim" | "cyber">("victim");
+    const [showScammerDetails, setShowScammerDetails] = useState(false);
 
     const [showPhoneInterface, setShowPhoneInterface] = useState(true);
     const [ringing, setRinging] = useState(false);
@@ -95,6 +96,7 @@ const App: React.FC = () => {
 
         if (currentAudioIndex >= audioFiles.length) {
             setCallStatus("call-ended");
+            setShowScammerDetails(true); // Open the modal
             return;
         }
 
@@ -227,12 +229,11 @@ const App: React.FC = () => {
                             scammerAudioRef={scammerAudioRef}
                             activeSpeaker={activeSpeaker}
                             callStatus={callStatus}
-                            showScammerDetails={showScammerDetails}
-                            setShowScammerDetails={setShowScammerDetails}
                         />
                     )}
                 </>
             )}
+            {showScammerDetails && <ScammerDetailsModal onClose={() => setShowScammerDetails(false)} />}
         </>
     );
 };

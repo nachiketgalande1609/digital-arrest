@@ -3,25 +3,15 @@ import "./CyberSite.css";
 import AudioVisualizer from "./components/visualizer/AudioVisualizer";
 import Navbar from "./components/navbar/Navbar";
 import ReactLeaflet from "./ReactLeaflet";
-import ScammerDetailsModal from "./components/modal/ScammerDetailsModal";
 
 interface TelangalanCyberSiteProps {
     victimAudioRef: React.RefObject<HTMLAudioElement | null>;
     scammerAudioRef: React.RefObject<HTMLAudioElement | null>;
     activeSpeaker: "caller" | "victim";
     callStatus: "incoming" | "analyzing" | "scam-detected" | "call-ended";
-    showScammerDetails: boolean;
-    setShowScammerDetails: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
-    victimAudioRef,
-    scammerAudioRef,
-    activeSpeaker,
-    callStatus,
-    showScammerDetails,
-    setShowScammerDetails,
-}) => {
+const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({ victimAudioRef, scammerAudioRef, activeSpeaker, callStatus }) => {
     const [victimLogs, setVictimLogs] = useState<any[]>([]);
     const [scammerLogs, setScammerLogs] = useState<any[]>([]);
 
@@ -203,12 +193,10 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
                             scammerLocation={[17.4849, 78.4138]} // Kukatpally, Hyderabad
                             connectionStrength={75}
                             isCallActive={true}
-                        />{" "}
+                        />
                     </div>
                 </div>
             </div>
-
-            {showScammerDetails && <ScammerDetailsModal onClose={() => setShowScammerDetails(false)} />}
         </div>
     );
 };
