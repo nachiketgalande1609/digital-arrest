@@ -73,39 +73,38 @@ const PhoneInterface: React.FC<PhoneInterfaceProps> = ({ onAnswer, onReject, cal
                 {/* Phone screen */}
                 <div className="phone-screen">
                     {/* Status bar */}
-                    <div className="status-bar">
-                        <span className="time">{currentTime}</span>
-                        <div className="status-icons">
-                            <span className="icon">
-                                <svg viewBox="0 0 24 24" width="16" height="16">
-                                    <path
-                                        fill="currentColor"
-                                        d="M17,9H7V7H17M17,13H7V11H17M14,17H7V15H14M12,3A1,1 0 0,1 13,4A1,1 0 0,1 12,5A1,1 0 0,1 11,4A1,1 0 0,1 12,3M19,3H14.82C14.4,1.84 13.3,1 12,1C10.7,1 9.6,1.84 9.18,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3Z"
-                                    />
-                                </svg>
-                            </span>
-                            <span className="icon wifi">
-                                <svg viewBox="0 0 24 24" width="16" height="16">
-                                    <path
-                                        fill="currentColor"
-                                        d="M12,21L15.6,16.2C14.6,15.45 13.35,15 12,15C10.65,15 9.4,15.45 8.4,16.2L12,21M12,3C7.95,3 4.21,4.34 1.2,6.6L3,9C5.5,7.12 8.62,6 12,6C15.38,6 18.5,7.12 21,9L22.8,6.6C19.79,4.34 16.05,3 12,3M12,9C9.3,9 6.81,9.89 4.8,11.4L6.6,13.8C8.1,12.67 9.97,12 12,12C14.03,12 15.9,12.67 17.4,13.8L19.2,11.4C17.19,9.89 14.7,9 12,9Z"
-                                    />
-                                </svg>
-                            </span>
-                            <span className="icon battery">
-                                <svg viewBox="0 0 24 24" width="18" height="16">
-                                    <path
-                                        fill="currentColor"
-                                        d="M16,20H8V6H16M16.67,4H15V2H9V4H7.33A1.33,1.33 0 0,0 6,5.33V20.67C6,21.4 6.6,22 7.33,22H16.67A1.33,1.33 0 0,0 18,20.67V5.33C18,4.6 17.4,4 16.67,4Z"
-                                    />
-                                </svg>
-                            </span>
-                        </div>
-                    </div>
 
                     {/* Call screen */}
                     <div className={`call-screen ringing`}>
-                        {/* Top gradient overlay */}
+                        <div className="status-bar">
+                            <span className="time">{currentTime}</span>
+                            <div className="status-icons">
+                                <span className="icon">
+                                    <svg viewBox="0 0 24 24" width="16" height="16">
+                                        <path
+                                            fill="currentColor"
+                                            d="M17,9H7V7H17M17,13H7V11H17M14,17H7V15H14M12,3A1,1 0 0,1 13,4A1,1 0 0,1 12,5A1,1 0 0,1 11,4A1,1 0 0,1 12,3M19,3H14.82C14.4,1.84 13.3,1 12,1C10.7,1 9.6,1.84 9.18,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3Z"
+                                        />
+                                    </svg>
+                                </span>
+                                <span className="icon wifi">
+                                    <svg viewBox="0 0 24 24" width="16" height="16">
+                                        <path
+                                            fill="currentColor"
+                                            d="M12,21L15.6,16.2C14.6,15.45 13.35,15 12,15C10.65,15 9.4,15.45 8.4,16.2L12,21M12,3C7.95,3 4.21,4.34 1.2,6.6L3,9C5.5,7.12 8.62,6 12,6C15.38,6 18.5,7.12 21,9L22.8,6.6C19.79,4.34 16.05,3 12,3M12,9C9.3,9 6.81,9.89 4.8,11.4L6.6,13.8C8.1,12.67 9.97,12 12,12C14.03,12 15.9,12.67 17.4,13.8L19.2,11.4C17.19,9.89 14.7,9 12,9Z"
+                                        />
+                                    </svg>
+                                </span>
+                                <span className="icon battery">
+                                    <svg viewBox="0 0 24 24" width="18" height="16">
+                                        <path
+                                            fill="currentColor"
+                                            d="M16,20H8V6H16M16.67,4H15V2H9V4H7.33A1.33,1.33 0 0,0 6,5.33V20.67C6,21.4 6.6,22 7.33,22H16.67A1.33,1.33 0 0,0 18,20.67V5.33C18,4.6 17.4,4 16.67,4Z"
+                                        />
+                                    </svg>
+                                </span>
+                            </div>
+                        </div>
                         <div className="top-gradient"></div>
 
                         {/* Caller info */}
