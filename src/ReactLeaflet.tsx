@@ -22,6 +22,7 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({ connectionStrength = 80, is
     }>({});
     const zoomIntervalRef = useRef<number | null>(null);
     const [currentZoom, setCurrentZoom] = useState(5);
+    const [showOverlay, setShowOverlay] = useState(false);
 
     // Create custom icons
     const createIcons = useCallback(() => {
@@ -182,8 +183,14 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({ connectionStrength = 80, is
         }
     }, [victimLocation, scammerLocation, showTriangulation, createIcons, connectionStrength]);
 
+    console.log(currentZoom);
+
     // Auto-zoom functionality
     const startAutoZoom = useCallback(() => {
+        if (currentZoom >= 15) {
+            setShowOverlay(true);
+            return;
+        }
         if (zoomIntervalRef.current) {
             clearInterval(zoomIntervalRef.current);
         }
@@ -193,7 +200,7 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({ connectionStrength = 80, is
 
         zoomIntervalRef.current = setInterval(() => {
             if (zoomIn) {
-                zoomLevel = Math.min(zoomLevel + 1, 15); // Max zoom
+                zoomLevel = Math.min(zoomLevel + 0.5, 15); // Max zoom
                 if (zoomLevel === 15) zoomIn = false;
             } else {
                 zoomLevel = Math.max(zoomLevel - 1, 10); // Min zoom
@@ -205,7 +212,7 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({ connectionStrength = 80, is
                 animate: true,
                 duration: 1,
             });
-        }, 3000); // Change zoom level every 3 seconds
+        }, 2000); // Change zoom level every 3 seconds
     }, [currentZoom, scammerLocation]);
 
     useEffect(() => {
@@ -231,7 +238,27 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({ connectionStrength = 80, is
         }
     }, [currentZoom, scammerLocation]);
 
-    return <div ref={mapContainerRef} className={`leaflet-map ${isCallActive ? "call-active" : ""}`} />;
+    return (
+        <div className="map-container">
+            <div ref={mapContainerRef} className={`leaflet-map ${isCallActive ? "call-active" : ""}`} />
+
+            {showOverlay && (
+                <div className="scammer-overlay">
+                    <div className="overlay-content">
+                        <h3>Scammer Location Identified</h3>
+                        <div className="coordinates">
+                            <span>Latitude: {scammerLocation[0].toFixed(6)}</span>
+                            <span>Longitude: {scammerLocation[1].toFixed(6)}</span>
+                        </div>
+                        <div className="accuracy">Estimated Accuracy: {Math.max(10, 100 - connectionStrength)} meters</div>
+                        <button className="close-button" onClick={() => setShowOverlay(false)}>
+                            Close
+                        </button>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
 };
 
 export default ReactLeaflet;
