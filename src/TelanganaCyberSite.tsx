@@ -104,6 +104,18 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({ victimAudioRe
         };
     }, []);
 
+    useEffect(() => {
+        if (victimTerminalRef.current) {
+            victimTerminalRef.current.scrollTop = victimTerminalRef.current.scrollHeight;
+        }
+    }, [victimLogs]);
+    
+    useEffect(() => {
+        if (scammerTerminalRef.current) {
+            scammerTerminalRef.current.scrollTop = scammerTerminalRef.current.scrollHeight;
+        }
+    }, [scammerLogs]);
+
     return (
         <div style={{ width: "100vw" }}>
             <Navbar />
