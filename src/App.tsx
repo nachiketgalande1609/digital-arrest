@@ -31,27 +31,11 @@ const App: React.FC = () => {
         { src: "before_beep/5_victim.mp3", type: "victim" },
         { src: "before_beep/6_scammer.mp3", type: "caller" },
         { src: "before_beep/7_victim.mp3", type: "victim" },
-        { src: "after_beep/8_scammer.m4a", type: "caller" },
-        { src: "after_beep/9_deepfake.mp3", type: "victim" },
-        { src: "after_beep/10_scammer.m4a", type: "caller" },
-        { src: "after_beep/11_deepfake.mp3", type: "victim" },
-        { src: "after_beep/12_scammer.m4a", type: "caller" },
-        { src: "after_beep/13_deepfake.mp3", type: "victim" },
-        { src: "after_beep/14_scammer.m4a", type: "caller" },
-        { src: "after_beep/15_deepfake.mp3", type: "victim" },
-        { src: "after_beep/16_scammer.m4a", type: "caller" },
-        { src: "after_beep/17_deepfake.mp3", type: "victim" },
-        { src: "after_beep/18_scammer.m4a", type: "caller" },
-        { src: "after_beep/19_deepfake.mp3", type: "victim" },
-        { src: "after_beep/20_scammer.m4a", type: "caller" },
-        { src: "after_beep/21_deepfake.mp3", type: "victim" },
-        { src: "after_beep/22_scammer.m4a", type: "caller" },
-        { src: "after_beep/23_deepfake.mp3", type: "victim" },
-        { src: "after_beep/24_scammer.m4a", type: "caller" },
-        { src: "after_beep/25_deepfake.mp3", type: "victim" },
-        { src: "after_beep/26_scammer.m4a", type: "caller" },
-        { src: "after_beep/27_deepfake.mp3", type: "victim" },
-        { src: "after_beep/28_scammer.m4a", type: "caller" },
+        { src: "before_beep/8_scammer.mp3", type: "caller" },
+        { src: "after_beep/9_victim.mp3", type: "victim" },
+        { src: "after_beep/10_scammer.mp3", type: "caller" },
+        { src: "after_beep/11_victim.mp3", type: "victim" },
+        { src: "after_beep/12_scammer.mp3", type: "caller" },
     ];
 
     const [callerInfo] = useState<CallerInfo>({
@@ -109,8 +93,7 @@ const App: React.FC = () => {
         if (targetAudioRef.current) {
             targetAudioRef.current.src = currentAudio.src;
             targetAudioRef.current.onended = () => {
-                // Special handling for the 7_victim.mp3 (index 6)
-                if (currentAudioIndex === 6) {
+                if (currentAudioIndex === 7) {
                     setCallStatus("scam-detected");
                     if (beepRef.current) {
                         setIsBeepPlaying(true);
@@ -138,7 +121,7 @@ const App: React.FC = () => {
             targetAudioRef.current.play().catch((err) => {
                 console.error("Error playing audio:", err);
                 setTimeout(() => {
-                    if (currentAudioIndex === 6) {
+                    if (currentAudioIndex === 7) {
                         setCallStatus("scam-detected");
                         setCurrentScreen("cyber");
                         setCurrentAudioIndex((prev) => prev + 1);
