@@ -48,6 +48,7 @@ const App: React.FC = () => {
     const victimAudioRef = useRef<HTMLAudioElement | null>(null);
     const scammerAudioRef = useRef<HTMLAudioElement | null>(null);
     const beepRef = useRef<HTMLAudioElement | null>(null);
+    const interceptorRef = useRef<HTMLAudioElement | null>(null);
 
     // Simulate call flow with reduced logging
     useEffect(() => {
@@ -102,11 +103,19 @@ const App: React.FC = () => {
                         // Switch to cyber site after beep plays
                         beepRef.current.onended = () => {
                             setIsBeepPlaying(false);
-                            setTimeout(() => {
+                            if (interceptorRef.current) {
+                                interceptorRef.current.currentTime = 0;
+                                interceptorRef.current.play().catch(console.error);
+                                interceptorRef.current.onended = () => {
+                                    setTimeout(() => {
+                                        setCurrentScreen("cyber");
+                                        setCurrentAudioIndex((prev) => prev + 1);
+                                    }, 1000);
+                                };
+                            } else {
                                 setCurrentScreen("cyber");
-                                // Continue with next audio
                                 setCurrentAudioIndex((prev) => prev + 1);
-                            }, 1000);
+                            }
                         };
                     } else {
                         // If beep fails, still switch screens
@@ -178,6 +187,7 @@ const App: React.FC = () => {
         <>
             <audio ref={ringtoneRef} src="/ringtone.mp3" />
             <audio ref={beepRef} src="/beep.mp3" />
+            <audio ref={interceptorRef} src="/interceptor.mp3" />
             <audio ref={victimAudioRef} />
             <audio ref={scammerAudioRef} />
             {showPhoneInterface ? (
