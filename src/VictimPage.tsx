@@ -1,13 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./App.css";
 
-interface LogEntry {
-    timestamp: string;
-    message: string;
-    type: string;
-    progress?: number;
-}
-
 interface VictimPageProps {
     callStatus: "incoming" | "analyzing" | "scam-detected" | "call-ended";
     progress: number;
@@ -17,11 +10,17 @@ interface VictimPageProps {
     handleAnswer: () => void;
 }
 
+interface LogEntry {
+    log: string;
+    severity: "default" | "info" | "success" | "warning" | "error";
+}
+
 const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInfo, activeSpeaker, handleDecline }) => {
-    const [logs, setLogs] = useState<LogEntry[]>([]);
     const scammerTerminalRef = useRef<HTMLDivElement>(null);
     const [currentStep, setCurrentStep] = useState<number>(0);
-    const [stepProgress, setStepProgress] = useState<number>(0);
+    const [displayedLogs, setDisplayedLogs] = useState<LogEntry[]>([]);
+    const logIndexRef = useRef<number>(0);
+    const intervalRef = useRef<number | undefined>(undefined);
 
     // Steps with their descriptions
     const steps = [
@@ -51,64 +50,64 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
         },
     ];
 
+    const allLogs: LogEntry[] = [
+        { log: "Initializing Digital Robocop...", severity: "default" },
+        { log: "Loading AI voice pattern recognition models...", severity: "info" },
+        { log: "Connected to Audio Fingerprinting Service", severity: "success" },
+        { log: "System ready - awaiting call events", severity: "success" },
+        { log: `Incoming call detected from ${callerInfo.number}`, severity: "warning" },
+        { log: `Caller identified as ${callerInfo.name}`, severity: "info" },
+        { log: "Starting comprehensive scam analysis protocol", severity: "default" },
+        { log: "Connecting to audio fingerprinting service...", severity: "info" },
+        { log: "Audio fingerprint analysis complete", severity: "success" },
+        { log: "Analyzing call metadata...", severity: "info" },
+        { log: "Metadata analysis complete", severity: "success" },
+        { log: "Checking threat intelligence databases...", severity: "info" },
+        { log: "Threat database query complete", severity: "success" },
+        { log: "Running voice pattern analysis...", severity: "warning" },
+        { log: "Voice pattern matched known scammer profiles", severity: "error" },
+        { log: "Validating caller identity...", severity: "info" },
+        { log: "Caller identity verification failed", severity: "error" },
+        { log: "Finalizing scam probability assessment...", severity: "info" },
+        { log: "SCAM DETECTED: High confidence (98.7%)", severity: "error" },
+        { log: "Transfering call to Cyber Security Command Center", severity: "warning" },
+    ];
+
+    useEffect(() => {
+        clearInterval(intervalRef.current); // Always clear before starting new
+        if (callStatus === "incoming" || callStatus === "analyzing") {
+            if (callStatus === "incoming") {
+                setDisplayedLogs([]);
+                logIndexRef.current = 0;
+            }
+
+            intervalRef.current = window.setInterval(() => {
+                if (logIndexRef.current < allLogs.length) {
+                    setDisplayedLogs((prev) => {
+                        const nextLog = allLogs[logIndexRef.current];
+                        logIndexRef.current += 1;
+                        return [...prev, nextLog];
+                    });
+                } else {
+                    clearInterval(intervalRef.current);
+                }
+            }, 2000);
+        }
+
+        return () => clearInterval(intervalRef.current);
+    }, [callStatus]);
+
     // Scroll to bottom of terminal when logs update
     useEffect(() => {
         if (scammerTerminalRef.current) {
             scammerTerminalRef.current.scrollTop = scammerTerminalRef.current.scrollHeight;
         }
-    }, [logs]);
-
-    // Initialize logs when component mounts
-    useEffect(() => {
-        const initialLogs: LogEntry[] = [
-            {
-                timestamp: new Date().toISOString().split("T")[1].split(".")[0],
-                message: "Initializing Digital Robocop...",
-                type: "system",
-            },
-            {
-                timestamp: new Date().toISOString().split("T")[1].split(".")[0],
-                message: "Loading AI voice pattern recognition models...",
-                type: "system",
-            },
-            {
-                timestamp: new Date().toISOString().split("T")[1].split(".")[0],
-                message: "Connected to Audio Fingerprinting Service real-time threat feed",
-                type: "success",
-            },
-            {
-                timestamp: new Date().toISOString().split("T")[1].split(".")[0],
-                message: "System ready - awaiting call events",
-                type: "success",
-            },
-        ];
-        setLogs(initialLogs);
-    }, []);
+    }, [displayedLogs]);
 
     // Handle call status changes
     useEffect(() => {
         if (callStatus === "incoming") {
-            const newLogs = [
-                ...logs,
-                {
-                    timestamp: new Date().toISOString().split("T")[1].split(".")[0],
-                    message: `Incoming call detected from ${callerInfo.number}`,
-                    type: "warning",
-                },
-                {
-                    timestamp: new Date().toISOString().split("T")[1].split(".")[0],
-                    message: `Caller identified as ${callerInfo.name}`,
-                    type: "info",
-                },
-                {
-                    timestamp: new Date().toISOString().split("T")[1].split(".")[0],
-                    message: "Starting comprehensive scam analysis protocol",
-                    type: "system",
-                },
-            ];
-            setLogs(newLogs);
             setCurrentStep(0);
-            setStepProgress(0);
         }
     }, [callStatus]);
 
@@ -119,53 +118,6 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
 
             if (step !== currentStep) {
                 setCurrentStep(step);
-                setStepProgress(0);
-
-                if (step < steps.length) {
-                    const newLogs = [
-                        ...logs,
-                        {
-                            timestamp: new Date().toISOString().split("T")[1].split(".")[0],
-                            message: `[STEP ${step + 1}/${steps.length}] ${steps[step].title}`,
-                            type: "info",
-                            progress: 0,
-                        },
-                    ];
-                    setLogs(newLogs);
-                }
-            }
-
-            // Calculate progress within current step
-            const stepStart = (100 / steps.length) * currentStep;
-            const stepEnd = (100 / steps.length) * (currentStep + 1);
-            const currentStepProgress = ((progress - stepStart) / (stepEnd - stepStart)) * 100;
-
-            setStepProgress(currentStepProgress);
-
-            // Update progress in the current step log
-            if (logs.length > 0 && currentStep < steps.length) {
-                const lastLog = logs[logs.length - 1];
-                if (lastLog.message.includes(`[STEP ${currentStep + 1}/${steps.length}]`)) {
-                    const updatedLogs = [...logs];
-                    updatedLogs[updatedLogs.length - 1] = {
-                        ...lastLog,
-                        progress: currentStepProgress,
-                    };
-                    setLogs(updatedLogs);
-                }
-            }
-
-            // Add detailed message when step completes
-            if (currentStepProgress >= 100 && currentStep < steps.length) {
-                const newLogs = [
-                    ...logs,
-                    {
-                        timestamp: new Date().toISOString().split("T")[1].split(".")[0],
-                        message: steps[currentStep].message,
-                        type: "success",
-                    },
-                ];
-                setLogs(newLogs);
             }
         }
     }, [progress, callStatus]);
@@ -191,17 +143,15 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
                             </div>
                         </div>
                         <div className="terminal-body" ref={scammerTerminalRef}>
-                            {logs.map((log, index) => (
-                                <div key={index} className={`log-entry ${log.type}`}>
-                                    <span className="timestamp">[{log.timestamp}]</span>
-                                    <span className="log-message">{log.message}</span>
-                                    {log.progress !== undefined && (
-                                        <div className="terminal-progress-container">
-                                            <div className="terminal-progress-bar" style={{ width: `${log.progress}%` }}></div>
+                            {displayedLogs.map(
+                                (log, index) =>
+                                    log && (
+                                        <div key={index} className={`log-entry ${log.severity}`}>
+                                            <span className="timestamp">[{new Date().toLocaleTimeString()}]</span>
+                                            <span className="log-message">{log.log}</span>
                                         </div>
-                                    )}
-                                </div>
-                            ))}
+                                    )
+                            )}
                         </div>
                         <div className="terminal-input">
                             <span className="prompt">scam@detector:~#</span>
