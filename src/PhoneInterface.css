@@ -33,7 +33,7 @@
     top: 8px;
     left: 50%;
     transform: translateX(-50%);
-    width: 140px;
+    width: 120px;
     height: 25px;
     background: #1a1a1a;
     border-radius: 18px;
@@ -54,7 +54,7 @@
 .status-bar {
     display: flex;
     justify-content: space-between;
-    padding: 12px 24px 4px 24px;
+    padding: 12px 28px 4px 28px;
     color: white;
     font-weight: 600;
     z-index: 10;
