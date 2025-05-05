@@ -109,7 +109,7 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({ victimAudioRe
             victimTerminalRef.current.scrollTop = victimTerminalRef.current.scrollHeight;
         }
     }, [victimLogs]);
-    
+
     useEffect(() => {
         if (scammerTerminalRef.current) {
             scammerTerminalRef.current.scrollTop = scammerTerminalRef.current.scrollHeight;
@@ -132,7 +132,7 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({ victimAudioRe
                                     <div className="cyber-terminal-btn cyber-terminal-btn-maximize"></div>
                                 </div>
                                 <div className="cyber-terminal-titlebar">
-                                    <span className="cyber-terminal-appname">Victim Terminal</span>
+                                    <span className="cyber-terminal-appname">Digital Robocop</span>
                                     <span className="cyber-terminal-version">v2.3.7</span>
                                 </div>
                                 <div className="cyber-terminal-state">
@@ -170,8 +170,7 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({ victimAudioRe
                                     <div className="cyber-terminal-btn cyber-terminal-btn-maximize"></div>
                                 </div>
                                 <div className="cyber-terminal-titlebar">
-                                    <span className="cyber-terminal-appname">Scam Detector</span>
-                                    <span className="cyber-terminal-version">v2.3.7</span>
+                                    <span className="cyber-terminal-appname">Scam Source Log</span>
                                 </div>
                                 <div className="cyber-terminal-state">
                                     <div

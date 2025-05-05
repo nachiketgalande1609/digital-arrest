@@ -63,7 +63,7 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
         const initialLogs: LogEntry[] = [
             {
                 timestamp: new Date().toISOString().split("T")[1].split(".")[0],
-                message: "Initializing digital arrest detection system...",
+                message: "Initializing Digital Robocop...",
                 type: "system",
             },
             {
@@ -182,7 +182,7 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
                                 <div className="terminal-btn maximize"></div>
                             </div>
                             <div className="terminal-title">
-                                <span className="app-name">Digital Arrest</span>
+                                <span className="app-name">Digital Robocop</span>
                                 <span className="app-version">v2.3.7</span>
                             </div>
                             <div className="terminal-status">
@@ -274,7 +274,7 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
                                     </svg>
                                 </div>
                                 <h1>SCAM ALERT</h1>
-                                <h2>Transfering the Call to Telangana Cyber Bureau</h2>
+                                <h2>Transfering the Call to Telangana Cyber Security Command Center</h2>
                                 <button className="end-call-btn" onClick={handleDecline}>
                                     <span className="icon">☎</span>
                                     <span>End Call</span>
