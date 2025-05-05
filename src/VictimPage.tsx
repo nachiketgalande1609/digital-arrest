@@ -167,7 +167,7 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
                             <div className="avatar-container">
                                 <img src={callerInfo.avatar} alt="Caller" className="caller-avatar" />
                             </div>
-                            <h2>{activeSpeaker === "caller" ? callerInfo.name : "Victim"}</h2>
+                            <h2>Unknown Caller</h2>
                             <p className="caller-number">{callerInfo.number}</p>
 
                             {callStatus === "incoming" && (
