@@ -210,7 +210,6 @@ const App: React.FC = () => {
                             callStatus={callStatus}
                             progress={progress}
                             callerInfo={callerInfo}
-                            activeSpeaker={activeSpeaker}
                             handleDecline={handleDecline}
                             handleAnswer={handleAnswer}
                         />

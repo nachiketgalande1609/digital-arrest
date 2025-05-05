@@ -5,7 +5,6 @@ interface VictimPageProps {
     callStatus: "incoming" | "analyzing" | "scam-detected" | "call-ended";
     progress: number;
     callerInfo: { avatar: string; name: string; number: string };
-    activeSpeaker: "caller" | "victim";
     handleDecline: () => void;
     handleAnswer: () => void;
 }
@@ -15,7 +14,7 @@ interface LogEntry {
     severity: "default" | "info" | "success" | "warning" | "error";
 }
 
-const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInfo, activeSpeaker, handleDecline }) => {
+const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInfo, handleDecline }) => {
     const scammerTerminalRef = useRef<HTMLDivElement>(null);
     const [currentStep, setCurrentStep] = useState<number>(0);
     const [displayedLogs, setDisplayedLogs] = useState<any>([]);
@@ -56,6 +55,24 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
         { log: `Incoming call detected from ${callerInfo.number}`, severity: "warning" },
         { log: `Caller identified as ${callerInfo.name}`, severity: "info" },
         { log: "Starting comprehensive scam analysis protocol", severity: "default" },
+
+        // Threat pattern detection logs
+        { log: "Scanning for known threat patterns...", severity: "info" },
+        { log: "Detecting Threat Pattern #TSC-0042: IRS/Tax Scam", severity: "warning" },
+        { log: "Detecting Threat Pattern #TSC-0115: Tech Support Fraud", severity: "warning" },
+        { log: "Detecting Threat Pattern #TSC-0087: Fake Bank Alert", severity: "warning" },
+        { log: "Detecting Threat Pattern #TSC-0031: Social Security Number Suspension", severity: "warning" },
+        { log: "Detecting Threat Pattern #TSC-0099: Fake Prize/Lottery Winning", severity: "warning" },
+        { log: "Detecting Threat Pattern #TSC-0065: Grandparent/Relative Emergency", severity: "warning" },
+        { log: "Detecting Threat Pattern #TSC-0073: Fake Debt Collection", severity: "warning" },
+        { log: "Detecting Threat Pattern #TSC-0028: Romance Scam Opening", severity: "warning" },
+        { log: "Detecting Threat Pattern #TSC-0054: Fake Job Offer", severity: "warning" },
+        { log: "Detecting Threat Pattern #TSC-0042: Customs Narcotics Scam", severity: "warning" },
+        { log: "Scammer impersonating Mumbai Customs Narcotics Division", severity: "error" },
+        { log: "Scammer warning about parcel containing drugs and illegal items", severity: "error" },
+        { log: "Threat pattern scan complete - Fraud detected: Customs Narcotics Scam", severity: "error" },
+
+        // Continue with existing logs
         { log: "Connecting to audio fingerprinting service...", severity: "info" },
         { log: "Audio fingerprint analysis complete", severity: "success" },
         { log: "Analyzing call metadata...", severity: "info" },
@@ -68,7 +85,10 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
         { log: "Caller identity verification failed", severity: "error" },
         { log: "Finalizing scam probability assessment...", severity: "info" },
         { log: "SCAM DETECTED: High confidence (98.7%)", severity: "error" },
-        { log: "Transfering call to Cyber Security Command Center", severity: "warning" },
+        { log: "Confidence level: 95% - Scam call highly likely", severity: "warning" },
+        { log: "Reverifying call analysis to confirm scam detection", severity: "info" },
+        { log: "Reverification complete: Confirmed Scam Call", severity: "error" },
+        { log: "Transfering call to Telangana Cyber Crime Command Center", severity: "warning" },
     ];
 
     useEffect(() => {
@@ -81,7 +101,7 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
                     timestamp: new Date().toLocaleTimeString(),
                 };
                 setDisplayedLogs((prev: any) => [...prev, logWithTimestamp]);
-                timeoutId = window.setTimeout(() => displayLogsSequentially(index + 1), 2000);
+                timeoutId = window.setTimeout(() => displayLogsSequentially(index + 1), 500);
             }
         };
 
@@ -224,7 +244,7 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
                                     </svg>
                                 </div>
                                 <h1>SCAM ALERT</h1>
-                                <h2>Transfering the Call to Telangana Cyber Security Command Center</h2>
+                                <h2>Transfering the Call to Telangana Cyber Crime Command Center</h2>
                                 <button className="end-call-btn" onClick={handleDecline}>
                                     <span className="icon">☎</span>
                                     <span>End Call</span>

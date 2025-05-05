@@ -76,7 +76,7 @@ const Navbar = () => {
                     <img src="/logo.png" alt="Telangana Cyber Cell Logo" className="navbar-logo-img" />
                     <div>
                         <h1 className="navbar-title">Telangana</h1>
-                        <h1 className="navbar-title">Cyber Security Command Center</h1>
+                        <h1 className="navbar-title">Cyber Crime Command Center</h1>
                     </div>
                 </div>
 
