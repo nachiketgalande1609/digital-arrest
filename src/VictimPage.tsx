@@ -74,27 +74,25 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
     ];
 
     useEffect(() => {
-        clearInterval(intervalRef.current); // Always clear before starting new
+        let timeoutId: number;
+
+        const displayLogsSequentially = (index: number) => {
+            if (index < allLogs.length) {
+                setDisplayedLogs((prev) => [...prev, allLogs[index]]);
+                timeoutId = window.setTimeout(() => displayLogsSequentially(index + 1), 2000);
+            }
+        };
+
         if (callStatus === "incoming" || callStatus === "analyzing") {
             if (callStatus === "incoming") {
                 setDisplayedLogs([]);
-                logIndexRef.current = 0;
             }
-
-            intervalRef.current = window.setInterval(() => {
-                if (logIndexRef.current < allLogs.length) {
-                    setDisplayedLogs((prev) => {
-                        const nextLog = allLogs[logIndexRef.current];
-                        logIndexRef.current += 1;
-                        return [...prev, nextLog];
-                    });
-                } else {
-                    clearInterval(intervalRef.current);
-                }
-            }, 2000);
+            displayLogsSequentially(0);
         }
 
-        return () => clearInterval(intervalRef.current);
+        return () => {
+            clearTimeout(timeoutId);
+        };
     }, [callStatus]);
 
     // Scroll to bottom of terminal when logs update
