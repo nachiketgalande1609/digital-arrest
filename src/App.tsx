@@ -68,7 +68,7 @@ const App: React.FC = () => {
                     const nextProgress = prev + (Math.random() * 3 + 2);
                     return nextProgress;
                 });
-            }, 1500);
+            }, 2500);
 
             return () => clearInterval(analysisInterval);
         }
@@ -81,7 +81,7 @@ const App: React.FC = () => {
 
         if (currentAudioIndex >= audioFiles.length) {
             setCallStatus("call-ended");
-            setShowScammerDetails(true); // Open the modal
+            setShowScammerDetails(true);
             return;
         }
 
@@ -94,7 +94,7 @@ const App: React.FC = () => {
         if (targetAudioRef.current) {
             targetAudioRef.current.src = currentAudio.src;
             targetAudioRef.current.onended = () => {
-                if (currentAudioIndex === 1) {
+                if (currentAudioIndex === 7) {
                     setCallStatus("scam-detected");
                     if (beepRef.current) {
                         setIsBeepPlaying(true);
