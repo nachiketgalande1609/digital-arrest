@@ -218,7 +218,7 @@ body {
 }
 
 .cyber-log-warning .cyber-log-message {
-    color: var(--cyber-accent-warning);
+    color: #000000;
 }
 
 .cyber-log-error .cyber-log-message {
@@ -227,7 +227,7 @@ body {
 }
 
 .cyber-log-success .cyber-log-message {
-    color: var(--cyber-accent-secondary);
+    color: green;
 }
 
 .cyber-log-debug .cyber-log-message {

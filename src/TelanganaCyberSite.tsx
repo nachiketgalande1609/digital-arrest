@@ -11,65 +11,60 @@ interface TelangalanCyberSiteProps {
     callStatus: "incoming" | "analyzing" | "scam-detected" | "call-ended";
 }
 
+type LogSeverity = "info" | "warning" | "error" | "success";
+
+interface LogEntry {
+    timestamp: string;
+    message: string;
+    type: LogSeverity;
+}
+
 const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({ victimAudioRef, scammerAudioRef, activeSpeaker, callStatus }) => {
-    const [victimLogs, setVictimLogs] = useState<any[]>([]);
-    const [scammerLogs, setScammerLogs] = useState<any[]>([]);
+    const [victimLogs, setVictimLogs] = useState<LogEntry[]>([]);
+    const [scammerLogs, setScammerLogs] = useState<LogEntry[]>([]);
 
     const victimTerminalRef = useRef<HTMLDivElement>(null);
     const scammerTerminalRef = useRef<HTMLDivElement>(null);
 
-    const victimMessages = useRef<string[]>([
-        "Initiated conversation loop: expressing confusion to prolong interaction.",
-        "Analyzing scammer's message pattern… injecting logical inconsistencies.",
-        "Deployed counter-questions to simulate gullibility while assessing intent.",
-        "Location triangulation in progress… delaying with false banking questions.",
-        "Responded with emotional vulnerability script to escalate scammer engagement.",
-        "Simulated typing delay to mimic human thought process.",
-        "GPS signal lock: 62% — maintaining chatter with fabricated account issue.",
-        "Internal reasoning: scammer’s story has contradiction, escalating confusion.",
-        "Behavioral markers matched — scammer profile 87% confidence.",
-        "Geolocation fix achieved — handing off to enforcement.",
+    const victimMessages = useRef<{ message: string; severity: LogSeverity }[]>([
+        { message: "Initiated conversation loop: expressing confusion to prolong interaction.", severity: "info" },
+        { message: "Analyzing scammer's message pattern… injecting logical inconsistencies.", severity: "info" },
+        { message: "Deployed counter-questions to simulate gullibility while assessing intent.", severity: "info" },
+        { message: "Location triangulation in progress… delaying with false banking questions.", severity: "warning" },
+        { message: "Responded with emotional vulnerability script to escalate scammer engagement.", severity: "info" },
+        { message: "Simulated typing delay to mimic human thought process.", severity: "info" },
+        { message: "GPS signal lock: 62% — maintaining chatter with fabricated account issue.", severity: "warning" },
+        { message: "Internal reasoning: scammer's story has contradiction, escalating confusion.", severity: "error" },
+        { message: "Behavioral markers matched — scammer profile 87% confidence.", severity: "error" },
+        { message: "Geolocation fix achieved — handing off to enforcement.", severity: "success" },
     ]);
 
-    const scammerMessages = useRef<string[]>([
-        "Call analyzing: scam script initiated — impersonating victim.",
-        "Voice detected — initiating vocal pattern analysis...",
-        "AI Response Delay Detected — possible stalling tactic.",
-        "Voice stress level rising — 72% inconsistency with claimed identity.",
-        "IP trace started... routing through suspicious proxy (Singapore node).",
-        "Deep packet inspection triggered — unusual DNS tunneling behavior found.",
-        "Cross-referencing vocal pattern with scammer database (v3.4)...",
-        "Match found: previously flagged voiceprint — Confidence: 91.2%",
-        "AI assistant repeating queries — scammer agitation detected.",
-        "IP re-routing failed — real IP identified: 182.72.89.54",
-        "Location triangulated via IP, voice latency, and call metadata.",
-        "Final Location: **Koti, Hyderabad, Telangana, India**",
-        "Flagged for law enforcement handoff — tracker engaged.",
+    const scammerMessages = useRef<{ message: string; severity: LogSeverity }[]>([
+        { message: "Call analyzing: scam script initiated — impersonating victim.", severity: "info" },
+        { message: "Voice detected — initiating vocal pattern analysis...", severity: "info" },
+        { message: "AI Response Delay Detected — possible stalling tactic.", severity: "warning" },
+        { message: "Voice stress level rising — 72% inconsistency with claimed identity.", severity: "warning" },
+        { message: "IP trace started... routing through suspicious proxy (Singapore node).", severity: "error" },
+        { message: "Deep packet inspection triggered — unusual DNS tunneling behavior found.", severity: "error" },
+        { message: "Cross-referencing vocal pattern with scammer database (v3.4)...", severity: "warning" },
+        { message: "Match found: previously flagged voiceprint — Confidence: 91.2%", severity: "error" },
+        { message: "AI assistant repeating queries — scammer agitation detected.", severity: "warning" },
+        { message: "IP re-routing failed — real IP identified: 182.72.89.54", severity: "error" },
+        { message: "Location triangulated via IP, voice latency, and call metadata.", severity: "error" },
+        { message: "Final Location: **Koti, Hyderabad, Telangana, India**", severity: "error" },
+        { message: "Flagged for law enforcement handoff — tracker engaged.", severity: "error" },
     ]);
-
-    useEffect(() => {
-        const victimInterval = setInterval(() => {
-            const timestamp = new Date().toLocaleTimeString();
-            const victimMsg = victimMessages.current[0];
-            if (victimMsg) {
-                setVictimLogs((prev) => [...prev, { timestamp, message: victimMsg, type: "info" }]);
-                victimMessages.current.shift();
-            }
-        }, 5000);
-
-        return () => clearInterval(victimInterval);
-    }, []);
 
     useEffect(() => {
         // Initial victim log
-        const initialVictimLog = {
+        const initialVictimLog: LogEntry = {
             timestamp: new Date().toLocaleTimeString(),
             message: "AI Assistant activated — initiating scammer time-wasting protocol...",
             type: "info",
         };
 
         // Initial scammer log
-        const initialScammerLog = {
+        const initialScammerLog: LogEntry = {
             timestamp: new Date().toLocaleTimeString(),
             message: "Call connected — analyzing audio input for scam indicators...",
             type: "info",
@@ -83,7 +78,7 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({ victimAudioRe
             const timestamp = new Date().toLocaleTimeString();
             const victimMsg = victimMessages.current[0];
             if (victimMsg) {
-                setVictimLogs((prev) => [...prev, { timestamp, message: victimMsg, type: "info" }]);
+                setVictimLogs((prev) => [...prev, { timestamp, message: victimMsg.message, type: victimMsg.severity }]);
                 victimMessages.current.shift();
             }
         }, 5000);
@@ -93,7 +88,7 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({ victimAudioRe
             const timestamp = new Date().toLocaleTimeString();
             const scammerMsg = scammerMessages.current[0];
             if (scammerMsg) {
-                setScammerLogs((prev) => [...prev, { timestamp, message: scammerMsg, type: "info" }]);
+                setScammerLogs((prev) => [...prev, { timestamp, message: scammerMsg.message, type: scammerMsg.severity }]);
                 scammerMessages.current.shift();
             }
         }, 4000);
@@ -152,7 +147,7 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({ victimAudioRe
                             </div>
                             <div className="cyber-terminal-content cyber-terminal-scroll" ref={victimTerminalRef}>
                                 {victimLogs.map((log, index) => (
-                                    <div key={index} className={`cyber-log-entry ${log.type}`}>
+                                    <div key={index} className={`cyber-log-entry cyber-log-${log.type}`}>
                                         <span className="cyber-log-time">[{log.timestamp}]</span>
                                         <span className="cyber-log-message">{log.message}</span>
                                     </div>
@@ -189,7 +184,7 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({ victimAudioRe
                             </div>
                             <div className="cyber-terminal-content cyber-terminal-scroll" ref={scammerTerminalRef}>
                                 {scammerLogs.map((log, index) => (
-                                    <div key={index} className={`cyber-log-entry ${log.type}`}>
+                                    <div key={index} className={`cyber-log-entry cyber-log-${log.type}`}>
                                         <span className="cyber-log-time">[{log.timestamp}]</span>
                                         <span className="cyber-log-message">{log.message}</span>
                                     </div>
