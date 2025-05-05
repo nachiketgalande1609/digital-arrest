@@ -6,8 +6,10 @@ interface ScammerDetails {
     name: string;
     phoneNumber: string;
     location: string;
+    realLocation: string;
     coordinates: [number, number];
     ipAddress: string;
+    realIpAddress: string;
     vpnProvider: string;
     carrier: string;
     threatLevel: "HIGH" | "CRITICAL" | "SEVERE";
@@ -31,9 +33,11 @@ const ScammerDetailsModal: React.FC<{ onClose: () => void }> = ({ onClose }) => 
         id: "CCD-2023-4872",
         name: "Operation Silver Tongue - Primary Suspect",
         phoneNumber: "+91 98XXXXXX21 (Burner)",
-        location: "Hyderabad, Telangana, India",
-        coordinates: [17.385, 78.4867],
-        ipAddress: "182.72.123.45 → VPN Exit (Singapore)",
+        location: "Phnom Penh, Cambodia (VPN Exit)",
+        realLocation: "Hyderabad, Telangana, India (Actual)",
+        coordinates: [11.5564, 104.9282], // Phnom Penh coordinates
+        ipAddress: "182.72.123.45 → VPN Exit (Cambodia)",
+        realIpAddress: "117.212.87.34 (Identified Real IP - Hyderabad)",
         vpnProvider: "NordVPN (Compromised Account)",
         carrier: "Jio Mobile (SIM Box Spoofing)",
         threatLevel: "CRITICAL",
@@ -70,7 +74,7 @@ const ScammerDetailsModal: React.FC<{ onClose: () => void }> = ({ onClose }) => 
                 </div>
 
                 <div className="cyber-modal-body">
-                    <div className="cyber-stats-grid">
+                    {/* <div className="cyber-stats-grid">
                         <div className="cyber-stat-card critical">
                             <div className="stat-label">Location Confidence</div>
                             <div className="stat-value">92%</div>
@@ -91,29 +95,29 @@ const ScammerDetailsModal: React.FC<{ onClose: () => void }> = ({ onClose }) => 
                             <div className="stat-label">Case Status</div>
                             <div className="stat-value status-badge">{scammerData.caseStatus}</div>
                         </div>
-                    </div>
+                    </div> */}
 
                     <div className="cyber-detail-section">
                         <h3 className="section-title">LOCATION TRACKING</h3>
                         <div className="cyber-detail-grid">
                             <div className="detail-item">
-                                <span className="detail-label">Last Known Location</span>
+                                <span className="detail-label">VPN Exit Location</span>
                                 <span className="detail-value">
                                     {scammerData.location}
                                     <span className="gps-coords">{scammerData.coordinates.join(", ")}</span>
                                 </span>
                             </div>
                             <div className="detail-item">
-                                <span className="detail-label">Network Path</span>
-                                <span className="detail-value warning">{scammerData.ipAddress}</span>
+                                <span className="detail-label">Real Location</span>
+                                <span className="detail-value success">{scammerData.realLocation}</span>
                             </div>
                             <div className="detail-item">
-                                <span className="detail-label">VPN Provider</span>
-                                <span className="detail-value">{scammerData.vpnProvider}</span>
+                                <span className="detail-label">VPN IP Address</span>
+                                <span className="detail-value">{scammerData.ipAddress}</span>
                             </div>
                             <div className="detail-item">
-                                <span className="detail-label">Carrier Spoof</span>
-                                <span className="detail-value">{scammerData.carrier}</span>
+                                <span className="detail-label">Real IP Address</span>
+                                <span className="detail-value success">{scammerData.realIpAddress}</span>
                             </div>
                         </div>
                     </div>
@@ -128,6 +132,10 @@ const ScammerDetailsModal: React.FC<{ onClose: () => void }> = ({ onClose }) => 
                             <div className="tech-item">
                                 <span className="tech-label">Call Pattern</span>
                                 <span className="tech-value">{scammerData.technicalFootprint.callPattern}</span>
+                            </div>
+                            <div className="tech-item full-width">
+                                <span className="tech-label">VPN Detection Method</span>
+                                <span className="tech-value">TCP timestamp analysis + VPN server fingerprint mismatch</span>
                             </div>
                         </div>
                     </div>
@@ -150,6 +158,7 @@ const ScammerDetailsModal: React.FC<{ onClose: () => void }> = ({ onClose }) => 
                         <button className="cyber-action-btn secondary">FREEZE ASSETS</button>
                         <button className="cyber-action-btn tertiary">ISSUE WARRANT</button>
                     </div>
+                    <div className="cyber-timestamp">Last updated: {new Date().toLocaleString()} | VPN detection confidence: 87%</div>
                 </div>
             </div>
         </div>

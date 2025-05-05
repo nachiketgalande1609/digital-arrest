@@ -16,7 +16,8 @@
 
 .cyber-modal {
     background: #0a0a12;
-    border-radius: 16px; /* Add rounded corners to the main modal */
+    border-radius: 16px;
+    /* Add rounded corners to the main modal */
     width: 90%;
     max-width: 900px;
     max-height: 90vh;
@@ -84,67 +85,6 @@
 .cyber-modal-body {
     padding: 20px;
     flex: 1;
-}
-
-.cyber-stats-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
-    margin-bottom: 25px;
-}
-
-.cyber-stat-card {
-    background: #121220;
-    border: 1px solid #1e2d3d;
-    padding: 15px;
-    position: relative;
-    border-radius: 12px; /* Round the modal body */
-    overflow: hidden;
-}
-
-.cyber-stat-card.critical {
-    border-left: 4px solid #ff4d4d;
-}
-
-.cyber-stat-card.high {
-    border-left: 4px solid #ff9a4d;
-}
-
-.stat-label {
-    font-size: 0.8rem;
-    color: #7f8c8d;
-    margin-bottom: 5px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.stat-value {
-    font-size: 1.8rem;
-    font-weight: bold;
-    color: #fff;
-    margin-bottom: 10px;
-}
-
-.stat-value.status-badge {
-    font-size: 1rem;
-    background: rgba(0, 255, 255, 0.2);
-    color: #0ff;
-    padding: 5px 10px;
-    display: inline-block;
-}
-
-.stat-bar {
-    height: 4px;
-    background: rgba(255, 255, 255, 0.1);
-    width: 100%;
-    border-radius: 6px; /* Round the stat bars */
-    overflow: hidden;
-}
-
-.stat-bar-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #ff4d4d 0%, #ff9a4d 100%);
-    border-radius: 6px; /* Match the stat bar radius */
 }
 
 .cyber-detail-section {
@@ -246,7 +186,8 @@
     border-radius: 3px;
     font-size: 0.8rem;
     border: 1px solid rgba(0, 255, 255, 0.3);
-    border-radius: 20px; /* Make badges pill-shaped */
+    border-radius: 20px;
+    /* Make badges pill-shaped */
 }
 
 .cyber-bio-features {
@@ -347,4 +288,23 @@
     font-size: 0.7rem;
     color: #7f8c8d;
     text-align: right;
+}
+
+.detail-value.success {
+    color: #4dff4d;
+    font-weight: bold;
+}
+
+.tech-item.full-width {
+    grid-column: span 2;
+}
+
+.success-badge {
+    background: rgba(77, 255, 77, 0.1);
+    color: #4dff4d;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 0.7rem;
+    margin-left: 8px;
+    border: 1px solid rgba(77, 255, 77, 0.3);
 }
