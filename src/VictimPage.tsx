@@ -18,9 +18,7 @@ interface LogEntry {
 const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInfo, activeSpeaker, handleDecline }) => {
     const scammerTerminalRef = useRef<HTMLDivElement>(null);
     const [currentStep, setCurrentStep] = useState<number>(0);
-    const [displayedLogs, setDisplayedLogs] = useState<LogEntry[]>([]);
-    const logIndexRef = useRef<number>(0);
-    const intervalRef = useRef<number | undefined>(undefined);
+    const [displayedLogs, setDisplayedLogs] = useState<any>([]);
 
     // Steps with their descriptions
     const steps = [
@@ -78,7 +76,11 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
 
         const displayLogsSequentially = (index: number) => {
             if (index < allLogs.length) {
-                setDisplayedLogs((prev) => [...prev, allLogs[index]]);
+                const logWithTimestamp = {
+                    ...allLogs[index],
+                    timestamp: new Date().toLocaleTimeString(),
+                };
+                setDisplayedLogs((prev: any) => [...prev, logWithTimestamp]);
                 timeoutId = window.setTimeout(() => displayLogsSequentially(index + 1), 2000);
             }
         };
@@ -142,10 +144,10 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
                         </div>
                         <div className="terminal-body" ref={scammerTerminalRef}>
                             {displayedLogs.map(
-                                (log, index) =>
+                                (log: any, index: any) =>
                                     log && (
                                         <div key={index} className={`log-entry ${log.severity}`}>
-                                            <span className="timestamp">[{new Date().toLocaleTimeString()}]</span>
+                                            <span className="timestamp">[{log.timestamp}]</span>
                                             <span className="log-message">{log.log}</span>
                                         </div>
                                     )
