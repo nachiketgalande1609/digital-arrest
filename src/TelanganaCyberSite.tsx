@@ -36,22 +36,20 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
     console.log(currentAudioIndex);
 
     const victimMessages = useRef<{ message: string; severity: LogSeverity }[]>([
-        { message: "[SYSTEM BOOT] Deepfake voice synthesis initialized via ElevenLabs API v3.2.", severity: "info" },
         { message: "Voice profile loaded: 'Female: nervous tone' (ID: VCTM-8872).", severity: "success" },
-        { message: "Connecting to OpenAI GPT-4-turbo model for dynamic response generation...", severity: "info" },
+        { message: "Connected to OpenAI GPT-4-turbo model for dynamic response generation...", severity: "info" },
         { message: "Deepfake voice engaged: 'Frightened woman' (ElevenLabs v3.4).", severity: "info" },
         { message: "VPN Detection: Call origin masked via NordVPN exit node (Jakarta, Indonesia).", severity: "error" },
         { message: "Scammer script: 'This is Officer Sharma from Mumbai Narcotics! A parcel in your name...'.", severity: "warning" },
         { message: "RTP packet analysis: High jitter (187ms) → Likely overseas routing.", severity: "error" },
         { message: "Countermeasure: AI feigns panic—'Oh god! But I didn’t order anything!'.", severity: "info" },
-        { message: "STUN server probe: Attempting to bypass VPN via WebRTC leak.", severity: "warning" },
-        { message: "Scammer demands: 'Pay ₹1.2 lakh via Bitcoin or face arrest!'.", severity: "error" },
-        { message: "Voice stress analysis: Scammer frustration rising (pitch +12%).", severity: "warning" },
-        { message: "Traceroute initiated: Hopping through VPN nodes (Singapore → Netherlands).", severity: "error" },
+        { message: "STUN server probe: Attempting to bypass VPN via WebRTC leak.", severity: "info" },
+        { message: "Voice stress analysis: Scammer frustration rising (pitch +12%).", severity: "success" },
+        { message: "Traceroute initiated: Hopping through VPN nodes (Cambodia → India).", severity: "error" },
         { message: "Fake 'Mumbai Police' portal loaded (scammer phishing link clicked).", severity: "success" },
-        { message: "Scammer enters credentials: [ID: narcotics_scam@protonmail.com].", severity: "error" },
         { message: "DNS tunneling detected: Malicious .onion domain resolved.", severity: "error" },
         { message: "VPN IP stripped! Real IP exposed: 117.211.75.63 (BSNL, New Delhi).", severity: "success" },
+        { message: "Scammer demands: 'Pay ₹92,000 as a security deposit or face arrest!'.", severity: "error" },
         { message: "Final handoff: Cyber Crime Division notified w/ full call logs.", severity: "success" },
     ]);
 
@@ -74,7 +72,7 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
         // Initial victim log
         const initialVictimLog: LogEntry = {
             timestamp: new Date().toLocaleTimeString(),
-            message: "AI Assistant activated — initiating scammer time-wasting protocol...",
+            message: "[SYSTEM BOOT] Deepfake voice synthesis initialized via ElevenLabs API v3.2.",
             type: "info",
         };
 
@@ -120,8 +118,8 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
             const newLog: LogEntry = {
                 timestamp,
                 message:
-                    "Deepfake Response: Please, please try to understand. There is a mistake. I have no clue about such parcel. I swear. I am innocent. Please tell me how this can be fixed now?",
-                type: "info",
+                    "Deepfake Response: What! This sounds serious. I have no one at Taiwan. I don't know anyone from there. I have never sent or received anything from Taiwan. There is a mistake.",
+                type: "warning",
             };
             setVictimLogs((prev) => [...prev, newLog]);
         } else if (currentAudioIndex === 8) {
