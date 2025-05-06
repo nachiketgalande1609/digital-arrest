@@ -189,7 +189,7 @@ body {
     padding: 16px;
     overflow-y: auto;
     font-family: "Fira Code", monospace;
-    font-size: 16px;
+    font-size: 18px;
     line-height: 1.5;
     color: var(--cyber-text-primary);
     background-color: rgba(0, 0, 0, 0.2);
@@ -219,7 +219,7 @@ body {
 
 .cyber-log-warning .cyber-log-message {
     color: rgb(255, 238, 0);
-    background-color: rgb(0,0,0,0.5);
+    background-color: rgb(0, 0, 0, 0.5);
     padding: 5px;
     border-radius: 10px;
 }

@@ -39,18 +39,6 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
         { message: "Voice profile loaded: 'Female: nervous tone' (ID: VCTM-8872).", severity: "success" },
         { message: "Connected to OpenAI GPT-4-turbo model for dynamic response generation...", severity: "info" },
         { message: "Deepfake voice engaged: 'Frightened woman' (ElevenLabs v3.4).", severity: "info" },
-        { message: "VPN Detection: Call origin masked via NordVPN exit node (Jakarta, Indonesia).", severity: "error" },
-        { message: "Scammer script: 'This is Officer Sharma from Mumbai Narcotics! A parcel in your name...'.", severity: "warning" },
-        { message: "RTP packet analysis: High jitter (187ms) → Likely overseas routing.", severity: "error" },
-        { message: "Countermeasure: AI feigns panic—'Oh god! But I didn’t order anything!'.", severity: "info" },
-        { message: "STUN server probe: Attempting to bypass VPN via WebRTC leak.", severity: "info" },
-        { message: "Voice stress analysis: Scammer frustration rising (pitch +12%).", severity: "success" },
-        { message: "Traceroute initiated: Hopping through VPN nodes (Cambodia → India).", severity: "error" },
-        { message: "Fake 'Mumbai Police' portal loaded (scammer phishing link clicked).", severity: "success" },
-        { message: "DNS tunneling detected: Malicious .onion domain resolved.", severity: "error" },
-        { message: "VPN IP stripped! Real IP exposed: 117.211.75.63 (BSNL, New Delhi).", severity: "success" },
-        { message: "Scammer demands: 'Pay ₹92,000 as a security deposit or face arrest!'.", severity: "error" },
-        { message: "Final handoff: Cyber Crime Division notified w/ full call logs.", severity: "success" },
     ]);
 
     const scammerMessages = useRef<{ message: string; severity: LogSeverity }[]>([
