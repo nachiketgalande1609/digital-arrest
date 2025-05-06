@@ -35,45 +35,60 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
     const [voicePrintProgress, setVoicePrintProgress] = useState(0);
     const [languageSearchProgress, setLanguageSearchProgress] = useState(0);
     const [displayedLogs, setDisplayedLogs] = useState<LogEntry[]>([]);
-    const [scanStage, setScanStage] = useState<"patterns" | "voiceprint" | "language">("patterns");
-    const [initialLogs, setInitialLogs] = useState<LogEntry[]>([]);
+    const [endingLogs, setEndingLogs] = useState<LogEntry[]>([]);
+    const [scanStage, setScanStage] = useState<"initial" | "patterns" | "voiceprint" | "language">("initial");
+    const [initialLogs] = useState<LogEntry[]>([
+        {
+            log: "Initializing Digital Robocop v2.3.7",
+            severity: "info",
+        },
+        {
+            log: "Loading threat pattern database...",
+            severity: "info",
+        },
+        {
+            log: "Connecting to voiceprint registry...",
+            severity: "info",
+        },
+        {
+            log: "Establishing link to cognitive language model...",
+            severity: "info",
+        },
+        {
+            log: "System ready - awaiting call...",
+            severity: "success",
+        },
+        {
+            log: `Incoming call detected from: ${callerInfo.number}`,
+            severity: "warning",
+        },
+        {
+            log: "Caller ID not found in contacts database",
+            severity: "warning",
+        },
+        {
+            log: "Initiating real-time scam detection protocol",
+            severity: "info",
+        },
+    ]);
 
+    // Show initial logs with 500ms interval
     useEffect(() => {
-        setInitialLogs([
-            {
-                log: "Initializing Digital Robocop v2.3.7",
-                severity: "info",
-            },
-            {
-                log: "Loading threat pattern database...",
-                severity: "info",
-            },
-            {
-                log: "Connecting to voiceprint registry...",
-                severity: "info",
-            },
-            {
-                log: "Establishing link to cognitive language model...",
-                severity: "info",
-            },
-            {
-                log: "System ready - awaiting call...",
-                severity: "success",
-            },
-            {
-                log: `Incoming call detected from: ${callerInfo.number}`,
-                severity: "warning",
-            },
-            {
-                log: "Caller ID not found in contacts database",
-                severity: "warning",
-            },
-            {
-                log: "Initiating real-time scam detection protocol",
-                severity: "info",
-            },
-        ]);
-    }, [callerInfo.number]);
+        if (callStatus !== "analyzing" || scanStage !== "initial") return;
+
+        const timer = setTimeout(() => {
+            if (displayedLogs.length < initialLogs.length) {
+                setDisplayedLogs((prev) => [...prev, initialLogs[prev.length]]);
+
+                // When all initial logs are displayed, move to patterns stage
+                if (displayedLogs.length === initialLogs.length - 1) {
+                    setScanStage("patterns");
+                }
+            }
+        }, 500);
+
+        return () => clearTimeout(timer);
+    }, [callStatus, displayedLogs.length, initialLogs, scanStage]);
 
     useEffect(() => {
         let timeoutId: number;
@@ -133,7 +148,7 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
                     if (newProgress >= 100) {
                         clearInterval(languageSearchIntervalId);
                         if (prev < 100) {
-                            setDisplayedLogs((prevLogs) => [
+                            setEndingLogs((prevLogs) => [
                                 ...prevLogs,
                                 {
                                     log: "Language patterns matched known scam scripts (92% confidence)",
@@ -153,29 +168,12 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
         };
 
         if (callStatus === "analyzing") {
-            if (scanStage === "voiceprint") {
+            if (scanStage === "patterns") {
+                startPatternScan();
+            } else if (scanStage === "voiceprint") {
                 startVoicePrintScan();
             } else if (scanStage === "language") {
                 startLanguageSearch();
-            } else if (currentPatternIndex === 0 && displayedLogs.length === 0) {
-                // Initial pattern scan
-                setDisplayedLogs([
-                    {
-                        log: `Scanning for known threat patterns: ${threatPatterns[0]}`,
-                        severity: "info",
-                    },
-                ]);
-                startPatternScan();
-            } else if (currentPatternIndex > 0) {
-                // Update log for new pattern
-                setDisplayedLogs((prev) => [
-                    ...prev.slice(0, -1),
-                    {
-                        log: `Scanning for known threat patterns: ${threatPatterns[currentPatternIndex]}`,
-                        severity: "info",
-                    },
-                ]);
-                startPatternScan();
             }
         }
 
@@ -230,7 +228,7 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
                             </div>
                         </div>
                         <div className="terminal-body" ref={scammerTerminalRef}>
-                            {initialLogs.map((log, index) => (
+                            {displayedLogs.map((log, index) => (
                                 <div key={index} className={`log-entry ${log.severity}`}>
                                     <span className="timestamp">[{new Date().toLocaleTimeString()}]</span>
                                     <span className="log-message">{log.log}</span>
@@ -284,6 +282,13 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
                                     </div>
                                 </>
                             )}
+
+                            {endingLogs.map((log, index) => (
+                                <div key={index} className={`log-entry ${log.severity}`}>
+                                    <span className="timestamp">[{new Date().toLocaleTimeString()}]</span>
+                                    <span className="log-message">{log.log}</span>
+                                </div>
+                            ))}
                         </div>
                         <div className="terminal-input">
                             <span className="prompt">scam@detector:~#</span>
@@ -321,14 +326,6 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
                                     <div className="wave"></div>
                                     <div className="wave"></div>
                                 </div>
-
-                                <p className="analyzing-text">
-                                    {scanStage === "patterns"
-                                        ? `Checking pattern: ${threatPatterns[currentPatternIndex]}`
-                                        : scanStage === "voiceprint"
-                                        ? "Analyzing voice fingerprint..."
-                                        : "Analyzing language patterns..."}
-                                </p>
 
                                 <div className="progress-container">
                                     <div className="progress-bar">
