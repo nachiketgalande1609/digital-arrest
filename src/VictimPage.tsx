@@ -34,9 +34,10 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
     const [patternProgress, setPatternProgress] = useState(0);
     const [voicePrintProgress, setVoicePrintProgress] = useState(0);
     const [languageSearchProgress, setLanguageSearchProgress] = useState(0);
+    const [reverificationProgress, setReverificationProgress] = useState(0);
     const [displayedLogs, setDisplayedLogs] = useState<LogEntry[]>([]);
     const [endingLogs, setEndingLogs] = useState<LogEntry[]>([]);
-    const [scanStage, setScanStage] = useState<"initial" | "patterns" | "voiceprint" | "language">("initial");
+    const [scanStage, setScanStage] = useState<"initial" | "patterns" | "voiceprint" | "language" | "reverification" | "ending">("initial");
     const [initialLogs] = useState<LogEntry[]>([
         {
             log: "Initializing Digital Robocop v2.3.7",
@@ -53,18 +54,6 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
         {
             log: "Establishing link to cognitive language model...",
             severity: "info",
-        },
-        {
-            log: "System ready - awaiting call...",
-            severity: "success",
-        },
-        {
-            log: `Incoming call detected from: ${callerInfo.number}`,
-            severity: "warning",
-        },
-        {
-            log: "Caller ID not found in contacts database",
-            severity: "warning",
         },
         {
             log: "Initiating real-time scam detection protocol",
@@ -95,6 +84,7 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
         let progressIntervalId: number;
         let voicePrintIntervalId: number;
         let languageSearchIntervalId: number;
+        let reverificationIntervalId: number;
 
         const startPatternScan = () => {
             // Reset for new pattern
@@ -129,7 +119,6 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
                     const newProgress = prev + 5;
                     if (newProgress >= 100) {
                         clearInterval(voicePrintIntervalId);
-                        // Add the voiceprint match log only when we reach 100%
                         if (prev < 100) {
                             setScanStage("language");
                         }
@@ -148,17 +137,24 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
                     if (newProgress >= 100) {
                         clearInterval(languageSearchIntervalId);
                         if (prev < 100) {
-                            setEndingLogs((prevLogs) => [
-                                ...prevLogs,
-                                {
-                                    log: "Language patterns matched known scam scripts (92% confidence)",
-                                    severity: "error",
-                                },
-                                {
-                                    log: "Final verdict: HIGH CONFIDENCE SCAM DETECTED",
-                                    severity: "error",
-                                },
-                            ]);
+                            setScanStage("reverification");
+                        }
+                        return 100;
+                    }
+                    return newProgress;
+                });
+            }, 100);
+        };
+
+        const startReverification = () => {
+            setReverificationProgress(0);
+            reverificationIntervalId = window.setInterval(() => {
+                setReverificationProgress((prev) => {
+                    const newProgress = prev + 1;
+                    if (newProgress >= 100) {
+                        clearInterval(reverificationIntervalId);
+                        if (prev < 100) {
+                            setScanStage("ending");
                         }
                         return 100;
                     }
@@ -174,6 +170,8 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
                 startVoicePrintScan();
             } else if (scanStage === "language") {
                 startLanguageSearch();
+            } else if (scanStage === "reverification") {
+                startReverification();
             }
         }
 
@@ -182,8 +180,25 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
             clearInterval(progressIntervalId);
             clearInterval(voicePrintIntervalId);
             clearInterval(languageSearchIntervalId);
+            clearInterval(reverificationIntervalId);
         };
     }, [callStatus, currentPatternIndex, scanStage]);
+
+    useEffect(() => {
+        if (scanStage === "ending") {
+            setEndingLogs((prevLogs) => [
+                ...prevLogs,
+                {
+                    log: "Initiating call transfer protocol...",
+                    severity: "warning",
+                },
+                {
+                    log: "Transferring call to Telangana Cyber Crime Command Center",
+                    severity: "error",
+                },
+            ]);
+        }
+    }, [scanStage]);
 
     // Scroll to bottom of terminal when logs update
     useEffect(() => {
@@ -235,25 +250,28 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
                                 </div>
                             ))}
 
-                            {["patterns", "voiceprint", "language"].includes(scanStage) && currentPatternIndex < threatPatterns.length && (
-                                <>
-                                    <div className={`log-entry info`}>
-                                        <span className="timestamp">[{new Date().toLocaleTimeString()}]</span>
-                                        <span className="log-message">Scanning for known threat patterns: {threatPatterns[currentPatternIndex]}</span>
-                                    </div>
-                                    <div className="hash-progress-container" style={{ marginTop: "10px" }}>
-                                        {renderProgressBar(patternProgress)}
-                                    </div>
-                                </>
-                            )}
+                            {["patterns", "voiceprint", "language", "reverification", "ending"].includes(scanStage) &&
+                                currentPatternIndex < threatPatterns.length && (
+                                    <>
+                                        <div className={`log-entry warning`}>
+                                            <span className="timestamp">[{new Date().toLocaleTimeString()}]</span>
+                                            <span className="log-message">
+                                                Scanning for known threat patterns: {threatPatterns[currentPatternIndex]}
+                                            </span>
+                                        </div>
+                                        <div className="hash-progress-container" style={{ marginTop: "10px" }}>
+                                            {renderProgressBar(patternProgress)}
+                                        </div>
+                                    </>
+                                )}
 
-                            {["voiceprint", "language"].includes(scanStage) && (
+                            {["voiceprint", "language", "reverification", "ending"].includes(scanStage) && (
                                 <>
                                     <div className={`log-entry error`}>
                                         <span className="timestamp">[{new Date().toLocaleTimeString()}]</span>
                                         <span className="log-message">Threat pattern scan complete - Fraud detected: Customs Narcotics Scam</span>
                                     </div>
-                                    <div className={`log-entry info`}>
+                                    <div className={`log-entry warning`}>
                                         <span className="timestamp">[{new Date().toLocaleTimeString()}]</span>
                                         <span className="log-message">Searching for known scammer voice fingerprint</span>
                                     </div>
@@ -263,7 +281,7 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
                                 </>
                             )}
 
-                            {scanStage === "language" && (
+                            {["language", "reverification", "ending"].includes(scanStage) && (
                                 <>
                                     <div className={`log-entry error`}>
                                         <span className="timestamp">[{new Date().toLocaleTimeString()}]</span>
@@ -273,7 +291,7 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
                                         <span className="timestamp">[{new Date().toLocaleTimeString()}]</span>
                                         <span className="log-message">Initiating cognitive language search...</span>
                                     </div>
-                                    <div className={`log-entry info`}>
+                                    <div className={`log-entry warning`}>
                                         <span className="timestamp">[{new Date().toLocaleTimeString()}]</span>
                                         <span className="log-message">Cognitive Language Search: Connecting to Fine Tuned Model</span>
                                     </div>
@@ -283,8 +301,41 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
                                 </>
                             )}
 
+                            {["reverification", "ending"].includes(scanStage) && (
+                                <>
+                                    <div className={`log-entry error`}>
+                                        <span className="timestamp">[{new Date().toLocaleTimeString()}]</span>
+                                        <span className="log-message">Language patterns matched known scam scripts (92% confidence)</span>
+                                    </div>
+                                    <div className={`log-entry warning`}>
+                                        <span className="timestamp">[{new Date().toLocaleTimeString()}]</span>
+                                        <span className="log-message">Initiating final reverification process...</span>
+                                    </div>
+                                    <div className="hash-progress-container" style={{ marginTop: "10px" }}>
+                                        {renderProgressBar(reverificationProgress)}
+                                    </div>
+                                </>
+                            )}
+
+                            {scanStage === "ending" && (
+                                <>
+                                    <div className={`log-entry error`}>
+                                        <span className="timestamp">[{new Date().toLocaleTimeString()}]</span>
+                                        <span className="log-message">Reverification complete - all checks confirmed</span>
+                                    </div>
+                                    <div className={`log-entry error`}>
+                                        <span className="timestamp">[{new Date().toLocaleTimeString()}]</span>
+                                        <span className="log-message">Final verdict: HIGH CONFIDENCE SCAM DETECTED</span>
+                                    </div>
+                                    <div className={`log-entry error`}>
+                                        <span className="timestamp">[{new Date().toLocaleTimeString()}]</span>
+                                        <span className="log-message">SCAM DETECTED: Confidence level: 98.7%</span>
+                                    </div>
+                                </>
+                            )}
+
                             {endingLogs.map((log, index) => (
-                                <div key={index} className={`log-entry ${log.severity}`}>
+                                <div key={`ending-${index}`} className={`log-entry ${log.severity}`}>
                                     <span className="timestamp">[{new Date().toLocaleTimeString()}]</span>
                                     <span className="log-message">{log.log}</span>
                                 </div>
@@ -297,7 +348,6 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
                     </div>
                 </div>
 
-                {/* Rest of your existing JSX remains the same */}
                 <div className="call-panel">
                     <div className={`call-screen ${callStatus}`}>
                         <div className="caller-info">
