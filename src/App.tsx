@@ -24,14 +24,12 @@ const App: React.FC = () => {
     const [ringing, setRinging] = useState(false);
 
     const audioFiles = [
-        { src: "before_beep/1_victim.mp3", type: "victim" },
-        { src: "before_beep/2_scammer.mp3", type: "caller" },
-        { src: "before_beep/3_victim.mp3", type: "victim" },
-        { src: "before_beep/4_scammer.mp3", type: "caller" },
-        { src: "before_beep/5_victim.mp3", type: "victim" },
-        { src: "before_beep/6_scammer.mp3", type: "caller" },
-        { src: "before_beep/7_victim.mp3", type: "victim" },
-        { src: "before_beep/8_scammer.mp3", type: "caller" },
+        { src: "before_beep/1_victim.wav", type: "victim" },
+        { src: "before_beep/2_scammer.wav", type: "caller" },
+        { src: "before_beep/3_victim.wav", type: "victim" },
+        { src: "before_beep/4_scammer.wav", type: "caller" },
+        { src: "before_beep/5_victim.wav", type: "victim" },
+        { src: "before_beep/6_scammer.wav", type: "caller" },
         { src: "after_beep/9_victim.mp3", type: "victim" },
         { src: "after_beep/10_scammer.mp3", type: "caller" },
         { src: "after_beep/11_victim.mp3", type: "victim" },
@@ -68,7 +66,7 @@ const App: React.FC = () => {
                     const nextProgress = prev + (Math.random() * 3 + 2);
                     return nextProgress;
                 });
-            }, 2500);
+            }, 1250);
 
             return () => clearInterval(analysisInterval);
         }
@@ -94,7 +92,7 @@ const App: React.FC = () => {
         if (targetAudioRef.current) {
             targetAudioRef.current.src = currentAudio.src;
             targetAudioRef.current.onended = () => {
-                if (currentAudioIndex === 1) {
+                if (currentAudioIndex === 5) {
                     setCallStatus("scam-detected");
                     if (beepRef.current) {
                         setIsBeepPlaying(true);
@@ -130,7 +128,7 @@ const App: React.FC = () => {
             targetAudioRef.current.play().catch((err) => {
                 console.error("Error playing audio:", err);
                 setTimeout(() => {
-                    if (currentAudioIndex === 7) {
+                    if (currentAudioIndex === 5) {
                         setCallStatus("scam-detected");
                         setCurrentScreen("cyber");
                         setCurrentAudioIndex((prev) => prev + 1);
