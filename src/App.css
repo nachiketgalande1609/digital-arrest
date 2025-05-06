@@ -192,7 +192,7 @@ body {
     overflow-y: auto;
     /* Scroll when content overflows */
     font-family: "Fira Code", monospace;
-    font-size: 16px;
+    font-size: 20px;
     line-height: 1.5;
     color: var(--text-primary);
     background-color: rgba(0, 0, 0, 0.2);
@@ -1249,7 +1249,22 @@ button .icon {
     background-color: #ff5e55;
 }
 
-.progress-container {
-    margin-left: 100px;
+.hash-progress-container {
+    margin-left: 61px;
     width: calc(100% - 100px);
+}
+
+.hash-filled {
+    color: #f59e0b;
+    /* Green color for filled portion */
+}
+
+.hash-empty {
+    color: #f59e0b;
+    /* Gray color for empty portion */
+}
+
+.progress-percent {
+    margin-left: 10px;
+    color: #f59e0b;
 }

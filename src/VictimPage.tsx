@@ -96,6 +96,21 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
         }
     }, [displayedLogs]);
 
+    // Helper function to render the progress bar with hash symbols
+    const renderProgressBar = (progressValue: number) => {
+        const totalChars = 95;
+        const filledChars = Math.round((progressValue / 100) * totalChars);
+        const emptyChars = totalChars - filledChars;
+
+        return (
+            <div className="hash-progress-container">
+                <span className="hash-filled">{"#".repeat(filledChars)}</span>
+                <span className="hash-empty">{"..".repeat(emptyChars)}</span>
+                <span className="progress-percent">{Math.min(progressValue, 100).toFixed(0)}%</span>
+            </div>
+        );
+    };
+
     return (
         <div style={{ width: "100vw" }}>
             <div className="victim-container">
@@ -124,11 +139,8 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
                                 </div>
                             ))}
                             {callStatus === "analyzing" && currentPatternIndex < threatPatterns.length && (
-                                <div className="progress-container" style={{ marginTop: "10px" }}>
-                                    <div className="progress-bar">
-                                        <div className="progress" style={{ width: `${patternProgress}%` }}></div>
-                                    </div>
-                                    <span className="progress-text">{Math.min(patternProgress, 100).toFixed(0)}%</span>
+                                <div className="hash-progress-container" style={{ marginTop: "10px" }}>
+                                    {renderProgressBar(patternProgress)}
                                 </div>
                             )}
                             {callStatus === "analyzing" && currentPatternIndex === threatPatterns.length - 1 && patternProgress >= 100 && (
