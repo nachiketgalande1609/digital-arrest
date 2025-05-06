@@ -55,12 +55,12 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
 
     const scammerMessages = useRef<{ message: string; severity: LogSeverity }[]>([
         { message: "VOIP call initiated via Twilio SIP proxy (spoofing Mumbai Customs number).", severity: "info" },
-        { message: "VPN enabled: Traffic routed through NordVPN (Singapore exit node).", severity: "info" },
+        { message: "VPN enabled: Traffic routed through NordVPN (Jakarta, Indonesia).", severity: "info" },
         { message: "Victim answered call — deploying 'narcotics threat' script.", severity: "success" },
         { message: "AI detected? Unusual response delay (+4.2s).", severity: "warning" },
         { message: "Target stalling: 'My son will transfer money...'.", severity: "warning" },
         { message: "RTP stream interrupted — possible packet inspection.", severity: "error" },
-        { message: "Switching VPN servers (Singapore → Netherlands).", severity: "info" },
+        { message: "Switching VPN servers (Jakarta Indonesia).", severity: "info" },
         { message: "Target clicked fake 'Mumbai Police' link — session hijacked.", severity: "success" },
         { message: "WebRTC leak detected! Real IP exposed (117.211.75.63).", severity: "error" },
         { message: "VPN killswitch failed — ISP metadata leaked (BSNL, New Delhi).", severity: "error" },
