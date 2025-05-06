@@ -33,13 +33,53 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
     const [currentPatternIndex, setCurrentPatternIndex] = useState(0);
     const [patternProgress, setPatternProgress] = useState(0);
     const [voicePrintProgress, setVoicePrintProgress] = useState(0);
+    const [languageSearchProgress, setLanguageSearchProgress] = useState(0);
     const [displayedLogs, setDisplayedLogs] = useState<LogEntry[]>([]);
-    const [scanStage, setScanStage] = useState<"patterns" | "voiceprint">("patterns");
+    const [scanStage, setScanStage] = useState<"patterns" | "voiceprint" | "language">("patterns");
+    const [initialLogs, setInitialLogs] = useState<LogEntry[]>([]);
+
+    useEffect(() => {
+        setInitialLogs([
+            {
+                log: "Initializing Digital Robocop v2.3.7",
+                severity: "info",
+            },
+            {
+                log: "Loading threat pattern database...",
+                severity: "info",
+            },
+            {
+                log: "Connecting to voiceprint registry...",
+                severity: "info",
+            },
+            {
+                log: "Establishing link to cognitive language model...",
+                severity: "info",
+            },
+            {
+                log: "System ready - awaiting call...",
+                severity: "success",
+            },
+            {
+                log: `Incoming call detected from: ${callerInfo.number}`,
+                severity: "warning",
+            },
+            {
+                log: "Caller ID not found in contacts database",
+                severity: "warning",
+            },
+            {
+                log: "Initiating real-time scam detection protocol",
+                severity: "info",
+            },
+        ]);
+    }, [callerInfo.number]);
 
     useEffect(() => {
         let timeoutId: number;
         let progressIntervalId: number;
         let voicePrintIntervalId: number;
+        let languageSearchIntervalId: number;
 
         const startPatternScan = () => {
             // Reset for new pattern
@@ -76,10 +116,31 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
                         clearInterval(voicePrintIntervalId);
                         // Add the voiceprint match log only when we reach 100%
                         if (prev < 100) {
+                            setScanStage("language");
+                        }
+                        return 100;
+                    }
+                    return newProgress;
+                });
+            }, 100);
+        };
+
+        const startLanguageSearch = () => {
+            setLanguageSearchProgress(0);
+            languageSearchIntervalId = window.setInterval(() => {
+                setLanguageSearchProgress((prev) => {
+                    const newProgress = prev + 2;
+                    if (newProgress >= 100) {
+                        clearInterval(languageSearchIntervalId);
+                        if (prev < 100) {
                             setDisplayedLogs((prevLogs) => [
                                 ...prevLogs,
                                 {
-                                    log: "Voice fingerprint match found in scammer database (87% confidence)",
+                                    log: "Language patterns matched known scam scripts (92% confidence)",
+                                    severity: "error",
+                                },
+                                {
+                                    log: "Final verdict: HIGH CONFIDENCE SCAM DETECTED",
                                     severity: "error",
                                 },
                             ]);
@@ -94,6 +155,8 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
         if (callStatus === "analyzing") {
             if (scanStage === "voiceprint") {
                 startVoicePrintScan();
+            } else if (scanStage === "language") {
+                startLanguageSearch();
             } else if (currentPatternIndex === 0 && displayedLogs.length === 0) {
                 // Initial pattern scan
                 setDisplayedLogs([
@@ -120,6 +183,7 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
             clearTimeout(timeoutId);
             clearInterval(progressIntervalId);
             clearInterval(voicePrintIntervalId);
+            clearInterval(languageSearchIntervalId);
         };
     }, [callStatus, currentPatternIndex, scanStage]);
 
@@ -145,8 +209,6 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
         );
     };
 
-    console.log(scanStage);
-
     return (
         <div style={{ width: "100vw" }}>
             <div className="victim-container">
@@ -168,20 +230,26 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
                             </div>
                         </div>
                         <div className="terminal-body" ref={scammerTerminalRef}>
-                            {displayedLogs.map((log, index) => (
+                            {initialLogs.map((log, index) => (
                                 <div key={index} className={`log-entry ${log.severity}`}>
                                     <span className="timestamp">[{new Date().toLocaleTimeString()}]</span>
                                     <span className="log-message">{log.log}</span>
                                 </div>
                             ))}
 
-                            {currentPatternIndex < threatPatterns.length && (
-                                <div className="hash-progress-container" style={{ marginTop: "10px" }}>
-                                    {renderProgressBar(patternProgress)}
-                                </div>
+                            {["patterns", "voiceprint", "language"].includes(scanStage) && currentPatternIndex < threatPatterns.length && (
+                                <>
+                                    <div className={`log-entry info`}>
+                                        <span className="timestamp">[{new Date().toLocaleTimeString()}]</span>
+                                        <span className="log-message">Scanning for known threat patterns: {threatPatterns[currentPatternIndex]}</span>
+                                    </div>
+                                    <div className="hash-progress-container" style={{ marginTop: "10px" }}>
+                                        {renderProgressBar(patternProgress)}
+                                    </div>
+                                </>
                             )}
 
-                            {scanStage === "voiceprint" && (
+                            {["voiceprint", "language"].includes(scanStage) && (
                                 <>
                                     <div className={`log-entry error`}>
                                         <span className="timestamp">[{new Date().toLocaleTimeString()}]</span>
@@ -193,6 +261,26 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
                                     </div>
                                     <div className="hash-progress-container" style={{ marginTop: "10px" }}>
                                         {renderProgressBar(voicePrintProgress)}
+                                    </div>
+                                </>
+                            )}
+
+                            {scanStage === "language" && (
+                                <>
+                                    <div className={`log-entry error`}>
+                                        <span className="timestamp">[{new Date().toLocaleTimeString()}]</span>
+                                        <span className="log-message">Voice fingerprint match found in scammer database (87% confidence)</span>
+                                    </div>
+                                    <div className={`log-entry info`}>
+                                        <span className="timestamp">[{new Date().toLocaleTimeString()}]</span>
+                                        <span className="log-message">Initiating cognitive language search...</span>
+                                    </div>
+                                    <div className={`log-entry info`}>
+                                        <span className="timestamp">[{new Date().toLocaleTimeString()}]</span>
+                                        <span className="log-message">Cognitive Language Search: Connecting to Fine Tuned Model</span>
+                                    </div>
+                                    <div className="hash-progress-container" style={{ marginTop: "10px" }}>
+                                        {renderProgressBar(languageSearchProgress)}
                                     </div>
                                 </>
                             )}
@@ -235,9 +323,11 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
                                 </div>
 
                                 <p className="analyzing-text">
-                                    {currentPatternIndex < threatPatterns.length
+                                    {scanStage === "patterns"
                                         ? `Checking pattern: ${threatPatterns[currentPatternIndex]}`
-                                        : "Compiling final results..."}
+                                        : scanStage === "voiceprint"
+                                        ? "Analyzing voice fingerprint..."
+                                        : "Analyzing language patterns..."}
                                 </p>
 
                                 <div className="progress-container">
