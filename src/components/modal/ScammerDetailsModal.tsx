@@ -34,10 +34,10 @@ const ScammerDetailsModal: React.FC<{ onClose: () => void }> = ({ onClose }) => 
         name: "Operation Silver Tongue - Primary Suspect",
         phoneNumber: "+91 98XXXXXX21 (Burner)",
         location: "Jakarta, Indonesia (VPN Exit)",
-        realLocation: "Hyderabad, Telangana, India (Actual)",
-        coordinates: [11.5564, 104.9282], // Phnom Penh coordinates
+        realLocation: "Phnom Penh, Cambodia (Actual)",
+        coordinates: [-6.2088, 106.8456],
         ipAddress: "180.252.113.199 → VPN Exit (Jakarta, Indonesia)",
-        realIpAddress: "103.240.180.25 (Identified Real IP - Phnom Penh, Cambodia)",
+        realIpAddress: "103.240.180.25 (Identified Real IP)",
         vpnProvider: "NordVPN (Compromised Account)",
         carrier: "Jio Mobile (SIM Box Spoofing)",
         threatLevel: "CRITICAL",
@@ -154,9 +154,9 @@ const ScammerDetailsModal: React.FC<{ onClose: () => void }> = ({ onClose }) => 
 
                 <div className="cyber-modal-footer">
                     <div className="cyber-actions">
-                        <button className="cyber-action-btn primary">INITIATE TRACKING</button>
+                        <button className="cyber-action-btn primary">INITIATE FIR</button>
                         <button className="cyber-action-btn secondary">FREEZE ASSETS</button>
-                        <button className="cyber-action-btn tertiary">ISSUE WARRANT</button>
+                        <button className="cyber-action-btn secondary">CONTACT CAMBODIA POLICE</button>
                     </div>
                     <div className="cyber-timestamp">Last updated: {new Date().toLocaleString()} | VPN detection confidence: 87%</div>
                 </div>
