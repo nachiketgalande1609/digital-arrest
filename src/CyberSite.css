@@ -104,7 +104,7 @@ body {
     display: flex;
     align-items: center;
     padding: 12px 16px;
-    background-color: rgba(0, 0, 0, 0.2);
+    background-color: rgba(0, 0, 0, 0.35);
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
@@ -218,7 +218,10 @@ body {
 }
 
 .cyber-log-warning .cyber-log-message {
-    color: #000000;
+    color: rgb(255, 238, 0);
+    background-color: rgb(0,0,0,0.5);
+    padding: 5px;
+    border-radius: 10px;
 }
 
 .cyber-log-error .cyber-log-message {

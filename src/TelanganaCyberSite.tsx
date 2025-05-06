@@ -31,45 +31,74 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({ victimAudioRe
     
 
     const victimMessages = useRef<{ message: string; severity: LogSeverity }[]>([
-        { message: "[SYSTEM BOOT] Deepfake voice synthesis initialized via ElevenLabs API v3.2.", severity: "info" },
         { message: "Voice profile loaded: 'Female: nervous tone' (ID: VCTM-8872).", severity: "success" },
-        { message: "Connecting to OpenAI GPT-4-turbo model for dynamic response generation...", severity: "info" },
+        { message: "Connected to OpenAI GPT-4-turbo model for dynamic response generation...", severity: "info" },
         { message: "Deepfake voice engaged: 'Frightened woman' (ElevenLabs v3.4).", severity: "info" },
-        { message: "VPN Detection: Call origin masked via NordVPN exit node (Singapore).", severity: "error" },
-        { message: "Scammer script: 'This is Officer Sharma from Mumbai Narcotics! A parcel in your name...'.", severity: "warning" },
+        { message: "VPN Detection: Call origin masked via NordVPN exit node (Cambodia).", severity: "error" },
         { message: "RTP packet analysis: High jitter (187ms) → Likely overseas routing.", severity: "error" },
         { message: "Countermeasure: AI feigns panic—'Oh god! But I didn’t order anything!'.", severity: "info" },
-        { message: "STUN server probe: Attempting to bypass VPN via WebRTC leak.", severity: "warning" },
-        { message: "Scammer demands: 'Pay ₹1.2 lakh via Bitcoin or face arrest!'.", severity: "error" },
-        { message: "Voice stress analysis: Scammer frustration rising (pitch +12%).", severity: "warning" },
-        { message: "Traceroute initiated: Hopping through VPN nodes (Singapore → Netherlands).", severity: "error" },
+        { message: "STUN server probe: Attempting to bypass VPN via WebRTC leak.", severity: "info" },
+        { message: "Voice stress analysis: Scammer frustration rising (pitch +12%).", severity: "success" },
+        { message: "Traceroute initiated: Hopping through VPN nodes (Cambodia → India).", severity: "error" },
         { message: "Fake 'Mumbai Police' portal loaded (scammer phishing link clicked).", severity: "success" },
-        { message: "Scammer enters credentials: [ID: narcotics_scam@protonmail.com].", severity: "error" },
         { message: "DNS tunneling detected: Malicious .onion domain resolved.", severity: "error" },
         { message: "VPN IP stripped! Real IP exposed: 117.211.75.63 (BSNL, New Delhi).", severity: "success" },
+        { message: "Scammer demands: 'Pay ₹92,000 as a security deposit or face arrest!'.", severity: "error" },
         { message: "Final handoff: Cyber Crime Division notified w/ full call logs.", severity: "success" },
     ]);
 
     const scammerMessages = useRef<{ message: string; severity: LogSeverity }[]>([
-        { message: "VOIP call initiated via Twilio SIP proxy (spoofing Mumbai Customs number).", severity: "info" },
-        { message: "VPN enabled: Traffic routed through NordVPN (Singapore exit node).", severity: "info" },
-        { message: "Victim answered call — deploying 'narcotics threat' script.", severity: "success" },
-        { message: "AI detected? Unusual response delay (+4.2s).", severity: "warning" },
-        { message: "Target stalling: 'My son will transfer money...'.", severity: "warning" },
-        { message: "RTP stream interrupted — possible packet inspection.", severity: "error" },
-        { message: "Switching VPN servers (Singapore → Netherlands).", severity: "info" },
-        { message: "Target clicked fake 'Mumbai Police' link — session hijacked.", severity: "success" },
-        { message: "WebRTC leak detected! Real IP exposed (117.211.75.63).", severity: "error" },
-        { message: "VPN killswitch failed — ISP metadata leaked (BSNL, New Delhi).", severity: "error" },
-        { message: "Call terminated abruptly — law enforcement trace detected.", severity: "error" },
-        { message: "EMERGENCY: All sessions disconnected. Device wipe initiated.", severity: "error" },
+        // Initial call detection
+        { message: "Incoming WhatsApp call detected from +855 XX XXXX (Cambodia prefix)", severity: "info" },
+        { message: "Call pattern matches known tech support scam signatures (98.7% confidence)", severity: "error" },
+        { message: "Starting call metadata analysis - building connection fingerprint", severity: "info" },
+    
+        // VPN detection
+        { message: "Initial IP trace: 182.72.123.45 registered to Nord VPN (Cambodia)", severity: "success" },
+        { message: "VPN detection: Nord VPN configuration identified (UDP port 1194)", severity: "info" },
+        { message: "Analyzing packet timings - high latency suggests distant VPN server", severity: "info" },
+        { message: "VPN server linked to 14 other scam operations this month", severity: "error" },
+    
+        // Technical tracing
+        { message: "Triangulating via STUN servers - estimating true geographical region", severity: "info" },
+        { message: "Cross-referencing with Indian scam call databases...", severity: "info" },
+        { message: "Timezone analysis: Call patterns match IST (UTC+5:30)", severity: "success" },
+    
+        // WebRTC breakthrough
+        { message: "WebRTC ICE candidate leak detected - gathering IP clues", severity: "info" },
+        { message: "Partial IP fragment: 117.212.XX.XX (Indian IP range)", severity: "success" },
+        { message: "Signal strength analysis suggests urban location", severity: "info" },
+    
+        // VPN correlation
+        { message: "Matching VPN timestamps with BSNL outage reports...", severity: "info" },
+        { message: "VPN connection instability detected (3 packet drops in 2 minutes)", severity: "info" },
+        { message: "Momentary VPN disconnect - captured partial real IP", severity: "success" },
+    
+        // Critical breakthrough
+        { message: "TRUE IP CONFIRMED: 117.212.87.34 (Jio Mobile Hyderabad)", severity: "warning" },
+    
+        // Scammer identification
+        { message: "Device fingerprint: Redmi Note 9 (MIUI 12.5.3)", severity: "info" },
+        { message: "Matching IMEI pattern to previous scam operations", severity: "error" },
+        { message: "Call center signature detected (multiple voices in background)", severity: "info" },
+    
+        // Scammer reaction
+        { message: "Scammer noticed tracing attempt - call duration extended artificially", severity: "error" },
+        { message: "VPN killswitch activated - maintaining RTP stream analysis", severity: "error" },
+        { message: "Emergency wipe initiated on scammer device", severity: "error" },
+    
+        // Post-call forensics
+        { message: "Recovering DNS cache from packet captures...", severity: "info" },
+        { message: "Evidence package compiled with 14 verification points", severity: "success" },
+        { message: "Cybercrime report filed with Indian CERT-In", severity: "info" },
+        { message: "Operation complete - scammer location 92% verified", severity: "success" }
     ]);
 
     useEffect(() => {
         // Initial victim log
         const initialVictimLog: LogEntry = {
             timestamp: new Date().toLocaleTimeString(),
-            message: "AI Assistant activated — initiating scammer time-wasting protocol...",
+            message: "[SYSTEM BOOT] Deepfake voice synthesis initialized via ElevenLabs API v3.2.",
             type: "info",
         };
 
@@ -114,16 +143,24 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({ victimAudioRe
             const timestamp = new Date().toLocaleTimeString();
             const newLog: LogEntry = {
                 timestamp,
-                message: "Deepfake Response: Please, please try to understand. There is a mistake. I have no clue about such parcel. I swear. I am innocent. Please tell me how this can be fixed now?",
-                type: "info"
+                message: "Deepfake Response: What! This sounds serious. I have no one at Taiwan. I don't know anyone from there. I have never sent or received anything from Taiwan. There is a mistake.",
+                type: "warning"
             };
             setVictimLogs(prev => [...prev, newLog]);
         } else if (currentAudioIndex === 8) {
             const timestamp = new Date().toLocaleTimeString();
             const newLog: LogEntry = {
                 timestamp,
-                message: "Deepfake Response: Okay! But do I need to send the money today. I would need some time to arrange the whole sum. Please understand. Please, requesting you give me some time to connect with my spouse at least.",
-                type: "info"
+                message: "Deepfake Response: Please listen, there is some mistake. I swear, I am innocent. How can I fix this?",
+                type: "warning"
+            };
+            setVictimLogs(prev => [...prev, newLog]);
+        } else if (currentAudioIndex === 10) {
+            const timestamp = new Date().toLocaleTimeString();
+            const newLog: LogEntry = {
+                timestamp,
+                message: "Deepfake Response: Aadhar Number? That sounds I need to give some important stuff to you. Also do I need to send the money today?",
+                type: "warning"
             };
             setVictimLogs(prev => [...prev, newLog]);
         }

@@ -3,7 +3,6 @@ import VictimPage from "./VictimPage";
 import TelangalanCyberSite from "./TelanganaCyberSite";
 import PhoneInterface from "./PhoneInterface";
 import ScammerDetailsModal from "./components/modal/ScammerDetailsModal";
-import UnknownCallerProfilePhoto from "../public/blank-profile.webp"
 
 type CallStatus = "incoming" | "analyzing" | "scam-detected" | "call-ended";
 
@@ -30,10 +29,12 @@ const App: React.FC = () => {
         { src: "before_beep/4_scammer.wav", type: "caller" },
         { src: "before_beep/5_victim.wav", type: "victim" },
         { src: "before_beep/6_scammer.wav", type: "caller" },
-        { src: "after_beep/9_victim.mp3", type: "victim" },
-        { src: "after_beep/10_scammer.mp3", type: "caller" },
-        { src: "after_beep/11_victim.mp3", type: "victim" },
-        { src: "after_beep/12_scammer.mp3", type: "caller" },
+        { src: "after_beep/PC_DF_1.mp3", type: "victim" },
+        { src: "after_beep/Scammer_Part_1.wav", type: "caller" },
+        { src: "after_beep/PC_DF_2.mp3", type: "victim" },
+        { src: "after_beep/Scammer_Part_2.wav", type: "caller" },
+        { src: "after_beep/PC_DF_3.mp3", type: "victim" },
+        { src: "after_beep/Scammer_Part_3.wav", type: "caller" },
     ];
 
     const [callerInfo] = useState<CallerInfo>({
