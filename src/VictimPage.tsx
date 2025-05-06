@@ -25,6 +25,38 @@ const threatPatterns = [
     "Fake Debt Collection",
     "Romance Scam Opening",
     "Fake Job Offer",
+    "Bank Account Compromise",
+    "Fake Charity Donation",
+    "Investment Scam",
+    "Fake Covid-19 Relief",
+    "Fake Government Grant",
+    "Fake Delivery Notification",
+    "Fake Covid Test Results",
+    "Fake Insurance Policy",
+    "Fake Inheritance Claim",
+    "Fake Rental Property",
+    "Fake Cryptocurrency Offer",
+    "Fake Online Shopping Refund",
+    "Fake Travel Booking",
+    "Fake Scholarship Offer",
+    "Fake Dating Profile",
+    "Fake Loan Approval",
+    "Fake Credit Card Offer",
+    "Fake Electricity Bill Payment",
+    "Fake Water Bill Payment",
+    "Fake Gas Connection Offer",
+    "QR Code Phishing",
+    "SIM Swap Fraud",
+    "Business Email Compromise (BEC)",
+    "AI Voice Impersonation Scam",
+    "Fake Tech Device Recall",
+    "Fake Antivirus Alert",
+    "Subscription Renewal Scam",
+    "Online Marketplace Overpayment Scam",
+    "Fake Survey Participation Reward",
+    "Phishing Link in Calendar Invite",
+    "Scam Job Interview via Video Call",
+    "Fake Domain Registrar Renewal",
     "Customs Narcotics Scam",
 ];
 
@@ -97,9 +129,9 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
                         clearInterval(progressIntervalId);
                         return 100;
                     }
-                    return prev + 10;
+                    return prev + 20;
                 });
-            }, 100);
+            }, 50);
 
             // Move to next pattern after delay
             timeoutId = window.setTimeout(() => {
@@ -109,7 +141,7 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
                     // All patterns scanned, move to voiceprint
                     setScanStage("voiceprint");
                 }
-            }, 1500);
+            }, 500);
         };
 
         const startVoicePrintScan = () => {
