@@ -3,13 +3,13 @@ import VictimPage from "./VictimPage";
 import TelangalanCyberSite from "./TelanganaCyberSite";
 import PhoneInterface from "./PhoneInterface";
 import ScammerDetailsModal from "./components/modal/ScammerDetailsModal";
+import UnknownCallerProfilePhoto from "../public/blank-profile.webp"
 
 type CallStatus = "incoming" | "analyzing" | "scam-detected" | "call-ended";
 
 interface CallerInfo {
     name: string;
     number: string;
-    avatar: string;
 }
 
 const App: React.FC = () => {
@@ -38,8 +38,7 @@ const App: React.FC = () => {
 
     const [callerInfo] = useState<CallerInfo>({
         name: "Unknown Caller",
-        number: "+1 (555) 123-4567",
-        avatar: "https://img.freepik.com/premium-photo/male-customer-service-3d-cartoon-avatar-portrait_839035-522335.jpg",
+        number: "+855 10 234 567",
     });
 
     const ringtoneRef = useRef<HTMLAudioElement | null>(null);
@@ -219,6 +218,7 @@ const App: React.FC = () => {
                             scammerAudioRef={scammerAudioRef}
                             activeSpeaker={activeSpeaker}
                             callStatus={callStatus}
+                            currentAudioIndex={currentAudioIndex}
                         />
                     )}
                 </>

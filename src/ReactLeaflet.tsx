@@ -183,8 +183,6 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({ connectionStrength = 80, is
         }
     }, [victimLocation, scammerLocation, showTriangulation, createIcons, connectionStrength]);
 
-    console.log(currentZoom);
-
     // Auto-zoom functionality
     const startAutoZoom = useCallback(() => {
         if (currentZoom >= 15) {
@@ -245,12 +243,11 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({ connectionStrength = 80, is
             {showOverlay && (
                 <div className="scammer-overlay">
                     <div className="overlay-content">
-                        <h3>Scammer Location Identified</h3>
+                        <h3>Scammer IP Traced</h3>
                         <div className="coordinates">
-                            <span>Latitude: {scammerLocation[0].toFixed(6)}</span>
-                            <span>Longitude: {scammerLocation[1].toFixed(6)}</span>
+                            <span>182.72.123.45 → VPN Exit (Cambodia)</span>
+                            <span>117.212.87.34 (Identified Real IP - Hyderabad)</span>
                         </div>
-                        <div className="accuracy">Estimated Accuracy: {Math.max(10, 100 - connectionStrength)} meters</div>
                         <button className="close-button" onClick={() => setShowOverlay(false)}>
                             Close
                         </button>

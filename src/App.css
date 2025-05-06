@@ -1212,7 +1212,7 @@ button .icon {
     background-color: #222;
     padding: 1rem;
     border-radius: 8px;
-    max-width: 400px;
+    max-width: 500px;
     text-align: center;
     border: 1px solid #ff3b30;
     display: flex;
@@ -1230,13 +1230,8 @@ button .icon {
     flex-direction: column;
     margin: 1rem 0;
     font-family: monospace;
+    color: #ff3b30;
     font-size: 1.1rem;
-}
-
-.accuracy {
-    margin: 1rem 0;
-    color: #ff9500;
-    margin: 0;
 }
 
 .close-button {
@@ -1247,7 +1242,7 @@ button .icon {
     border-radius: 4px;
     cursor: pointer;
     font-weight: bold;
-    margin-top: 1rem;
+    margin-top: 2px;
 }
 
 .close-button:hover {

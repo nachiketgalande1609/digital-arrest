@@ -1,5 +1,7 @@
 import React, { useState, useEffect, Dispatch, SetStateAction } from "react";
 import "./PhoneInterface.css";
+import UnknownCallerProfilePhoto from "../public/blank-profile.png"
+
 
 interface PhoneInterfaceProps {
     onAnswer: () => void;
@@ -7,7 +9,6 @@ interface PhoneInterfaceProps {
     callerInfo: {
         name: string;
         number: string;
-        avatar: string;
     };
     setRinging: Dispatch<SetStateAction<boolean>>;
 }
@@ -111,7 +112,7 @@ const PhoneInterface: React.FC<PhoneInterfaceProps> = ({ onAnswer, onReject, cal
                         <div className="caller-info">
                             <div className="caller-avatar-container">
                                 <div className="caller-avatar">
-                                    <img src={callerInfo.avatar} alt="Caller" />
+                                    <img src={UnknownCallerProfilePhoto} alt="Caller" />
                                 </div>
                                 <img src="/whatsapp.png" alt="WhatsApp Icon" className="whatsapp-icon" />
 

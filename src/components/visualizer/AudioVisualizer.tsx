@@ -179,7 +179,7 @@ const AudioVisualizer = ({ audioRef, active = false, type }: AudioVisualizerProp
                         textShadow: `0 0 5px ${type === "victim" ? "rgba(0, 255, 170, 0.7)" : "rgba(255, 85, 85, 0.7)"}`,
                     }}
                 >
-                    {type === "victim" ? "VICTIM" : "CALLER"} {active ? "ACTIVE" : "STANDBY"}
+                    {type === "victim" ? "DEEPFAKE" : "CALLER"} {active ? "ACTIVE" : "STANDBY"}
                 </span>
                 <div
                     style={{

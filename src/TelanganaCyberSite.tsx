@@ -9,6 +9,7 @@ interface TelangalanCyberSiteProps {
     scammerAudioRef: React.RefObject<HTMLAudioElement | null>;
     activeSpeaker: "caller" | "victim";
     callStatus: "incoming" | "analyzing" | "scam-detected" | "call-ended";
+    currentAudioIndex: Number
 }
 
 type LogSeverity = "info" | "warning" | "error" | "success";
@@ -19,26 +20,27 @@ interface LogEntry {
     type: LogSeverity;
 }
 
-const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({ victimAudioRef, scammerAudioRef, activeSpeaker, callStatus }) => {
+const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({ victimAudioRef, scammerAudioRef, activeSpeaker, callStatus, currentAudioIndex }) => {
     const [victimLogs, setVictimLogs] = useState<LogEntry[]>([]);
     const [scammerLogs, setScammerLogs] = useState<LogEntry[]>([]);
 
     const victimTerminalRef = useRef<HTMLDivElement>(null);
     const scammerTerminalRef = useRef<HTMLDivElement>(null);
 
+    console.log(currentAudioIndex);
+    
+
     const victimMessages = useRef<{ message: string; severity: LogSeverity }[]>([
         { message: "[SYSTEM BOOT] Deepfake voice synthesis initialized via ElevenLabs API v3.2.", severity: "info" },
-        { message: "Voice profile loaded: 'Middle-aged female, nervous tone' (ID: VCTM-8872).", severity: "success" },
+        { message: "Voice profile loaded: 'Female: nervous tone' (ID: VCTM-8872).", severity: "success" },
         { message: "Connecting to OpenAI GPT-4-turbo model for dynamic response generation...", severity: "info" },
         { message: "Deepfake voice engaged: 'Frightened woman' (ElevenLabs v3.4).", severity: "info" },
         { message: "VPN Detection: Call origin masked via NordVPN exit node (Singapore).", severity: "error" },
-        { message: "AI Response: 'H-Hello? Who is this?!' (simulating call pickup confusion).", severity: "info" },
         { message: "Scammer script: 'This is Officer Sharma from Mumbai Narcotics! A parcel in your name...'.", severity: "warning" },
         { message: "RTP packet analysis: High jitter (187ms) → Likely overseas routing.", severity: "error" },
         { message: "Countermeasure: AI feigns panic—'Oh god! But I didn’t order anything!'.", severity: "info" },
         { message: "STUN server probe: Attempting to bypass VPN via WebRTC leak.", severity: "warning" },
         { message: "Scammer demands: 'Pay ₹1.2 lakh via Bitcoin or face arrest!'.", severity: "error" },
-        { message: "AI stalls: 'My son has Bitcoin... but he’s traveling! Can I pay tomorrow?'.", severity: "info" },
         { message: "Voice stress analysis: Scammer frustration rising (pitch +12%).", severity: "warning" },
         { message: "Traceroute initiated: Hopping through VPN nodes (Singapore → Netherlands).", severity: "error" },
         { message: "Fake 'Mumbai Police' portal loaded (scammer phishing link clicked).", severity: "success" },
@@ -106,6 +108,26 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({ victimAudioRe
             clearInterval(scammerInterval);
         };
     }, []);
+
+    useEffect(() => {
+        if (currentAudioIndex === 6) {
+            const timestamp = new Date().toLocaleTimeString();
+            const newLog: LogEntry = {
+                timestamp,
+                message: "Deepfake Response: Please, please try to understand. There is a mistake. I have no clue about such parcel. I swear. I am innocent. Please tell me how this can be fixed now?",
+                type: "info"
+            };
+            setVictimLogs(prev => [...prev, newLog]);
+        } else if (currentAudioIndex === 8) {
+            const timestamp = new Date().toLocaleTimeString();
+            const newLog: LogEntry = {
+                timestamp,
+                message: "Deepfake Response: Okay! But do I need to send the money today. I would need some time to arrange the whole sum. Please understand. Please, requesting you give me some time to connect with my spouse at least.",
+                type: "info"
+            };
+            setVictimLogs(prev => [...prev, newLog]);
+        }
+    }, [currentAudioIndex]);
 
     useEffect(() => {
         if (victimTerminalRef.current) {

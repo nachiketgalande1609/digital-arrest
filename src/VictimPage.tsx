@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./App.css";
+import UnknownCallerProfilePhoto from "../public/blank-profile.png"
 
 interface VictimPageProps {
   callStatus: "incoming" | "analyzing" | "scam-detected" | "call-ended";
   progress: number;
-  callerInfo: { avatar: string; name: string; number: string };
+  callerInfo: { name: string; number: string };
   handleDecline: () => void;
   handleAnswer: () => void;
 }
@@ -302,7 +303,7 @@ const VictimPage: React.FC<VictimPageProps> = ({
             <div className="caller-info">
               <div className="avatar-container">
                 <img
-                  src={callerInfo.avatar}
+                  src={UnknownCallerProfilePhoto}
                   alt="Caller"
                   className="caller-avatar"
                 />
