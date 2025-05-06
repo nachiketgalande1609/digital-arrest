@@ -63,7 +63,6 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
                 } else {
                     // All patterns scanned, move to voiceprint
                     setScanStage("voiceprint");
-                    startVoicePrintScan();
                 }
             }, 1500);
         };
@@ -72,25 +71,31 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
             setVoicePrintProgress(0);
             voicePrintIntervalId = window.setInterval(() => {
                 setVoicePrintProgress((prev) => {
-                    if (prev >= 100) {
+                    const newProgress = prev + 5;
+                    if (newProgress >= 100) {
                         clearInterval(voicePrintIntervalId);
-                        setDisplayedLogs((prev) => [
-                            ...prev,
-                            {
-                                log: "Voice fingerprint match found in scammer database (87% confidence)",
-                                severity: "error",
-                            },
-                        ]);
+                        // Add the voiceprint match log only when we reach 100%
+                        if (prev < 100) {
+                            setDisplayedLogs((prevLogs) => [
+                                ...prevLogs,
+                                {
+                                    log: "Voice fingerprint match found in scammer database (87% confidence)",
+                                    severity: "error",
+                                },
+                            ]);
+                        }
                         return 100;
                     }
-                    return prev + 5;
+                    return newProgress;
                 });
             }, 100);
         };
 
         if (callStatus === "analyzing") {
-            if (currentPatternIndex === 0 && displayedLogs.length === 0) {
-                // Initial log
+            if (scanStage === "voiceprint") {
+                startVoicePrintScan();
+            } else if (currentPatternIndex === 0 && displayedLogs.length === 0) {
+                // Initial pattern scan
                 setDisplayedLogs([
                     {
                         log: `Scanning for known threat patterns: ${threatPatterns[0]}`,
@@ -98,7 +103,7 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
                     },
                 ]);
                 startPatternScan();
-            } else if (currentPatternIndex > 0 && scanStage === "patterns") {
+            } else if (currentPatternIndex > 0) {
                 // Update log for new pattern
                 setDisplayedLogs((prev) => [
                     ...prev.slice(0, -1),
@@ -140,6 +145,8 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
         );
     };
 
+    console.log(scanStage);
+
     return (
         <div style={{ width: "100vw" }}>
             <div className="victim-container">
@@ -174,7 +181,7 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
                                 </div>
                             )}
 
-                            {scanStage === "voiceprint" && voicePrintProgress < 100 && (
+                            {scanStage === "voiceprint" && (
                                 <>
                                     <div className={`log-entry error`}>
                                         <span className="timestamp">[{new Date().toLocaleTimeString()}]</span>

@@ -93,33 +93,33 @@ const App: React.FC = () => {
             targetAudioRef.current.src = currentAudio.src;
             targetAudioRef.current.onended = () => {
                 if (currentAudioIndex === 5) {
-                    setCallStatus("scam-detected");
-                    if (beepRef.current) {
-                        setIsBeepPlaying(true);
-                        beepRef.current.currentTime = 0;
-                        beepRef.current.play().catch(console.error);
-                        // Switch to cyber site after beep plays
-                        beepRef.current.onended = () => {
-                            setIsBeepPlaying(false);
-                            if (interceptorRef.current) {
-                                interceptorRef.current.currentTime = 0;
-                                interceptorRef.current.play().catch(console.error);
-                                interceptorRef.current.onended = () => {
-                                    setTimeout(() => {
-                                        setCurrentScreen("cyber");
-                                        setCurrentAudioIndex((prev) => prev + 1);
-                                    }, 1000);
-                                };
-                            } else {
-                                setCurrentScreen("cyber");
-                                setCurrentAudioIndex((prev) => prev + 1);
-                            }
-                        };
-                    } else {
-                        // If beep fails, still switch screens
-                        setCurrentScreen("cyber");
-                        setCurrentAudioIndex((prev) => prev + 1);
-                    }
+                    // setCallStatus("scam-detected");
+                    // if (beepRef.current) {
+                    //     setIsBeepPlaying(true);
+                    //     beepRef.current.currentTime = 0;
+                    //     beepRef.current.play().catch(console.error);
+                    //     // Switch to cyber site after beep plays
+                    //     beepRef.current.onended = () => {
+                    //         setIsBeepPlaying(false);
+                    //         if (interceptorRef.current) {
+                    //             interceptorRef.current.currentTime = 0;
+                    //             interceptorRef.current.play().catch(console.error);
+                    //             interceptorRef.current.onended = () => {
+                    //                 setTimeout(() => {
+                    //                     setCurrentScreen("cyber");
+                    //                     setCurrentAudioIndex((prev) => prev + 1);
+                    //                 }, 1000);
+                    //             };
+                    //         } else {
+                    //             setCurrentScreen("cyber");
+                    //             setCurrentAudioIndex((prev) => prev + 1);
+                    //         }
+                    //     };
+                    // } else {
+                    //     // If beep fails, still switch screens
+                    //     setCurrentScreen("cyber");
+                    //     setCurrentAudioIndex((prev) => prev + 1);
+                    // }
                 } else {
                     setCurrentAudioIndex((prev) => prev + 1);
                 }
