@@ -138,15 +138,15 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
                                     <span className="log-message">{log.log}</span>
                                 </div>
                             ))}
-                            {callStatus === "analyzing" && currentPatternIndex < threatPatterns.length && (
+                            {currentPatternIndex < threatPatterns.length && (
                                 <div className="hash-progress-container" style={{ marginTop: "10px" }}>
                                     {renderProgressBar(patternProgress)}
                                 </div>
                             )}
-                            {callStatus === "analyzing" && currentPatternIndex === threatPatterns.length - 1 && patternProgress >= 100 && (
+                            {currentPatternIndex === threatPatterns.length - 1 && patternProgress >= 100 && (
                                 <div className={`log-entry error`}>
                                     <span className="timestamp">[{new Date().toLocaleTimeString()}]</span>
-                                    <span className="log-message">Threat pattern scan complete - Fraud detected: Customs Narcotics Scam</span>
+                                    <span className="log-message">Identified Threat pattern: Customs Narcotics Scam</span>
                                 </div>
                             )}
                         </div>
