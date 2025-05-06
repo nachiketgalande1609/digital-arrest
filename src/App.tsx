@@ -3,7 +3,6 @@ import VictimPage from "./VictimPage";
 import TelangalanCyberSite from "./TelanganaCyberSite";
 import PhoneInterface from "./PhoneInterface";
 import ScammerDetailsModal from "./components/modal/ScammerDetailsModal";
-import UnknownCallerProfilePhoto from "../public/blank-profile.webp"
 
 type CallStatus = "incoming" | "analyzing" | "scam-detected" | "call-ended";
 

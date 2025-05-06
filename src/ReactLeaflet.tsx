@@ -21,7 +21,7 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({ connectionStrength = 80, is
         rippleCircles?: L.Circle[];
     }>({});
     const zoomIntervalRef = useRef<number | null>(null);
-    const [currentZoom, setCurrentZoom] = useState(5);
+    const [currentZoom, setCurrentZoom] = useState(1);
     const [showOverlay, setShowOverlay] = useState(false);
 
     // Create custom icons
@@ -245,8 +245,8 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({ connectionStrength = 80, is
                     <div className="overlay-content">
                         <h3>Scammer IP Traced</h3>
                         <div className="coordinates">
-                            <span>182.72.123.45 → VPN Exit (Cambodia)</span>
-                            <span>117.212.87.34 (Identified Real IP - Hyderabad)</span>
+                            <span>180.252.113.199 → VPN Exit (Jakarta, Indonesia)</span>
+                            <span>103.240.180.25 (Identified Real IP - Phnom Penh, Cambodia)</span>
                         </div>
                         <button className="close-button" onClick={() => setShowOverlay(false)}>
                             Close
