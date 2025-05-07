@@ -253,15 +253,12 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
     }, [displayedLogs, endingLogs]);
 
     const renderProgressBar = (progressValue: number) => {
-        const totalChars = 95;
-        const filledChars = Math.round((progressValue / 100) * totalChars);
-        const emptyChars = totalChars - filledChars;
-
         return (
-            <div className="hash-progress-container">
-                <span className="hash-filled">{"#".repeat(filledChars)}</span>
-                <span className="hash-empty">{"..".repeat(emptyChars)}</span>
-                <span className="progress-percent">{Math.min(progressValue, 100).toFixed(0)}%</span>
+            <div className="modern-progress-bar-container">
+                <div className="modern-progress-bar">
+                    <div className="modern-progress-fill" style={{ width: `${Math.min(progressValue, 100)}%` }}></div>
+                </div>
+                <span className="progress-percent-modern">{Math.min(progressValue, 100).toFixed(0)}%</span>
             </div>
         );
     };

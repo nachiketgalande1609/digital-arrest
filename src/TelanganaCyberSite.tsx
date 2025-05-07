@@ -191,15 +191,12 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
     }, [scammerLogs]);
 
     const renderProgressBar = (progressValue: number) => {
-        const totalChars = 60;
-        const filledChars = Math.round((progressValue / 100) * totalChars);
-        const emptyChars = totalChars - filledChars;
-
         return (
-            <div className="cyber-hash-progress-container">
-                <span className="cyber-hash-filled">{"#".repeat(filledChars)}</span>
-                <span className="cyber-hash-empty">{"..".repeat(emptyChars)}</span>
-                <span className="cyber-progress-percent">{Math.min(progressValue, 100).toFixed(0)}%</span>
+            <div className="cyber-modern-progress-bar-container">
+                <div className="cyber-modern-progress-bar">
+                    <div className="cyber-modern-progress-fill" style={{ width: `${Math.min(progressValue, 100)}%` }}></div>
+                </div>
+                <span className="cyber-progress-percent-modern">{Math.min(progressValue, 100).toFixed(0)}%</span>
             </div>
         );
     };
