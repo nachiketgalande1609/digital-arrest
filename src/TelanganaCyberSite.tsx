@@ -18,6 +18,7 @@ interface LogEntry {
     timestamp: string;
     message: string;
     type: LogSeverity;
+    progress?: number; // Add progress to LogEntry interface
 }
 
 const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
@@ -29,11 +30,11 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
 }) => {
     const [victimLogs, setVictimLogs] = useState<LogEntry[]>([]);
     const [scammerLogs, setScammerLogs] = useState<LogEntry[]>([]);
+    const [currentScammerProgress, setCurrentScammerProgress] = useState(0);
+    const [currentScammerMessageIndex, setCurrentScammerMessageIndex] = useState(0);
 
     const victimTerminalRef = useRef<HTMLDivElement>(null);
     const scammerTerminalRef = useRef<HTMLDivElement>(null);
-
-    console.log(currentAudioIndex);
 
     const victimMessages = useRef<{ message: string; severity: LogSeverity }[]>([
         { message: "Voice profile loaded: 'Female: nervous tone' (ID: VCTM-8872).", severity: "success" },
@@ -42,18 +43,11 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
     ]);
 
     const scammerMessages = useRef<{ message: string; severity: LogSeverity }[]>([
-        { message: "VOIP call initiated via Twilio SIP proxy (spoofing Mumbai Customs number).", severity: "info" },
         { message: "VPN enabled: Traffic routed through NordVPN (Jakarta, Indonesia).", severity: "info" },
-        { message: "Victim answered call — deploying 'narcotics threat' script.", severity: "success" },
-        { message: "AI detected? Unusual response delay (+4.2s).", severity: "warning" },
-        { message: "Target stalling: 'My son will transfer money...'.", severity: "warning" },
         { message: "RTP stream interrupted — possible packet inspection.", severity: "error" },
         { message: "Switching VPN servers (Jakarta Indonesia).", severity: "info" },
-        { message: "Target clicked fake 'Mumbai Police' link — session hijacked.", severity: "success" },
         { message: "WebRTC leak detected! Real IP exposed (117.211.75.63).", severity: "error" },
-        { message: "VPN killswitch failed — ISP metadata leaked (BSNL, New Delhi).", severity: "error" },
-        { message: "Call terminated abruptly — law enforcement trace detected.", severity: "error" },
-        { message: "EMERGENCY: All sessions disconnected. Device wipe initiated.", severity: "error" },
+        { message: "VPN killswitch failed — ISP metadata leaked (Cambodia).", severity: "error" },
     ]);
 
     useEffect(() => {
@@ -84,21 +78,40 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
             }
         }, 5000);
 
-        // Scammer log interval
-        const scammerInterval = setInterval(() => {
-            const timestamp = new Date().toLocaleTimeString();
-            const scammerMsg = scammerMessages.current[0];
-            if (scammerMsg) {
-                setScammerLogs((prev) => [...prev, { timestamp, message: scammerMsg.message, type: scammerMsg.severity }]);
-                scammerMessages.current.shift();
-            }
-        }, 4000);
-
         return () => {
             clearInterval(victimInterval);
-            clearInterval(scammerInterval);
         };
     }, []);
+
+    // Scammer progress bar effect
+    useEffect(() => {
+        const scammerProgressInterval = setInterval(() => {
+            if (currentScammerMessageIndex < scammerMessages.current.length) {
+                setCurrentScammerProgress((prev) => {
+                    if (prev >= 100) {
+                        // Add the current message to logs when progress reaches 100%
+                        const timestamp = new Date().toLocaleTimeString();
+                        const scammerMsg = scammerMessages.current[currentScammerMessageIndex];
+                        if (scammerMsg) {
+                            setScammerLogs((prevLogs) => [
+                                ...prevLogs,
+                                {
+                                    timestamp,
+                                    message: scammerMsg.message,
+                                    type: scammerMsg.severity,
+                                },
+                            ]);
+                            setCurrentScammerMessageIndex((prevIndex) => prevIndex + 1);
+                        }
+                        return 0; // Reset progress for next message
+                    }
+                    return prev + 10; // Increment progress
+                });
+            }
+        }, 1000);
+
+        return () => clearInterval(scammerProgressInterval);
+    }, [currentScammerMessageIndex]);
 
     useEffect(() => {
         if (currentAudioIndex === 6) {
@@ -134,13 +147,27 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
         }
     }, [scammerLogs]);
 
+    const renderProgressBar = (progressValue: number) => {
+        const totalChars = 60;
+        const filledChars = Math.round((progressValue / 100) * totalChars);
+        const emptyChars = totalChars - filledChars;
+
+        return (
+            <div className="cyber-hash-progress-container">
+                <span className="cyber-hash-filled">{"#".repeat(filledChars)}</span>
+                <span className="cyber-hash-empty">{"..".repeat(emptyChars)}</span>
+                <span className="cyber-progress-percent">{Math.min(progressValue, 100).toFixed(0)}%</span>
+            </div>
+        );
+    };
+
     return (
         <div style={{ width: "100vw" }}>
             <Navbar />
             <div className="cyber-main-container">
                 <div className="cyber-left-panel">
                     <div className="cyber-terminal-wrapper">
-                        {/* Victim Terminal */}
+                        {/* Victim Terminal - unchanged */}
                         <div className="cyber-terminal-window">
                             <AudioVisualizer audioRef={victimAudioRef} active={activeSpeaker === "victim"} type="victim" />
                             <div className="cyber-terminal-topbar">
@@ -178,7 +205,7 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
                             </div>
                         </div>
 
-                        {/* Scammer Terminal */}
+                        {/* Scammer Terminal with progress bars */}
                         <div className="cyber-terminal-window">
                             <AudioVisualizer audioRef={scammerAudioRef} active={activeSpeaker === "caller"} type="caller" />
                             <div className="cyber-terminal-topbar">
@@ -207,11 +234,21 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
                             </div>
                             <div className="cyber-terminal-content cyber-terminal-scroll" ref={scammerTerminalRef}>
                                 {scammerLogs.map((log, index) => (
-                                    <div key={index} className={`cyber-log-entry cyber-log-${log.type}`}>
-                                        <span className="cyber-log-time">[{log.timestamp}]</span>
-                                        <span className="cyber-log-message">{log.message}</span>
-                                    </div>
+                                    <React.Fragment key={index}>
+                                        <div className={`cyber-log-entry cyber-log-${log.type}`}>
+                                            <span className="cyber-log-time">[{log.timestamp}]</span>
+                                            <span className="cyber-log-message">{log.message}</span>
+                                        </div>
+                                        {/* Show progress bar only for the current message being loaded */}
+                                        {index === scammerLogs.length - 1 && currentScammerMessageIndex < scammerMessages.current.length && (
+                                            <div className="cyber-log-progress">{renderProgressBar(currentScammerProgress)}</div>
+                                        )}
+                                    </React.Fragment>
                                 ))}
+                                {/* Show initial progress bar if no messages yet */}
+                                {scammerLogs.length === 0 && currentScammerMessageIndex === 0 && (
+                                    <div className="cyber-log-progress">{renderProgressBar(currentScammerProgress)}</div>
+                                )}
                             </div>
                         </div>
                     </div>

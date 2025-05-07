@@ -1126,3 +1126,23 @@ body {
         fill-opacity: 0;
     }
 }
+
+.cyber-hash-progress-container {
+    margin-left: 120px;
+    width: calc(100% - 100px);
+}
+
+.cyber-hash-filled {
+    color: #f50b0b;
+    /* Green color for filled portion */
+}
+
+.cyber-hash-empty {
+    color: #f50b0b;
+    /* Gray color for empty portion */
+}
+
+.cyber-progress-percent {
+    margin-left: 10px;
+    color: #f50b0b;
+}
