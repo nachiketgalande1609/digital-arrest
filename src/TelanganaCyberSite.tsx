@@ -123,6 +123,14 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
                 type: "warning",
             };
             setVictimLogs((prev) => [...prev, newLog]);
+        } else if (currentAudioIndex === 7) {
+            const timestamp = new Date().toLocaleTimeString();
+            const newLog: LogEntry = {
+                timestamp,
+                message: "[THINKING] Should I express more panic or seek clarification? Need to maintain emotional consistency.",
+                type: "info",
+            };
+            setVictimLogs((prev) => [...prev, newLog]);
         } else if (currentAudioIndex === 8) {
             const timestamp = new Date().toLocaleTimeString();
             const newLog: LogEntry = {
@@ -131,12 +139,29 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
                 type: "warning",
             };
             setVictimLogs((prev) => [...prev, newLog]);
+        } else if (currentAudioIndex === 9) {
+            const timestamp = new Date().toLocaleTimeString();
+            const newLog: LogEntry = {
+                timestamp,
+                message: "[SYNTH CORE] High-stress scenario detected. Adjusting vocal modulation parameters.",
+                type: "info",
+            };
+            setVictimLogs((prev) => [...prev, newLog]);
         } else if (currentAudioIndex === 10) {
             const timestamp = new Date().toLocaleTimeString();
             const newLog: LogEntry = {
                 timestamp,
-                message: "Aadhar Number! That sounds I need to give some important stuff to you. Also do I need to send the money today?",
+                message:
+                    "Deepfake Response: Aadhar Number! That sounds I need to give some important stuff to you. Also do I need to send the money today?",
                 type: "warning",
+            };
+            setVictimLogs((prev) => [...prev, newLog]);
+        } else if (currentAudioIndex === 11) {
+            const timestamp = new Date().toLocaleTimeString();
+            const newLog: LogEntry = {
+                timestamp,
+                message: "[THINKING] Mentioning money could escalate — should show willingness but also uncertainty.",
+                type: "info",
             };
             setVictimLogs((prev) => [...prev, newLog]);
         }
@@ -252,10 +277,6 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
                                         )}
                                     </React.Fragment>
                                 ))}
-                                {/* Show initial progress bar if no messages yet */}
-                                {scammerLogs.length === 0 && currentScammerMessageIndex === 0 && (
-                                    <div className="cyber-log-progress">{renderProgressBar(currentScammerProgress)}</div>
-                                )}
                             </div>
                         </div>
                     </div>
