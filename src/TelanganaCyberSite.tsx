@@ -18,7 +18,8 @@ interface LogEntry {
     timestamp: string;
     message: string;
     type: LogSeverity;
-    progress?: number; // Add progress to LogEntry interface
+    progress?: number; // Track progress for each log
+    completed?: boolean; // Track if progress is complete
 }
 
 const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
@@ -30,7 +31,6 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
 }) => {
     const [victimLogs, setVictimLogs] = useState<LogEntry[]>([]);
     const [scammerLogs, setScammerLogs] = useState<LogEntry[]>([]);
-    const [currentScammerProgress, setCurrentScammerProgress] = useState(0);
     const [currentScammerMessageIndex, setCurrentScammerMessageIndex] = useState(0);
 
     const victimTerminalRef = useRef<HTMLDivElement>(null);
@@ -47,8 +47,6 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
         { message: "RTP stream interrupted — possible packet inspection in progress.", severity: "error" },
         { message: "Switching VPN servers — new endpoint: Jakarta, Indonesia.", severity: "info" },
         { message: "WebRTC leak detected! Real IP exposed (117.211.75.63).", severity: "error" },
-
-        // Live/in-progress tracking updates
         { message: "Initiating GeoIP triangulation... signal pinged in Phnom Penh, Cambodia.", severity: "info" },
         { message: "Cross-referencing device fingerprint with darknet activity... match pending.", severity: "info" },
         { message: "TOR session cookie detected — correlating with previous behavior patterns.", severity: "info" },
@@ -92,38 +90,57 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
     }, []);
 
     // Scammer progress bar effect
-    // Scammer progress bar effect
     useEffect(() => {
         if (currentScammerMessageIndex >= scammerMessages.current.length) return;
 
-        const scammerProgressInterval = setInterval(() => {
-            setCurrentScammerProgress((prev) => {
-                const newProgress = prev + 10;
+        // Add the new message with initial progress
+        const scammerMsg = scammerMessages.current[currentScammerMessageIndex];
+        if (scammerMsg) {
+            const timestamp = new Date().toLocaleTimeString();
+            setScammerLogs((prevLogs) => [
+                ...prevLogs,
+                {
+                    timestamp,
+                    message: scammerMsg.message,
+                    type: scammerMsg.severity,
+                    progress: 0,
+                    completed: false,
+                },
+            ]);
+        }
 
-                if (newProgress >= 100) {
-                    // Add the current message to logs when progress reaches 100%
-                    const timestamp = new Date().toLocaleTimeString();
-                    const scammerMsg = scammerMessages.current[currentScammerMessageIndex];
-                    if (scammerMsg) {
-                        setScammerLogs((prevLogs) => [
-                            ...prevLogs,
-                            {
-                                timestamp,
-                                message: scammerMsg.message,
-                                type: scammerMsg.severity,
-                            },
-                        ]);
-                        setCurrentScammerMessageIndex((prevIndex) => prevIndex + 1);
-                    }
-                    return 0; // Reset progress for next message
+        const scammerProgressInterval = setInterval(() => {
+            setScammerLogs((prevLogs) => {
+                // Find the index of the current log being processed
+                const currentLogIndex = prevLogs.findIndex(
+                    (log) => log.message === scammerMessages.current[currentScammerMessageIndex]?.message && !log.completed
+                );
+
+                if (currentLogIndex === -1) return prevLogs;
+
+                const updatedLogs = [...prevLogs];
+                const currentProgress = updatedLogs[currentLogIndex].progress || 0;
+                const newProgress = Math.min(currentProgress + 10, 100);
+
+                updatedLogs[currentLogIndex] = {
+                    ...updatedLogs[currentLogIndex],
+                    progress: newProgress,
+                    completed: newProgress === 100,
+                };
+
+                // Move to next message if current one is complete
+                if (newProgress === 100) {
+                    setCurrentScammerMessageIndex((prevIndex) => prevIndex + 1);
                 }
-                return newProgress; // Increment progress
+
+                return updatedLogs;
             });
-        }, 1000);
+        }, 500);
 
         return () => clearInterval(scammerProgressInterval);
     }, [currentScammerMessageIndex]);
 
+    // Rest of your useEffect hooks for audio index changes remain the same
     useEffect(() => {
         if (currentAudioIndex === 6) {
             const timestamp = new Date().toLocaleTimeString();
@@ -194,9 +211,9 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
         return (
             <div className="cyber-modern-progress-bar-container">
                 <div className="cyber-modern-progress-bar">
-                    <div className="cyber-modern-progress-fill" style={{ width: `${Math.min(progressValue, 100)}%` }}></div>
+                    <div className="cyber-modern-progress-fill" style={{ width: `${progressValue}%` }}></div>
                 </div>
-                <span className="cyber-progress-percent-modern">{Math.min(progressValue, 100).toFixed(0)}%</span>
+                <span className="cyber-progress-percent-modern">{progressValue.toFixed(0)}%</span>
             </div>
         );
     };
@@ -207,7 +224,7 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
             <div className="cyber-main-container">
                 <div className="cyber-left-panel">
                     <div className="cyber-terminal-wrapper">
-                        {/* Victim Terminal - unchanged */}
+                        {/* Victim Terminal */}
                         <div className="cyber-terminal-window">
                             <AudioVisualizer audioRef={victimAudioRef} active={activeSpeaker === "victim"} type="victim" />
                             <div className="cyber-terminal-topbar">
@@ -279,10 +296,8 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
                                             <span className="cyber-log-time">[{log.timestamp}]</span>
                                             <span className="cyber-log-message">{log.message}</span>
                                         </div>
-                                        {/* Show progress bar only for the current message being loaded */}
-                                        {index === scammerLogs.length - 1 && currentScammerMessageIndex < scammerMessages.current.length && (
-                                            <div className="cyber-log-progress">{renderProgressBar(currentScammerProgress)}</div>
-                                        )}
+                                        {/* Show progress bar if this log has progress */}
+                                        {log.progress !== undefined && <div className="cyber-log-progress">{renderProgressBar(log.progress)}</div>}
                                     </React.Fragment>
                                 ))}
                             </div>
