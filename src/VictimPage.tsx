@@ -373,6 +373,67 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
 
                         {callStatus === "analyzing" && (
                             <div className="analysis-container">
+                                <div className="milestone-log-stack">
+                                    {scanStage === "initial" && (
+                                        <div className="milestone-log modern">
+                                            <div className="log-content">
+                                                <div className="log-title">System Initialization</div>
+                                                <div className="log-message">Starting scam detection protocols...</div>
+                                            </div>
+                                        </div>
+                                    )}
+                                    {scanStage === "patterns" && (
+                                        <>
+                                            <div className="milestone-log modern accent">
+                                                <div className="log-content">
+                                                    <div className="log-title">Pattern Analysis</div>
+                                                    <div className="log-message">Scanning for known scam patterns...</div>
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
+                                    {scanStage === "voiceprint" && (
+                                        <>
+                                            <div className="milestone-log modern accent">
+                                                <div className="log-content">
+                                                    <div className="log-title">Voice Analysis</div>
+                                                    <div className="log-message">Analyzing voice fingerprint</div>
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
+                                    {scanStage === "language" && (
+                                        <>
+                                            <div className="milestone-log modern accent">
+                                                <div className="log-content">
+                                                    <div className="log-title">Language Processing</div>
+                                                    <div className="log-message">Connecting to Fine Tuned Model</div>
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
+                                    {scanStage === "reverification" && (
+                                        <>
+                                            <div className="milestone-log modern accent">
+                                                <div className="log-content">
+                                                    <div className="log-title">Final Verification</div>
+                                                    <div className="log-message">Reverifying scam indicators</div>
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
+                                    {scanStage === "ending" && (
+                                        <>
+                                            <div className="milestone-log modern critical">
+                                                <div className="log-content">
+                                                    <div className="log-title">Final Verdict</div>
+                                                    <div className="log-message">98.7% confidence: SCAM DETECTED</div>
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+
                                 <div className="analyzing-animation">
                                     <div className="wave"></div>
                                     <div className="wave"></div>

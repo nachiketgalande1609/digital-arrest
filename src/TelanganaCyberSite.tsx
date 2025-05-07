@@ -44,10 +44,18 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
 
     const scammerMessages = useRef<{ message: string; severity: LogSeverity }[]>([
         { message: "VPN enabled: Traffic routed through NordVPN (Jakarta, Indonesia).", severity: "info" },
-        { message: "RTP stream interrupted — possible packet inspection.", severity: "error" },
-        { message: "Switching VPN servers (Jakarta Indonesia).", severity: "info" },
+        { message: "RTP stream interrupted — possible packet inspection in progress.", severity: "error" },
+        { message: "Switching VPN servers — new endpoint: Jakarta, Indonesia.", severity: "info" },
         { message: "WebRTC leak detected! Real IP exposed (117.211.75.63).", severity: "error" },
-        { message: "VPN killswitch failed — ISP metadata leaked (Cambodia).", severity: "error" },
+
+        // Live/in-progress tracking updates
+        { message: "Initiating GeoIP triangulation... signal pinged in Phnom Penh, Cambodia.", severity: "info" },
+        { message: "Cross-referencing device fingerprint with darknet activity... match pending.", severity: "info" },
+        { message: "TOR session cookie detected — correlating with previous behavior patterns.", severity: "info" },
+        { message: "Rogue AP handshake received — MAC address broadcast identified (Android v12).", severity: "info" },
+        { message: "IMSI capture underway... preliminary leak points to Cellcard (Cambodia).", severity: "error" },
+        { message: "Running voiceprint match... partial correlation with known scammer profiles.", severity: "info" },
+        { message: "Remote access session initializing — monitoring file system and clipboard.", severity: "error" },
     ]);
 
     useEffect(() => {
@@ -84,30 +92,33 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
     }, []);
 
     // Scammer progress bar effect
+    // Scammer progress bar effect
     useEffect(() => {
+        if (currentScammerMessageIndex >= scammerMessages.current.length) return;
+
         const scammerProgressInterval = setInterval(() => {
-            if (currentScammerMessageIndex < scammerMessages.current.length) {
-                setCurrentScammerProgress((prev) => {
-                    if (prev >= 100) {
-                        // Add the current message to logs when progress reaches 100%
-                        const timestamp = new Date().toLocaleTimeString();
-                        const scammerMsg = scammerMessages.current[currentScammerMessageIndex];
-                        if (scammerMsg) {
-                            setScammerLogs((prevLogs) => [
-                                ...prevLogs,
-                                {
-                                    timestamp,
-                                    message: scammerMsg.message,
-                                    type: scammerMsg.severity,
-                                },
-                            ]);
-                            setCurrentScammerMessageIndex((prevIndex) => prevIndex + 1);
-                        }
-                        return 0; // Reset progress for next message
+            setCurrentScammerProgress((prev) => {
+                const newProgress = prev + 10;
+
+                if (newProgress >= 100) {
+                    // Add the current message to logs when progress reaches 100%
+                    const timestamp = new Date().toLocaleTimeString();
+                    const scammerMsg = scammerMessages.current[currentScammerMessageIndex];
+                    if (scammerMsg) {
+                        setScammerLogs((prevLogs) => [
+                            ...prevLogs,
+                            {
+                                timestamp,
+                                message: scammerMsg.message,
+                                type: scammerMsg.severity,
+                            },
+                        ]);
+                        setCurrentScammerMessageIndex((prevIndex) => prevIndex + 1);
                     }
-                    return prev + 10; // Increment progress
-                });
-            }
+                    return 0; // Reset progress for next message
+                }
+                return newProgress; // Increment progress
+            });
         }, 1000);
 
         return () => clearInterval(scammerProgressInterval);
