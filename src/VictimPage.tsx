@@ -373,10 +373,6 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
 
                         {callStatus === "analyzing" && (
                             <div className="analysis-container">
-                                <div className="milestone-log">
-                                    <p className="milestone-log sky">🔍 Scanning for threat patterns...</p>
-                                </div>
-
                                 <div className="analyzing-animation">
                                     <div className="wave"></div>
                                     <div className="wave"></div>
