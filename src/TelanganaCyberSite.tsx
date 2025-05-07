@@ -127,9 +127,16 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
             const timestamp = new Date().toLocaleTimeString();
             const newLog: LogEntry = {
                 timestamp,
-                message:
-                    "Deepfake Response: Okay! But do I need to send the money today. I would need some time to arrange the whole sum. Please understand. Please, requesting you give me some time to connect with my spouse at least.",
-                type: "info",
+                message: "Deepfake Response: Please listen, there is some mistake. I swear I am innocent. How can I fix this?",
+                type: "warning",
+            };
+            setVictimLogs((prev) => [...prev, newLog]);
+        } else if (currentAudioIndex === 10) {
+            const timestamp = new Date().toLocaleTimeString();
+            const newLog: LogEntry = {
+                timestamp,
+                message: "Aadhar Number! That sounds I need to give some important stuff to you. Also do I need to send the money today?",
+                type: "warning",
             };
             setVictimLogs((prev) => [...prev, newLog]);
         }
