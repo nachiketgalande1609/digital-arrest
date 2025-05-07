@@ -90,12 +90,17 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
     }, []);
 
     // Scammer progress bar effect
+    // Replace your current scammer progress effect with this:
     useEffect(() => {
         if (currentScammerMessageIndex >= scammerMessages.current.length) return;
 
-        // Add the new message with initial progress
         const scammerMsg = scammerMessages.current[currentScammerMessageIndex];
-        if (scammerMsg) {
+        if (!scammerMsg) return;
+
+        // Check if this message has already been added to logs
+        const messageExists = scammerLogs.some((log) => log.message === scammerMsg.message && log.type === scammerMsg.severity);
+
+        if (!messageExists) {
             const timestamp = new Date().toLocaleTimeString();
             setScammerLogs((prevLogs) => [
                 ...prevLogs,
@@ -111,14 +116,11 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
 
         const scammerProgressInterval = setInterval(() => {
             setScammerLogs((prevLogs) => {
-                // Find the index of the current log being processed
-                const currentLogIndex = prevLogs.findIndex(
-                    (log) => log.message === scammerMessages.current[currentScammerMessageIndex]?.message && !log.completed
-                );
+                const updatedLogs = [...prevLogs];
+                const currentLogIndex = updatedLogs.findIndex((log) => log.message === scammerMsg.message && !log.completed);
 
                 if (currentLogIndex === -1) return prevLogs;
 
-                const updatedLogs = [...prevLogs];
                 const currentProgress = updatedLogs[currentLogIndex].progress || 0;
                 const newProgress = Math.min(currentProgress + 10, 100);
 
@@ -128,17 +130,27 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
                     completed: newProgress === 100,
                 };
 
-                // Move to next message if current one is complete
-                if (newProgress === 100) {
-                    setCurrentScammerMessageIndex((prevIndex) => prevIndex + 1);
-                }
-
                 return updatedLogs;
             });
         }, 500);
 
         return () => clearInterval(scammerProgressInterval);
-    }, [currentScammerMessageIndex]);
+    }, [currentScammerMessageIndex, scammerLogs]);
+
+    // Add this new effect to handle moving to the next message
+    useEffect(() => {
+        if (scammerLogs.length === 0) return;
+
+        const lastLog = scammerLogs[scammerLogs.length - 1];
+        if (lastLog.completed && currentScammerMessageIndex < scammerMessages.current.length - 1) {
+            // Add a small delay before moving to next message
+            const timer = setTimeout(() => {
+                setCurrentScammerMessageIndex((prev) => prev + 1);
+            }, 1000);
+
+            return () => clearTimeout(timer);
+        }
+    }, [scammerLogs, currentScammerMessageIndex]);
 
     // Rest of your useEffect hooks for audio index changes remain the same
     useEffect(() => {
