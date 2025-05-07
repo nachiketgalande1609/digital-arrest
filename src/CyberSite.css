@@ -1156,7 +1156,7 @@ body {
 
 .cyber-modern-progress-bar {
     position: relative;
-    height: 18px;
+    height: 10px;
     width: 1050px;
     background-color: #2e2e2e;
     border-radius: 6px;
@@ -1167,13 +1167,13 @@ body {
 
 .cyber-modern-progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, #b42f17, #b42f17);
+    background: linear-gradient(90deg, green, green);
     transition: width 0.3s ease-in-out;
     border-radius: 6px 0 0 6px;
 }
 
 .cyber-progress-percent-modern {
     font-weight: bold;
-    color: #b42f17;
+    color: green;
     min-width: 40px;
 }

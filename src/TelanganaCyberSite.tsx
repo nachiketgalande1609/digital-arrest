@@ -43,17 +43,18 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
     ]);
 
     const scammerMessages = useRef<{ message: string; severity: LogSeverity }[]>([
-        { message: "VPN enabled: Traffic routed through NordVPN (Jakarta, Indonesia).", severity: "info" },
-        { message: "RTP stream interrupted — possible packet inspection in progress.", severity: "error" },
-        { message: "Switching VPN servers — new endpoint: Jakarta, Indonesia.", severity: "info" },
-        { message: "WebRTC leak detected! Real IP exposed (117.211.75.63).", severity: "error" },
-        { message: "Initiating GeoIP triangulation... signal pinged in Phnom Penh, Cambodia.", severity: "info" },
-        { message: "Cross-referencing device fingerprint with darknet activity... match pending.", severity: "info" },
-        { message: "TOR session cookie detected — correlating with previous behavior patterns.", severity: "info" },
-        { message: "Rogue AP handshake received — MAC address broadcast identified (Android v12).", severity: "info" },
-        { message: "IMSI capture underway... preliminary leak points to Cellcard (Cambodia).", severity: "error" },
-        { message: "Running voiceprint match... partial correlation with known scammer profiles.", severity: "info" },
-        { message: "Remote access session initializing — monitoring file system and clipboard.", severity: "error" },
+        { message: "Initial connection detected from VPN IP: 180.252.113.199 (NordVPN, Jakarta)", severity: "info" },
+        { message: "Analyzing VPN tunnel characteristics for timing anomalies...", severity: "info" },
+        { message: "Detected WebRTC leak - possible real IP fragment: 103.240.180.*", severity: "info" },
+        { message: "Cross-referencing IP fragment with known scammer infrastructure...", severity: "info" },
+        { message: "Running TTL analysis on network packets to estimate true hop distance...", severity: "info" },
+        { message: "Detected VPN session cookie - correlating with previous scam patterns...", severity: "info" },
+        { message: "Analyzing voiceprint against known scammer databases...", severity: "info" },
+        { message: "Confirmed real IP behind VPN: 103.240.180.25 (Phnom Penh, Cambodia)", severity: "success" },
+        { message: "Mapping network path: VPN exit (Jakarta) → actual origin (Phnom Penh)", severity: "info" },
+        { message: "Identified ISP: Cellcard (Cambodia) - known scammer hotspot", severity: "info" },
+        { message: "Geolocation triangulation complete - accuracy: 92%", severity: "success" },
+        { message: "Compiling digital fingerprint for law enforcement submission...", severity: "info" },
     ]);
 
     useEffect(() => {
@@ -67,7 +68,7 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
         // Initial scammer log
         const initialScammerLog: LogEntry = {
             timestamp: new Date().toLocaleTimeString(),
-            message: "Call connected — analyzing audio input for scam indicators...",
+            message: "Call connected - tracking scammer through VPN tunnel...",
             type: "info",
         };
 
@@ -90,7 +91,6 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
     }, []);
 
     // Scammer progress bar effect
-    // Replace your current scammer progress effect with this:
     useEffect(() => {
         if (currentScammerMessageIndex >= scammerMessages.current.length) return;
 
@@ -137,7 +137,7 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
         return () => clearInterval(scammerProgressInterval);
     }, [currentScammerMessageIndex, scammerLogs]);
 
-    // Add this new effect to handle moving to the next message
+    // Handle moving to the next message
     useEffect(() => {
         if (scammerLogs.length === 0) return;
 
@@ -152,7 +152,7 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
         }
     }, [scammerLogs, currentScammerMessageIndex]);
 
-    // Rest of your useEffect hooks for audio index changes remain the same
+    // Victim response logs based on audio index
     useEffect(() => {
         if (currentAudioIndex === 6) {
             const timestamp = new Date().toLocaleTimeString();
@@ -319,7 +319,7 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
                     <div className="map-container">
                         <ReactLeaflet
                             victimLocation={[19.1197, 72.8464]} // Andheri, Mumbai
-                            scammerLocation={[-6.2088, 106.8456]} // Central Jakarta, Indonesia
+                            scammerLocation={[11.5564, 104.9282]} // Phnom Penh, Cambodia
                             connectionStrength={75}
                             isCallActive={true}
                         />
