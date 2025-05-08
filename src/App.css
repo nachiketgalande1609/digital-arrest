@@ -227,7 +227,7 @@ body {
 }
 
 .log-entry.error .log-message {
-    color: var(--accent-danger);
+    color: #e94f58;
     font-weight: 500;
 }
 
