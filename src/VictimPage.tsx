@@ -38,11 +38,6 @@ const threatPatterns = [
     "Fake Rental Property",
     "Fake Cryptocurrency Offer",
     "Fake Online Shopping Refund",
-    "Fake Travel Booking",
-    "Fake Scholarship Offer",
-    "Fake Dating Profile",
-    "Fake Loan Approval",
-    "Fake Credit Card Offer",
     "Fake Electricity Bill Payment",
     "Fake Water Bill Payment",
     "Fake Gas Connection Offer",
@@ -194,7 +189,7 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
             setReverificationProgress(0);
             reverificationIntervalId = window.setInterval(() => {
                 setReverificationProgress((prev) => {
-                    const newProgress = prev + 1;
+                    const newProgress = prev + 2;
                     if (newProgress >= 100) {
                         clearInterval(reverificationIntervalId);
                         if (prev < 100) {
