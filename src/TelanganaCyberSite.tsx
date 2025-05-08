@@ -97,7 +97,6 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
     }, []);
 
     // Scammer progress bar effect
-    // Scammer progress bar effect
     useEffect(() => {
         if (currentScammerMessageIndex >= scammerMessages.current.length) return;
 
@@ -141,7 +140,7 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
 
                     return updatedLogs;
                 });
-            }, 500);
+            }, 700);
 
             return () => clearInterval(scammerProgressInterval);
         }

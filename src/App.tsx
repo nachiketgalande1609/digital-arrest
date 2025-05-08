@@ -33,8 +33,6 @@ const App: React.FC = () => {
         { src: "after_beep/8_scammer.mp3", type: "caller" },
         { src: "after_beep/9_victim.mp3", type: "victim" },
         { src: "after_beep/10_scammer.mp3", type: "caller" },
-        { src: "after_beep/11_victim.mp3", type: "victim" },
-        { src: "after_beep/12_scammer.mp3", type: "caller" },
     ];
 
     const [callerInfo] = useState<CallerInfo>({
@@ -66,7 +64,7 @@ const App: React.FC = () => {
                     const nextProgress = prev + (Math.random() * 3 + 2);
                     return nextProgress;
                 });
-            }, 1250);
+            }, 1100);
 
             return () => clearInterval(analysisInterval);
         }
@@ -92,7 +90,7 @@ const App: React.FC = () => {
         if (targetAudioRef.current) {
             targetAudioRef.current.src = currentAudio.src;
             targetAudioRef.current.onended = () => {
-                if (currentAudioIndex === 1) {
+                if (currentAudioIndex === 5) {
                     setCallStatus("scam-detected");
                     if (beepRef.current) {
                         setIsBeepPlaying(true);
