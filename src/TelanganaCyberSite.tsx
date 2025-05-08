@@ -42,19 +42,25 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
         { message: "Deepfake voice engaged: 'Frightened woman' (ElevenLabs v3.4).", severity: "info" },
     ]);
 
-    const scammerMessages = useRef<{ message: string; severity: LogSeverity }[]>([
-        { message: "Initial connection detected from VPN IP: 180.252.113.199 (NordVPN, Jakarta)", severity: "info" },
-        { message: "Analyzing VPN tunnel characteristics for timing anomalies...", severity: "info" },
-        { message: "Detected WebRTC leak - possible real IP fragment: 103.240.180.*", severity: "info" },
-        { message: "Cross-referencing IP fragment with known scammer infrastructure...", severity: "info" },
-        { message: "Running TTL analysis on network packets to estimate true hop distance...", severity: "info" },
-        { message: "Detected VPN session cookie - correlating with previous scam patterns...", severity: "info" },
-        { message: "Analyzing voiceprint against known scammer databases...", severity: "info" },
-        { message: "Confirmed real IP behind VPN: 103.240.180.25 (Phnom Penh, Cambodia)", severity: "success" },
-        { message: "Mapping network path: VPN exit (Jakarta) → actual origin (Phnom Penh)", severity: "info" },
-        { message: "Identified ISP: Cellcard (Cambodia) - known scammer hotspot", severity: "info" },
-        { message: "Geolocation triangulation complete - accuracy: 92%", severity: "success" },
-        { message: "Compiling digital fingerprint for law enforcement submission...", severity: "info" },
+    const scammerMessages = useRef<{ message: string; severity: LogSeverity; hasProgress: boolean }[]>([
+        { message: "Initial connection detected from VPN IP: 180.252.113.199 (NordVPN, Jakarta)", severity: "info", hasProgress: false },
+        { message: "Analyzing VPN tunnel characteristics for timing anomalies...", severity: "info", hasProgress: true },
+        { message: "Detected WebRTC leak - possible real IP fragment: 103.240.180.*", severity: "info", hasProgress: false },
+        { message: "Cross-referencing IP fragment with known scammer infrastructure...", severity: "info", hasProgress: true },
+        { message: "Running TTL analysis on network packets to estimate true hop distance...", severity: "info", hasProgress: true },
+        { message: "Detected VPN session cookie - correlating with previous scam patterns...", severity: "info", hasProgress: false },
+        { message: "Analyzing voiceprint against known scammer databases...", severity: "info", hasProgress: true },
+        { message: "Confirmed real IP behind VPN: 103.240.180.25 (Phnom Penh, Cambodia)", severity: "success", hasProgress: false },
+        { message: "Mapping network path: VPN exit (Jakarta) → actual origin (Phnom Penh)", severity: "info", hasProgress: true },
+        { message: "Identified ISP: Cellcard (Cambodia) - known scammer hotspot", severity: "info", hasProgress: false },
+        { message: "Geolocation triangulation complete - accuracy: 92%", severity: "success", hasProgress: false },
+        { message: "Compiling digital fingerprint for law enforcement submission...", severity: "info", hasProgress: true },
+        {
+            message:
+                "Tracking details: IP 103.240.180.25, ISP: Cellcard, Device: Android 13, Browser: Chrome 118, Location: 11.5621°N, 104.8885°E (Central Phnom Penh)",
+            severity: "success",
+            hasProgress: false,
+        },
     ]);
 
     useEffect(() => {
@@ -91,6 +97,7 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
     }, []);
 
     // Scammer progress bar effect
+    // Scammer progress bar effect
     useEffect(() => {
         if (currentScammerMessageIndex >= scammerMessages.current.length) return;
 
@@ -108,33 +115,36 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
                     timestamp,
                     message: scammerMsg.message,
                     type: scammerMsg.severity,
-                    progress: 0,
-                    completed: false,
+                    progress: scammerMsg.hasProgress ? 0 : undefined, // Only set progress if hasProgress is true
+                    completed: !scammerMsg.hasProgress, // Mark as completed immediately if no progress bar
                 },
             ]);
         }
 
-        const scammerProgressInterval = setInterval(() => {
-            setScammerLogs((prevLogs) => {
-                const updatedLogs = [...prevLogs];
-                const currentLogIndex = updatedLogs.findIndex((log) => log.message === scammerMsg.message && !log.completed);
+        // Only set up progress interval if this message should have a progress bar
+        if (scammerMsg.hasProgress) {
+            const scammerProgressInterval = setInterval(() => {
+                setScammerLogs((prevLogs) => {
+                    const updatedLogs = [...prevLogs];
+                    const currentLogIndex = updatedLogs.findIndex((log) => log.message === scammerMsg.message && !log.completed);
 
-                if (currentLogIndex === -1) return prevLogs;
+                    if (currentLogIndex === -1) return prevLogs;
 
-                const currentProgress = updatedLogs[currentLogIndex].progress || 0;
-                const newProgress = Math.min(currentProgress + 10, 100);
+                    const currentProgress = updatedLogs[currentLogIndex].progress || 0;
+                    const newProgress = Math.min(currentProgress + 10, 100);
 
-                updatedLogs[currentLogIndex] = {
-                    ...updatedLogs[currentLogIndex],
-                    progress: newProgress,
-                    completed: newProgress === 100,
-                };
+                    updatedLogs[currentLogIndex] = {
+                        ...updatedLogs[currentLogIndex],
+                        progress: newProgress,
+                        completed: newProgress === 100,
+                    };
 
-                return updatedLogs;
-            });
-        }, 500);
+                    return updatedLogs;
+                });
+            }, 500);
 
-        return () => clearInterval(scammerProgressInterval);
+            return () => clearInterval(scammerProgressInterval);
+        }
     }, [currentScammerMessageIndex, scammerLogs]);
 
     // Handle moving to the next message
@@ -146,7 +156,7 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
             // Add a small delay before moving to next message
             const timer = setTimeout(() => {
                 setCurrentScammerMessageIndex((prev) => prev + 1);
-            }, 1000);
+            }, 1800);
 
             return () => clearTimeout(timer);
         }
@@ -308,7 +318,7 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
                                             <span className="cyber-log-time">[{log.timestamp}]</span>
                                             <span className="cyber-log-message">{log.message}</span>
                                         </div>
-                                        {/* Show progress bar if this log has progress */}
+                                        {/* Only show progress bar if progress is defined */}
                                         {log.progress !== undefined && <div className="cyber-log-progress">{renderProgressBar(log.progress)}</div>}
                                     </React.Fragment>
                                 ))}
