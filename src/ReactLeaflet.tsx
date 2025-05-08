@@ -7,9 +7,16 @@ interface ReactLeafletProps {
     isCallActive?: boolean;
     victimLocation: [number, number]; // [lat, lng]
     scammerLocation: [number, number]; // [lat, lng]
+    vpnLocation: [number, number];
 }
 
-const ReactLeaflet: React.FC<ReactLeafletProps> = ({ connectionStrength = 80, isCallActive = false, victimLocation, scammerLocation }) => {
+const ReactLeaflet: React.FC<ReactLeafletProps> = ({
+    connectionStrength = 80,
+    isCallActive = false,
+    victimLocation,
+    scammerLocation,
+    vpnLocation,
+}) => {
     const showTriangulation = true;
     const mapRef = useRef<L.Map | null>(null);
     const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -21,8 +28,14 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({ connectionStrength = 80, is
         rippleCircles?: L.Circle[];
     }>({});
     const zoomIntervalRef = useRef<number | null>(null);
-    const [currentZoom, setCurrentZoom] = useState(1);
+    const [currentZoom, setCurrentZoom] = useState(3);
     const [showOverlay, setShowOverlay] = useState(false);
+    const [realLocationFound, setRealLocationFound] = useState(false);
+
+    // Determine which location to use for scammer (VPN or real)
+    const currentScammerLocation = realLocationFound ? scammerLocation : vpnLocation;
+
+    console.log(realLocationFound);
 
     // Create custom icons
     const createIcons = useCallback(() => {
@@ -68,7 +81,7 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({ connectionStrength = 80, is
 
         // Create 3 concentric circles with different radii and colors
         for (let i = 0; i < 3; i++) {
-            const circle = L.circle(scammerLocation, {
+            const circle = L.circle(currentScammerLocation, {
                 radius: 500 + i * 300, // 500m, 800m, 1100m
                 color: colors[i],
                 fillColor: colors[i],
@@ -81,7 +94,7 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({ connectionStrength = 80, is
         }
 
         markersRef.current.rippleCircles = rippleCircles;
-    }, [scammerLocation]);
+    }, [currentScammerLocation]);
 
     // Initialize map
     const initMap = useCallback(() => {
@@ -92,7 +105,7 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({ connectionStrength = 80, is
             attributionControl: false,
             fadeAnimation: true,
             zoomAnimation: true,
-        }).setView(scammerLocation, currentZoom);
+        }).setView(currentScammerLocation, currentZoom);
 
         // Add tile layer with dark mode variant
         L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
@@ -107,7 +120,7 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({ connectionStrength = 80, is
             .addTo(mapRef.current);
 
         createRippleCircles();
-    }, [currentZoom, createRippleCircles, scammerLocation]);
+    }, [currentZoom, createRippleCircles, currentScammerLocation]);
 
     // Update markers and triangulation
     const updateMarkers = useCallback(() => {
@@ -142,13 +155,13 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({ connectionStrength = 80, is
     `);
 
         // Add new scammer marker
-        markersRef.current.scammer = L.marker(scammerLocation, {
+        markersRef.current.scammer = L.marker(currentScammerLocation, {
             icon: icons.scammer,
             zIndexOffset: 1000,
         }).addTo(mapRef.current).bindPopup(`
       <div class="map-popup">
-        <strong>Suspected Scammer</strong><br>
-        ${scammerLocation[0].toFixed(4)}, ${scammerLocation[1].toFixed(4)}<br>
+        <strong>${realLocationFound ? "Suspected Scammer" : "VPN Exit Node"}</strong><br>
+        ${currentScammerLocation[0].toFixed(4)}, ${currentScammerLocation[1].toFixed(4)}<br>
         <div class="risk-meter">
           <span>Risk Level:</span>
           <div class="meter">
@@ -162,7 +175,7 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({ connectionStrength = 80, is
         if (showTriangulation) {
             const lineColor = connectionStrength > 70 ? "#ff3b30" : connectionStrength > 40 ? "#ff9500" : "#ffcc00";
 
-            markersRef.current.triangulation = L.polyline([victimLocation, scammerLocation], {
+            markersRef.current.triangulation = L.polyline([victimLocation, currentScammerLocation], {
                 color: lineColor,
                 dashArray: connectionStrength > 50 ? "10, 5" : "5, 5",
                 weight: 1 + connectionStrength / 50,
@@ -171,7 +184,10 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({ connectionStrength = 80, is
             }).addTo(mapRef.current);
 
             // Add animated midpoint
-            const midpoint: [number, number] = [(victimLocation[0] + scammerLocation[0]) / 2, (victimLocation[1] + scammerLocation[1]) / 2];
+            const midpoint: [number, number] = [
+                (victimLocation[0] + currentScammerLocation[0]) / 2,
+                (victimLocation[1] + currentScammerLocation[1]) / 2,
+            ];
 
             markersRef.current.midpoint = L.circleMarker(midpoint, {
                 radius: 3 + connectionStrength / 30,
@@ -181,7 +197,7 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({ connectionStrength = 80, is
                 className: "triangulation-midpoint",
             }).addTo(mapRef.current);
         }
-    }, [victimLocation, scammerLocation, showTriangulation, createIcons, connectionStrength]);
+    }, [victimLocation, currentScammerLocation, showTriangulation, createIcons, connectionStrength, realLocationFound]);
 
     // Auto-zoom functionality
     const startAutoZoom = useCallback(() => {
@@ -206,17 +222,22 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({ connectionStrength = 80, is
             }
 
             setCurrentZoom(zoomLevel);
-            mapRef.current?.setView(scammerLocation, zoomLevel, {
+            mapRef.current?.setView(currentScammerLocation, zoomLevel, {
                 animate: true,
                 duration: 1,
             });
-        }, 2000); // Change zoom level every 3 seconds
-    }, [currentZoom, scammerLocation]);
+        }, 2000); // Change zoom level every 2 seconds
+    }, [currentZoom, currentScammerLocation]);
 
     useEffect(() => {
         initMap();
         updateMarkers();
         startAutoZoom();
+
+        // Set timeout to reveal real location after 10 seconds
+        setTimeout(() => {
+            setRealLocationFound(true);
+        }, 10000);
 
         return () => {
             if (zoomIntervalRef.current) {
@@ -228,13 +249,21 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({ connectionStrength = 80, is
     // Handle view changes (but keep centered on the midpoint)
     useEffect(() => {
         if (mapRef.current) {
-            mapRef.current.setView(scammerLocation, currentZoom, {
+            mapRef.current.setView(currentScammerLocation, currentZoom, {
                 animate: true,
                 duration: 1,
                 easeLinearity: 0.25,
             });
         }
-    }, [currentZoom, scammerLocation]);
+    }, [currentZoom, currentScammerLocation]);
+
+    // Update markers when realLocationFound changes
+    useEffect(() => {
+        if (mapRef.current) {
+            updateMarkers();
+            createRippleCircles();
+        }
+    }, [realLocationFound, updateMarkers, createRippleCircles]);
 
     return (
         <div className="map-container">
@@ -245,8 +274,14 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({ connectionStrength = 80, is
                     <div className="overlay-content">
                         <h3>Scammer IP Traced</h3>
                         <div className="coordinates">
-                            <span>180.252.113.199 → VPN Exit (Jakarta, Indonesia)</span>
-                            <span>103.240.180.25 (Identified Real IP - Phnom Penh, Cambodia)</span>
+                            <span>
+                                VPN Exit: {vpnLocation[0].toFixed(4)}, {vpnLocation[1].toFixed(4)}
+                            </span>
+                            {realLocationFound && (
+                                <span>
+                                    Real Location: {scammerLocation[0].toFixed(4)}, {scammerLocation[1].toFixed(4)}
+                                </span>
+                            )}
                         </div>
                         <button className="close-button" onClick={() => setShowOverlay(false)}>
                             Close

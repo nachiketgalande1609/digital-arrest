@@ -328,8 +328,9 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
 
                     <div className="map-container">
                         <ReactLeaflet
-                            victimLocation={[19.1197, 72.8464]} // Andheri, Mumbai
+                            victimLocation={[17.385, 78.4867]} // Hyderabad, Telangana
                             scammerLocation={[11.5564, 104.9282]} // Phnom Penh, Cambodia
+                            vpnLocation={[-6.2088, 106.8456]} // Jakarta, Indonesia
                             connectionStrength={75}
                             isCallActive={true}
                         />
