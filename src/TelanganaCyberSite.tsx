@@ -18,7 +18,8 @@ interface LogEntry {
     timestamp: string;
     message: string;
     type: LogSeverity;
-    progress?: number; // Add progress to LogEntry interface
+    progress?: number; // Track progress for each log
+    completed?: boolean; // Track if progress is complete
 }
 
 const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
@@ -30,7 +31,6 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
 }) => {
     const [victimLogs, setVictimLogs] = useState<LogEntry[]>([]);
     const [scammerLogs, setScammerLogs] = useState<LogEntry[]>([]);
-    const [currentScammerProgress, setCurrentScammerProgress] = useState(0);
     const [currentScammerMessageIndex, setCurrentScammerMessageIndex] = useState(0);
 
     const victimTerminalRef = useRef<HTMLDivElement>(null);
@@ -43,11 +43,18 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
     ]);
 
     const scammerMessages = useRef<{ message: string; severity: LogSeverity }[]>([
-        { message: "VPN enabled: Traffic routed through NordVPN (Jakarta, Indonesia).", severity: "info" },
-        { message: "RTP stream interrupted — possible packet inspection.", severity: "error" },
-        { message: "Switching VPN servers (Jakarta Indonesia).", severity: "info" },
-        { message: "WebRTC leak detected! Real IP exposed (117.211.75.63).", severity: "error" },
-        { message: "VPN killswitch failed — ISP metadata leaked (Cambodia).", severity: "error" },
+        { message: "Initial connection detected from VPN IP: 180.252.113.199 (NordVPN, Jakarta)", severity: "info" },
+        { message: "Analyzing VPN tunnel characteristics for timing anomalies...", severity: "info" },
+        { message: "Detected WebRTC leak - possible real IP fragment: 103.240.180.*", severity: "info" },
+        { message: "Cross-referencing IP fragment with known scammer infrastructure...", severity: "info" },
+        { message: "Running TTL analysis on network packets to estimate true hop distance...", severity: "info" },
+        { message: "Detected VPN session cookie - correlating with previous scam patterns...", severity: "info" },
+        { message: "Analyzing voiceprint against known scammer databases...", severity: "info" },
+        { message: "Confirmed real IP behind VPN: 103.240.180.25 (Phnom Penh, Cambodia)", severity: "success" },
+        { message: "Mapping network path: VPN exit (Jakarta) → actual origin (Phnom Penh)", severity: "info" },
+        { message: "Identified ISP: Cellcard (Cambodia) - known scammer hotspot", severity: "info" },
+        { message: "Geolocation triangulation complete - accuracy: 92%", severity: "success" },
+        { message: "Compiling digital fingerprint for law enforcement submission...", severity: "info" },
     ]);
 
     useEffect(() => {
@@ -61,7 +68,7 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
         // Initial scammer log
         const initialScammerLog: LogEntry = {
             timestamp: new Date().toLocaleTimeString(),
-            message: "Call connected — analyzing audio input for scam indicators...",
+            message: "Call connected - tracking scammer through VPN tunnel...",
             type: "info",
         };
 
@@ -85,34 +92,67 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
 
     // Scammer progress bar effect
     useEffect(() => {
+        if (currentScammerMessageIndex >= scammerMessages.current.length) return;
+
+        const scammerMsg = scammerMessages.current[currentScammerMessageIndex];
+        if (!scammerMsg) return;
+
+        // Check if this message has already been added to logs
+        const messageExists = scammerLogs.some((log) => log.message === scammerMsg.message && log.type === scammerMsg.severity);
+
+        if (!messageExists) {
+            const timestamp = new Date().toLocaleTimeString();
+            setScammerLogs((prevLogs) => [
+                ...prevLogs,
+                {
+                    timestamp,
+                    message: scammerMsg.message,
+                    type: scammerMsg.severity,
+                    progress: 0,
+                    completed: false,
+                },
+            ]);
+        }
+
         const scammerProgressInterval = setInterval(() => {
-            if (currentScammerMessageIndex < scammerMessages.current.length) {
-                setCurrentScammerProgress((prev) => {
-                    if (prev >= 100) {
-                        // Add the current message to logs when progress reaches 100%
-                        const timestamp = new Date().toLocaleTimeString();
-                        const scammerMsg = scammerMessages.current[currentScammerMessageIndex];
-                        if (scammerMsg) {
-                            setScammerLogs((prevLogs) => [
-                                ...prevLogs,
-                                {
-                                    timestamp,
-                                    message: scammerMsg.message,
-                                    type: scammerMsg.severity,
-                                },
-                            ]);
-                            setCurrentScammerMessageIndex((prevIndex) => prevIndex + 1);
-                        }
-                        return 0; // Reset progress for next message
-                    }
-                    return prev + 10; // Increment progress
-                });
-            }
-        }, 1000);
+            setScammerLogs((prevLogs) => {
+                const updatedLogs = [...prevLogs];
+                const currentLogIndex = updatedLogs.findIndex((log) => log.message === scammerMsg.message && !log.completed);
+
+                if (currentLogIndex === -1) return prevLogs;
+
+                const currentProgress = updatedLogs[currentLogIndex].progress || 0;
+                const newProgress = Math.min(currentProgress + 10, 100);
+
+                updatedLogs[currentLogIndex] = {
+                    ...updatedLogs[currentLogIndex],
+                    progress: newProgress,
+                    completed: newProgress === 100,
+                };
+
+                return updatedLogs;
+            });
+        }, 500);
 
         return () => clearInterval(scammerProgressInterval);
-    }, [currentScammerMessageIndex]);
+    }, [currentScammerMessageIndex, scammerLogs]);
 
+    // Handle moving to the next message
+    useEffect(() => {
+        if (scammerLogs.length === 0) return;
+
+        const lastLog = scammerLogs[scammerLogs.length - 1];
+        if (lastLog.completed && currentScammerMessageIndex < scammerMessages.current.length - 1) {
+            // Add a small delay before moving to next message
+            const timer = setTimeout(() => {
+                setCurrentScammerMessageIndex((prev) => prev + 1);
+            }, 1000);
+
+            return () => clearTimeout(timer);
+        }
+    }, [scammerLogs, currentScammerMessageIndex]);
+
+    // Victim response logs based on audio index
     useEffect(() => {
         if (currentAudioIndex === 6) {
             const timestamp = new Date().toLocaleTimeString();
@@ -180,15 +220,12 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
     }, [scammerLogs]);
 
     const renderProgressBar = (progressValue: number) => {
-        const totalChars = 60;
-        const filledChars = Math.round((progressValue / 100) * totalChars);
-        const emptyChars = totalChars - filledChars;
-
         return (
-            <div className="cyber-hash-progress-container">
-                <span className="cyber-hash-filled">{"#".repeat(filledChars)}</span>
-                <span className="cyber-hash-empty">{"..".repeat(emptyChars)}</span>
-                <span className="cyber-progress-percent">{Math.min(progressValue, 100).toFixed(0)}%</span>
+            <div className="cyber-modern-progress-bar-container">
+                <div className="cyber-modern-progress-bar">
+                    <div className="cyber-modern-progress-fill" style={{ width: `${progressValue}%` }}></div>
+                </div>
+                <span className="cyber-progress-percent-modern">{progressValue.toFixed(0)}%</span>
             </div>
         );
     };
@@ -199,7 +236,7 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
             <div className="cyber-main-container">
                 <div className="cyber-left-panel">
                     <div className="cyber-terminal-wrapper">
-                        {/* Victim Terminal - unchanged */}
+                        {/* Victim Terminal */}
                         <div className="cyber-terminal-window">
                             <AudioVisualizer audioRef={victimAudioRef} active={activeSpeaker === "victim"} type="victim" />
                             <div className="cyber-terminal-topbar">
@@ -271,10 +308,8 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
                                             <span className="cyber-log-time">[{log.timestamp}]</span>
                                             <span className="cyber-log-message">{log.message}</span>
                                         </div>
-                                        {/* Show progress bar only for the current message being loaded */}
-                                        {index === scammerLogs.length - 1 && currentScammerMessageIndex < scammerMessages.current.length && (
-                                            <div className="cyber-log-progress">{renderProgressBar(currentScammerProgress)}</div>
-                                        )}
+                                        {/* Show progress bar if this log has progress */}
+                                        {log.progress !== undefined && <div className="cyber-log-progress">{renderProgressBar(log.progress)}</div>}
                                     </React.Fragment>
                                 ))}
                             </div>
@@ -284,7 +319,7 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
                     <div className="map-container">
                         <ReactLeaflet
                             victimLocation={[19.1197, 72.8464]} // Andheri, Mumbai
-                            scammerLocation={[-6.2088, 106.8456]} // Central Jakarta, Indonesia
+                            scammerLocation={[11.5564, 104.9282]} // Phnom Penh, Cambodia
                             connectionStrength={75}
                             isCallActive={true}
                         />
