@@ -23,7 +23,10 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({
     const markersRef = useRef<{
         victim?: L.Marker;
         scammer?: L.Marker;
+        vpnMarker?: L.Marker;
         triangulation?: L.Polyline;
+        triangulationToVPN?: L.Polyline;
+        scammerToVPN?: L.Polyline;
         midpoint?: L.CircleMarker;
         rippleCircles?: L.Circle[];
     }>({});
@@ -31,11 +34,6 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({
     const [currentZoom, setCurrentZoom] = useState(3);
     const [showOverlay, setShowOverlay] = useState(false);
     const [realLocationFound, setRealLocationFound] = useState(false);
-
-    // Determine which location to use for scammer (VPN or real)
-    const currentScammerLocation = realLocationFound ? scammerLocation : vpnLocation;
-
-    console.log(realLocationFound);
 
     // Create custom icons
     const createIcons = useCallback(() => {
@@ -62,10 +60,21 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({
                 iconSize: [30, 30],
                 iconAnchor: [15, 15],
             }),
+            vpn: L.divIcon({
+                className: `vpn-marker ${isCallActive ? "active" : ""}`,
+                html: `
+          <div class="vpn-marker">
+            <div class="inner-vpn">VPN</div>
+            ${isCallActive ? '<div class="ripple"></div>' : ""}
+          </div>
+        `,
+                iconSize: [30, 30],
+                iconAnchor: [15, 15],
+            }),
         };
     }, [isCallActive]);
 
-    // Create rippling circles around scammer location
+    // Create rippling circles around locations
     const createRippleCircles = useCallback(() => {
         if (!mapRef.current) return;
 
@@ -79,33 +88,41 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({
         const colors = ["#ff3b30", "#ff9500", "#ffcc00"];
         const rippleCircles: L.Circle[] = [];
 
-        // Create 3 concentric circles with different radii and colors
-        for (let i = 0; i < 3; i++) {
-            const circle = L.circle(currentScammerLocation, {
-                radius: 500 + i * 300, // 500m, 800m, 1100m
-                color: colors[i],
-                fillColor: colors[i],
-                fillOpacity: 0.1,
-                weight: 1,
-                className: `ripple-circle ripple-circle-${i}`,
-            }).addTo(mapRef.current);
+        // Create ripples around both scammer and VPN locations if real location is found
+        const locations = realLocationFound ? [scammerLocation, vpnLocation] : [vpnLocation];
 
-            rippleCircles.push(circle);
-        }
+        locations.forEach((location, locIndex) => {
+            // Create 3 concentric circles with different radii and colors
+            for (let i = 0; i < 3; i++) {
+                const circle = L.circle(location, {
+                    radius: 500 + i * 300, // 500m, 800m, 1100m
+                    color: colors[i],
+                    fillColor: colors[i],
+                    fillOpacity: 0.1,
+                    weight: 1,
+                    className: `ripple-circle ripple-circle-${i} ${locIndex === 0 ? "scammer-ripple" : "vpn-ripple"}`,
+                }).addTo(mapRef.current);
+
+                rippleCircles.push(circle);
+            }
+        });
 
         markersRef.current.rippleCircles = rippleCircles;
-    }, [currentScammerLocation]);
+    }, [realLocationFound, scammerLocation, vpnLocation]);
 
     // Initialize map
     const initMap = useCallback(() => {
         if (!mapContainerRef.current || mapRef.current) return;
+
+        // Set initial view to center between victim and VPN location
+        const initialCenter: [number, number] = [(victimLocation[0] + vpnLocation[0]) / 2, (victimLocation[1] + vpnLocation[1]) / 2];
 
         mapRef.current = L.map(mapContainerRef.current, {
             zoomControl: false,
             attributionControl: false,
             fadeAnimation: true,
             zoomAnimation: true,
-        }).setView(currentScammerLocation, currentZoom);
+        }).setView(initialCenter, currentZoom);
 
         // Add tile layer with dark mode variant
         L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
@@ -120,7 +137,7 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({
             .addTo(mapRef.current);
 
         createRippleCircles();
-    }, [currentZoom, createRippleCircles, currentScammerLocation]);
+    }, [currentZoom, createRippleCircles, victimLocation, vpnLocation]);
 
     // Update markers and triangulation
     const updateMarkers = useCallback(() => {
@@ -131,7 +148,10 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({
         // Clear previous markers (except ripple circles)
         if (markersRef.current.victim) mapRef.current.removeLayer(markersRef.current.victim);
         if (markersRef.current.scammer) mapRef.current.removeLayer(markersRef.current.scammer);
+        if (markersRef.current.vpnMarker) mapRef.current.removeLayer(markersRef.current.vpnMarker);
         if (markersRef.current.triangulation) mapRef.current.removeLayer(markersRef.current.triangulation);
+        if (markersRef.current.triangulationToVPN) mapRef.current.removeLayer(markersRef.current.triangulationToVPN);
+        if (markersRef.current.scammerToVPN) mapRef.current.removeLayer(markersRef.current.scammerToVPN);
         if (markersRef.current.midpoint) mapRef.current.removeLayer(markersRef.current.midpoint);
 
         // Add new victim marker
@@ -154,28 +174,45 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({
       </div>
     `);
 
-        // Add new scammer marker
-        markersRef.current.scammer = L.marker(currentScammerLocation, {
-            icon: icons.scammer,
-            zIndexOffset: 1000,
+        // Always show VPN marker
+        markersRef.current.vpnMarker = L.marker(vpnLocation, {
+            icon: icons.vpn,
+            zIndexOffset: 900,
         }).addTo(mapRef.current).bindPopup(`
       <div class="map-popup">
-        <strong>${realLocationFound ? "Suspected Scammer" : "VPN Exit Node"}</strong><br>
-        ${currentScammerLocation[0].toFixed(4)}, ${currentScammerLocation[1].toFixed(4)}<br>
-        <div class="risk-meter">
-          <span>Risk Level:</span>
-          <div class="meter">
-            <div class="level" style="width: ${connectionStrength}%"></div>
-          </div>
+        <strong>VPN Exit Node</strong><br>
+        ${vpnLocation[0].toFixed(4)}, ${vpnLocation[1].toFixed(4)}<br>
+        <div class="vpn-info">
+          <span>Connection routed through VPN</span>
         </div>
       </div>
     `);
 
-        // Add triangulation if enabled (from victim to scammer)
+        // Add scammer marker if real location is found
+        if (realLocationFound) {
+            markersRef.current.scammer = L.marker(scammerLocation, {
+                icon: icons.scammer,
+                zIndexOffset: 1000,
+            }).addTo(mapRef.current).bindPopup(`
+        <div class="map-popup">
+          <strong>Suspected Scammer</strong><br>
+          ${scammerLocation[0].toFixed(4)}, ${scammerLocation[1].toFixed(4)}<br>
+          <div class="risk-meter">
+            <span>Risk Level:</span>
+            <div class="meter">
+              <div class="level" style="width: ${connectionStrength}%"></div>
+            </div>
+          </div>
+        </div>
+      `);
+        }
+
+        // Add triangulation if enabled
         if (showTriangulation) {
             const lineColor = connectionStrength > 70 ? "#ff3b30" : connectionStrength > 40 ? "#ff9500" : "#ffcc00";
 
-            markersRef.current.triangulation = L.polyline([victimLocation, currentScammerLocation], {
+            // Line from victim to VPN
+            markersRef.current.triangulation = L.polyline([victimLocation, vpnLocation], {
                 color: lineColor,
                 dashArray: connectionStrength > 50 ? "10, 5" : "5, 5",
                 weight: 1 + connectionStrength / 50,
@@ -183,11 +220,19 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({
                 className: "triangulation-line",
             }).addTo(mapRef.current);
 
-            // Add animated midpoint
-            const midpoint: [number, number] = [
-                (victimLocation[0] + currentScammerLocation[0]) / 2,
-                (victimLocation[1] + currentScammerLocation[1]) / 2,
-            ];
+            // If real location found, add line from scammer to VPN
+            if (realLocationFound) {
+                markersRef.current.scammerToVPN = L.polyline([scammerLocation, vpnLocation], {
+                    color: "#30a5ff",
+                    dashArray: "5, 5",
+                    weight: 2,
+                    opacity: 0.7,
+                    className: "scammer-vpn-line",
+                }).addTo(mapRef.current);
+            }
+
+            // Add animated midpoint (between victim and VPN)
+            const midpoint: [number, number] = [(victimLocation[0] + vpnLocation[0]) / 2, (victimLocation[1] + vpnLocation[1]) / 2];
 
             markersRef.current.midpoint = L.circleMarker(midpoint, {
                 radius: 3 + connectionStrength / 30,
@@ -197,7 +242,7 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({
                 className: "triangulation-midpoint",
             }).addTo(mapRef.current);
         }
-    }, [victimLocation, currentScammerLocation, showTriangulation, createIcons, connectionStrength, realLocationFound]);
+    }, [victimLocation, scammerLocation, vpnLocation, showTriangulation, createIcons, connectionStrength, realLocationFound]);
 
     // Auto-zoom functionality
     const startAutoZoom = useCallback(() => {
@@ -222,12 +267,18 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({
             }
 
             setCurrentZoom(zoomLevel);
-            mapRef.current?.setView(currentScammerLocation, zoomLevel, {
+
+            // Center the map between victim and VPN (or scammer if found)
+            const centerLocation = realLocationFound
+                ? [(victimLocation[0] + scammerLocation[0] + vpnLocation[0]) / 3, (victimLocation[1] + scammerLocation[1] + vpnLocation[1]) / 3]
+                : [(victimLocation[0] + vpnLocation[0]) / 2, (victimLocation[1] + vpnLocation[1]) / 2];
+
+            mapRef.current?.setView(centerLocation, zoomLevel, {
                 animate: true,
                 duration: 1,
             });
         }, 2000); // Change zoom level every 2 seconds
-    }, [currentZoom, currentScammerLocation]);
+    }, [currentZoom, victimLocation, scammerLocation, vpnLocation, realLocationFound]);
 
     useEffect(() => {
         initMap();
@@ -237,7 +288,7 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({
         // Set timeout to reveal real location after 10 seconds
         setTimeout(() => {
             setRealLocationFound(true);
-        }, 40500);
+        }, 40000);
 
         return () => {
             if (zoomIntervalRef.current) {
@@ -245,17 +296,6 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({
             }
         };
     }, [initMap, updateMarkers, startAutoZoom]);
-
-    // Handle view changes (but keep centered on the midpoint)
-    useEffect(() => {
-        if (mapRef.current) {
-            mapRef.current.setView(currentScammerLocation, currentZoom, {
-                animate: true,
-                duration: 1,
-                easeLinearity: 0.25,
-            });
-        }
-    }, [currentZoom, currentScammerLocation]);
 
     // Update markers when realLocationFound changes
     useEffect(() => {
