@@ -227,7 +227,7 @@ body {
 }
 
 .log-entry.error .log-message {
-    color: #e94f58;
+    color: #ef616a;
     font-weight: 500;
 }
 
@@ -1289,7 +1289,7 @@ button .icon {
     border-radius: 6px;
     overflow: hidden;
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.6);
-    margin-left: 120px;
+    margin-left: 133px;
 }
 
 .modern-progress-fill {
