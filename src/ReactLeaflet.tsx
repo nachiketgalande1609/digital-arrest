@@ -29,6 +29,9 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({
         scammerToVPN?: L.Polyline;
         midpoint?: L.CircleMarker;
         rippleCircles?: L.Circle[];
+        victimLabel?: L.Tooltip;
+        vpnLabel?: L.Tooltip;
+        scammerLabel?: L.Tooltip;
     }>({});
     const zoomIntervalRef = useRef<number | null>(null);
     const [currentZoom, setCurrentZoom] = useState(3);
@@ -153,6 +156,9 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({
         if (markersRef.current.triangulationToVPN) mapRef.current.removeLayer(markersRef.current.triangulationToVPN);
         if (markersRef.current.scammerToVPN) mapRef.current.removeLayer(markersRef.current.scammerToVPN);
         if (markersRef.current.midpoint) mapRef.current.removeLayer(markersRef.current.midpoint);
+        if (markersRef.current.victimLabel) mapRef.current.removeLayer(markersRef.current.victimLabel);
+        if (markersRef.current.vpnLabel) mapRef.current.removeLayer(markersRef.current.vpnLabel);
+        if (markersRef.current.scammerLabel) mapRef.current.removeLayer(markersRef.current.scammerLabel);
 
         // Add new victim marker
         markersRef.current.victim = L.marker(victimLocation, {
@@ -174,6 +180,16 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({
       </div>
     `);
 
+        // Add victim label
+        markersRef.current.victimLabel = L.tooltip({
+            permanent: true,
+            direction: "right",
+            className: "map-label victim-label",
+        })
+            .setContent("Victim (Hyderabad, Telangana)")
+            .setLatLng([victimLocation[0], victimLocation[1]])
+            .addTo(mapRef.current);
+
         // Always show VPN marker
         markersRef.current.vpnMarker = L.marker(vpnLocation, {
             icon: icons.vpn,
@@ -187,6 +203,16 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({
         </div>
       </div>
     `);
+
+        // Add VPN label
+        markersRef.current.vpnLabel = L.tooltip({
+            permanent: true,
+            direction: "right",
+            className: "map-label vpn-label",
+        })
+            .setContent("VPN (Jakarta, Indonesia)")
+            .setLatLng([vpnLocation[0], vpnLocation[1]])
+            .addTo(mapRef.current);
 
         // Add scammer marker if real location is found
         if (realLocationFound) {
@@ -205,6 +231,16 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({
           </div>
         </div>
       `);
+
+            // Add scammer label
+            markersRef.current.scammerLabel = L.tooltip({
+                permanent: true,
+                direction: "right",
+                className: "map-label scammer-label",
+            })
+                .setContent("Scammer (Phnom Penh, Cambodia)")
+                .setLatLng([scammerLocation[0], scammerLocation[1]])
+                .addTo(mapRef.current);
         }
 
         // Add triangulation if enabled
@@ -285,7 +321,7 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({
         updateMarkers();
         startAutoZoom();
 
-        // Set timeout to reveal real location after 10 seconds
+        // Set timeout to reveal real location after 40 seconds
         setTimeout(() => {
             setRealLocationFound(true);
         }, 40000);
