@@ -24,6 +24,7 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({
         victim?: L.Marker;
         scammer?: L.Marker;
         vpnMarker?: L.Marker;
+        vpnCircle?: L.Marker;
         triangulation?: L.Polyline;
         triangulationToVPN?: L.Polyline;
         scammerToVPN?: L.Polyline;
@@ -38,44 +39,53 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({
     const [showOverlay, setShowOverlay] = useState(false);
     const [realLocationFound, setRealLocationFound] = useState(false);
 
-    // Create custom icons
     const createIcons = useCallback(() => {
         return {
             victim: L.divIcon({
                 className: `victim-marker ${isCallActive ? "active" : ""}`,
                 html: `
-          <div class="pulse-marker">
-            <div class="inner-circle"></div>
-            ${isCallActive ? '<div class="ripple"></div>' : ""}
-          </div>
-        `,
+                    <div class="pulse-marker">
+                    <div class="inner-circle"></div>
+                    ${isCallActive ? '<div class="ripple"></div>' : ""}
+                    </div>
+                `,
                 iconSize: [30, 30],
                 iconAnchor: [15, 15],
             }),
             scammer: L.divIcon({
-                className: `scammer-marker ${isCallActive ? "active" : ""}`,
+                className: `scammer-marker ${realLocationFound ? "blinking" : ""} ${isCallActive ? "active" : ""}`,
                 html: `
-          <div class="alert-marker">
-            <div class="inner-alert">!</div>
-            ${isCallActive ? '<div class="ripple"></div>' : ""}
-          </div>
-        `,
+                    <div class="alert-marker">
+                    <div class="inner-alert">!</div>
+                    ${isCallActive ? '<div class="ripple"></div>' : ""}
+                    </div>
+                `,
                 iconSize: [30, 30],
                 iconAnchor: [15, 15],
             }),
             vpn: L.divIcon({
                 className: `vpn-marker ${isCallActive ? "active" : ""}`,
                 html: `
-          <div class="vpn-marker">
-            <div class="inner-vpn">VPN</div>
-            ${isCallActive ? '<div class="ripple"></div>' : ""}
-          </div>
-        `,
+                    <div class="vpn-marker-inner">
+                    <div class="inner-vpn">VPN</div>
+                    ${isCallActive ? '<div class="ripple"></div>' : ""}
+                    </div>
+                `,
                 iconSize: [30, 30],
                 iconAnchor: [15, 15],
             }),
+            vpnCircle: L.divIcon({
+                className: "vpn-circle-marker",
+                html: `
+                    <div class="vpn-circle">
+                    <div class="vpn-circle-inner"></div>
+                    </div>
+                `,
+                iconSize: [20, 20],
+                iconAnchor: [10, 10],
+            }),
         };
-    }, [isCallActive]);
+    }, [isCallActive, realLocationFound]);
 
     // Create rippling circles around locations
     const createRippleCircles = useCallback(() => {
@@ -152,6 +162,7 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({
         if (markersRef.current.victim) mapRef.current.removeLayer(markersRef.current.victim);
         if (markersRef.current.scammer) mapRef.current.removeLayer(markersRef.current.scammer);
         if (markersRef.current.vpnMarker) mapRef.current.removeLayer(markersRef.current.vpnMarker);
+        if (markersRef.current.vpnCircle) mapRef.current?.removeLayer(markersRef.current.vpnCircle);
         if (markersRef.current.triangulation) mapRef.current.removeLayer(markersRef.current.triangulation);
         if (markersRef.current.triangulationToVPN) mapRef.current.removeLayer(markersRef.current.triangulationToVPN);
         if (markersRef.current.scammerToVPN) mapRef.current.removeLayer(markersRef.current.scammerToVPN);
@@ -160,31 +171,52 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({
         if (markersRef.current.vpnLabel) mapRef.current.removeLayer(markersRef.current.vpnLabel);
         if (markersRef.current.scammerLabel) mapRef.current.removeLayer(markersRef.current.scammerLabel);
 
+        // Add VPN text marker (existing code)
+        markersRef.current.vpnMarker = L.marker(vpnLocation, {
+            icon: icons.vpn,
+            zIndexOffset: 900,
+        }).addTo(mapRef.current).bindPopup(`
+            <div class="map-popup">
+                <strong>VPN Exit Node</strong><br>
+                ${vpnLocation[0].toFixed(4)}, ${vpnLocation[1].toFixed(4)}<br>
+                <div class="vpn-info">
+                    <span>Connection routed through VPN</span>
+                </div>
+            </div>
+        `);
+
+        // Add circular VPN marker (new code)
+        markersRef.current.vpnCircle = L.marker(vpnLocation, {
+            icon: icons.vpnCircle,
+            zIndexOffset: 899, // Slightly lower than the text marker
+        }).addTo(mapRef.current);
+
         // Add new victim marker
         markersRef.current.victim = L.marker(victimLocation, {
             icon: icons.victim,
             zIndexOffset: 1000,
         }).addTo(mapRef.current).bindPopup(`
-      <div class="map-popup">
-        <strong>Victim Location</strong><br>
-        ${victimLocation[0].toFixed(4)}, ${victimLocation[1].toFixed(4)}<br>
-        <div class="signal-strength">
-          <span>Signal:</span>
-          <div class="strength-bars">
-            ${Array(5)
-                .fill(0)
-                .map((_, i) => `<div class="bar ${i < Math.floor(connectionStrength / 20) ? "active" : ""}"></div>`)
-                .join("")}
-          </div>
-        </div>
-      </div>
-    `);
+            <div class="map-popup">
+                <strong>Victim Location</strong><br>
+                ${victimLocation[0].toFixed(4)}, ${victimLocation[1].toFixed(4)}<br>
+                <div class="signal-strength">
+                <span>Signal:</span>
+                <div class="strength-bars">
+                    ${Array(5)
+                        .fill(0)
+                        .map((_, i) => `<div class="bar ${i < Math.floor(connectionStrength / 20) ? "active" : ""}"></div>`)
+                        .join("")}
+                </div>
+                </div>
+            </div>
+        `);
 
         // Add victim label
         markersRef.current.victimLabel = L.tooltip({
             permanent: true,
-            direction: "right",
+            direction: "left",
             className: "map-label victim-label",
+            offset: L.point(-13, -3),
         })
             .setContent("Victim (Hyderabad, Telangana)")
             .setLatLng([victimLocation[0], victimLocation[1]])
@@ -195,20 +227,21 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({
             icon: icons.vpn,
             zIndexOffset: 900,
         }).addTo(mapRef.current).bindPopup(`
-      <div class="map-popup">
-        <strong>VPN Exit Node</strong><br>
-        ${vpnLocation[0].toFixed(4)}, ${vpnLocation[1].toFixed(4)}<br>
-        <div class="vpn-info">
-          <span>Connection routed through VPN</span>
-        </div>
-      </div>
-    `);
+            <div class="map-popup">
+                <strong>VPN Exit Node</strong><br>
+                ${vpnLocation[0].toFixed(4)}, ${vpnLocation[1].toFixed(4)}<br>
+                <div class="vpn-info">
+                <span>Connection routed through VPN</span>
+                </div>
+            </div>
+        `);
 
         // Add VPN label
         markersRef.current.vpnLabel = L.tooltip({
             permanent: true,
             direction: "right",
             className: "map-label vpn-label",
+            offset: L.point(20, -2),
         })
             .setContent("VPN (Jakarta, Indonesia)")
             .setLatLng([vpnLocation[0], vpnLocation[1]])
@@ -220,23 +253,24 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({
                 icon: icons.scammer,
                 zIndexOffset: 1000,
             }).addTo(mapRef.current).bindPopup(`
-        <div class="map-popup">
-          <strong>Suspected Scammer</strong><br>
-          ${scammerLocation[0].toFixed(4)}, ${scammerLocation[1].toFixed(4)}<br>
-          <div class="risk-meter">
-            <span>Risk Level:</span>
-            <div class="meter">
-              <div class="level" style="width: ${connectionStrength}%"></div>
-            </div>
-          </div>
-        </div>
-      `);
+                <div class="map-popup">
+                <strong>Suspected Scammer</strong><br>
+                ${scammerLocation[0].toFixed(4)}, ${scammerLocation[1].toFixed(4)}<br>
+                <div class="risk-meter">
+                    <span>Risk Level:</span>
+                    <div class="meter">
+                    <div class="level" style="width: ${connectionStrength}%"></div>
+                    </div>
+                </div>
+                </div>
+            `);
 
             // Add scammer label
             markersRef.current.scammerLabel = L.tooltip({
                 permanent: true,
                 direction: "right",
                 className: "map-label scammer-label",
+                offset: L.point(20, -1),
             })
                 .setContent("Scammer (Phnom Penh, Cambodia)")
                 .setLatLng([scammerLocation[0], scammerLocation[1]])
@@ -266,61 +300,12 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({
                     className: "scammer-vpn-line",
                 }).addTo(mapRef.current);
             }
-
-            // Add animated midpoint (between victim and VPN)
-            const midpoint: [number, number] = [(victimLocation[0] + vpnLocation[0]) / 2, (victimLocation[1] + vpnLocation[1]) / 2];
-
-            markersRef.current.midpoint = L.circleMarker(midpoint, {
-                radius: 3 + connectionStrength / 30,
-                color: lineColor,
-                fillColor: lineColor,
-                fillOpacity: 0.7,
-                className: "triangulation-midpoint",
-            }).addTo(mapRef.current);
         }
     }, [victimLocation, scammerLocation, vpnLocation, showTriangulation, createIcons, connectionStrength, realLocationFound]);
-
-    // Auto-zoom functionality
-    const startAutoZoom = useCallback(() => {
-        if (currentZoom >= 15) {
-            setShowOverlay(true);
-            return;
-        }
-        if (zoomIntervalRef.current) {
-            clearInterval(zoomIntervalRef.current);
-        }
-
-        let zoomLevel = currentZoom;
-        let zoomIn = true;
-
-        zoomIntervalRef.current = setInterval(() => {
-            if (zoomIn) {
-                zoomLevel = Math.min(zoomLevel + 0.5, 15); // Max zoom
-                if (zoomLevel === 15) zoomIn = false;
-            } else {
-                zoomLevel = Math.max(zoomLevel - 1, 10); // Min zoom
-                if (zoomLevel === 10) zoomIn = true;
-            }
-
-            setCurrentZoom(zoomLevel);
-
-            // Center the map between victim and VPN (or scammer if found)
-            const centerLocation = realLocationFound
-                ? [(victimLocation[0] + scammerLocation[0] + vpnLocation[0]) / 3, (victimLocation[1] + scammerLocation[1] + vpnLocation[1]) / 3]
-                : [(victimLocation[0] + vpnLocation[0]) / 2, (victimLocation[1] + vpnLocation[1]) / 2];
-
-            mapRef.current?.setView(centerLocation, zoomLevel, {
-                animate: true,
-                duration: 1,
-            });
-        }, 2000); // Change zoom level every 2 seconds
-    }, [currentZoom, victimLocation, scammerLocation, vpnLocation, realLocationFound]);
 
     useEffect(() => {
         initMap();
         updateMarkers();
-        startAutoZoom();
-
         // Set timeout to reveal real location after 40 seconds
         setTimeout(() => {
             setRealLocationFound(true);
@@ -331,7 +316,7 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({
                 clearInterval(zoomIntervalRef.current);
             }
         };
-    }, [initMap, updateMarkers, startAutoZoom]);
+    }, [initMap, updateMarkers]);
 
     // Update markers when realLocationFound changes
     useEffect(() => {
