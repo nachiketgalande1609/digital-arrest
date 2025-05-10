@@ -216,7 +216,7 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({
             permanent: true,
             direction: "left",
             className: "map-label victim-label",
-            offset: L.point(-13, -3),
+            offset: L.point(-16, -3),
         })
             .setContent("Victim (Hyderabad, Telangana)")
             .setLatLng([victimLocation[0], victimLocation[1]])
@@ -270,9 +270,9 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({
                 permanent: true,
                 direction: "right",
                 className: "map-label scammer-label",
-                offset: L.point(20, -1),
+                offset: L.point(22, -1.5),
             })
-                .setContent("Scammer (Phnom Penh, Cambodia)")
+                .setContent("Scammer Located (Phnom Penh, Cambodia)")
                 .setLatLng([scammerLocation[0], scammerLocation[1]])
                 .addTo(mapRef.current);
         }

@@ -1087,7 +1087,7 @@ button .icon {
     }
 
     50% {
-        transform: scale(1.5);
+        transform: scale(2.5);
     }
 }
 
@@ -1453,5 +1453,25 @@ button .icon {
 .map-label {
     border-radius: 8px !important;
     padding: 2px 8px !important;
-    background-color: rgb(255, 255, 255, 0.5) !important;
+}
+
+.scammer-label {
+    background-color: #8c2a2a !important;
+    color: #ffffff !important;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.vpn-label {
+    background-color: #1f0153 !important;
+    color: #ffffff !important;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.victim-label {
+    background-color: #003543 !important;
+    color: #ffffff !important;
+    font-size: 14px;
+    font-weight: bold;
 }
