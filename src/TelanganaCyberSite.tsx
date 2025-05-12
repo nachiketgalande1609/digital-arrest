@@ -140,7 +140,7 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
 
                     return updatedLogs;
                 });
-            }, 700);
+            }, 520);
 
             return () => clearInterval(scammerProgressInterval);
         }
@@ -155,7 +155,7 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
             // Add a small delay before moving to next message
             const timer = setTimeout(() => {
                 setCurrentScammerMessageIndex((prev) => prev + 1);
-            }, 2500);
+            }, 200);
 
             return () => clearTimeout(timer);
         }
