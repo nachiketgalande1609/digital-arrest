@@ -90,7 +90,7 @@ const App: React.FC = () => {
         if (targetAudioRef.current) {
             targetAudioRef.current.src = currentAudio.src;
             targetAudioRef.current.onended = () => {
-                if (currentAudioIndex === 1) {
+                if (currentAudioIndex === 5) {
                     setCallStatus("scam-detected");
                     if (beepRef.current) {
                         setIsBeepPlaying(true);
