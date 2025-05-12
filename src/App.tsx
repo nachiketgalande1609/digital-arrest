@@ -72,12 +72,29 @@ const App: React.FC = () => {
 
     const [isBeepPlaying, setIsBeepPlaying] = useState(false);
 
+    const playBeepSound = (callback: () => void) => {
+        if (beepRef.current) {
+            setIsBeepPlaying(true);
+            beepRef.current.currentTime = 0;
+            beepRef.current.play().catch(console.error);
+            beepRef.current.onended = () => {
+                setIsBeepPlaying(false);
+                callback();
+            };
+        } else {
+            callback();
+        }
+    };
+
     const playAudioSequence = () => {
         if (isBeepPlaying) return;
 
         if (currentAudioIndex >= audioFiles.length) {
-            setCallStatus("call-ended");
-            setShowScammerDetails(true);
+            // Play beep before showing scammer details
+            playBeepSound(() => {
+                setCallStatus("call-ended");
+                setShowScammerDetails(true);
+            });
             return;
         }
 
@@ -90,34 +107,24 @@ const App: React.FC = () => {
         if (targetAudioRef.current) {
             targetAudioRef.current.src = currentAudio.src;
             targetAudioRef.current.onended = () => {
-                if (currentAudioIndex === 1) {
+                if (currentAudioIndex === 5) {
                     setCallStatus("scam-detected");
-                    if (beepRef.current) {
-                        setIsBeepPlaying(true);
-                        beepRef.current.currentTime = 0;
-                        beepRef.current.play().catch(console.error);
-                        // Switch to cyber site after beep plays
-                        beepRef.current.onended = () => {
-                            setIsBeepPlaying(false);
-                            if (interceptorRef.current) {
-                                interceptorRef.current.currentTime = 0;
-                                interceptorRef.current.play().catch(console.error);
-                                interceptorRef.current.onended = () => {
-                                    setTimeout(() => {
-                                        setCurrentScreen("cyber");
-                                        setCurrentAudioIndex((prev) => prev + 1);
-                                    }, 1000);
-                                };
-                            } else {
-                                setCurrentScreen("cyber");
-                                setCurrentAudioIndex((prev) => prev + 1);
-                            }
-                        };
-                    } else {
-                        // If beep fails, still switch screens
-                        setCurrentScreen("cyber");
-                        setCurrentAudioIndex((prev) => prev + 1);
-                    }
+                    // Play beep before switching to cyber site
+                    playBeepSound(() => {
+                        if (interceptorRef.current) {
+                            interceptorRef.current.currentTime = 0;
+                            interceptorRef.current.play().catch(console.error);
+                            interceptorRef.current.onended = () => {
+                                setTimeout(() => {
+                                    setCurrentScreen("cyber");
+                                    setCurrentAudioIndex((prev) => prev + 1);
+                                }, 1000);
+                            };
+                        } else {
+                            setCurrentScreen("cyber");
+                            setCurrentAudioIndex((prev) => prev + 1);
+                        }
+                    });
                 } else {
                     setCurrentAudioIndex((prev) => prev + 1);
                 }
@@ -128,8 +135,10 @@ const App: React.FC = () => {
                 setTimeout(() => {
                     if (currentAudioIndex === 5) {
                         setCallStatus("scam-detected");
-                        setCurrentScreen("cyber");
-                        setCurrentAudioIndex((prev) => prev + 1);
+                        playBeepSound(() => {
+                            setCurrentScreen("cyber");
+                            setCurrentAudioIndex((prev) => prev + 1);
+                        });
                     } else if (currentAudioIndex === audioFiles.length - 1) {
                         setCallStatus("scam-detected");
                     } else {
@@ -169,15 +178,6 @@ const App: React.FC = () => {
         setActiveSpeaker("caller");
         setCurrentAudioIndex(0);
     };
-
-    useEffect(() => {
-        if (callStatus === "scam-detected" && beepRef.current) {
-            beepRef.current.currentTime = 0; // Rewind to start in case it's already playing
-            beepRef.current.play().catch((err) => {
-                console.error("Error playing beep sound:", err);
-            });
-        }
-    }, [callStatus]);
 
     return (
         <>

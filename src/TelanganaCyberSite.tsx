@@ -155,7 +155,7 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
             // Add a small delay before moving to next message
             const timer = setTimeout(() => {
                 setCurrentScammerMessageIndex((prev) => prev + 1);
-            }, 1800);
+            }, 2500);
 
             return () => clearTimeout(timer);
         }
@@ -172,19 +172,12 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
                 type: "warning",
             };
             setVictimLogs((prev) => [...prev, newLog]);
-        } else if (currentAudioIndex === 7) {
-            const timestamp = new Date().toLocaleTimeString();
-            const newLog: LogEntry = {
-                timestamp,
-                message: "[THINKING] Should I express more panic or seek clarification? Need to maintain emotional consistency.",
-                type: "info",
-            };
-            setVictimLogs((prev) => [...prev, newLog]);
         } else if (currentAudioIndex === 8) {
             const timestamp = new Date().toLocaleTimeString();
             const newLog: LogEntry = {
                 timestamp,
-                message: "Deepfake Response: Please listen, there is some mistake. I swear I am innocent. How can I fix this?",
+                message:
+                    "Deepfake Response: Kindly listen, I believe there is some sort of misunderstanding. I truly don't know anything about this parcel. I assure you, I have done nothing wrong. Could you please let me know how can I resolve this?",
                 type: "warning",
             };
             setVictimLogs((prev) => [...prev, newLog]);
@@ -193,23 +186,6 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
             const newLog: LogEntry = {
                 timestamp,
                 message: "[SYNTH CORE] High-stress scenario detected. Adjusting vocal modulation parameters.",
-                type: "info",
-            };
-            setVictimLogs((prev) => [...prev, newLog]);
-        } else if (currentAudioIndex === 10) {
-            const timestamp = new Date().toLocaleTimeString();
-            const newLog: LogEntry = {
-                timestamp,
-                message:
-                    "Deepfake Response: Aadhar Number! That sounds I need to give some important stuff to you. Also do I need to send the money today?",
-                type: "warning",
-            };
-            setVictimLogs((prev) => [...prev, newLog]);
-        } else if (currentAudioIndex === 11) {
-            const timestamp = new Date().toLocaleTimeString();
-            const newLog: LogEntry = {
-                timestamp,
-                message: "[THINKING] Mentioning money could escalate — should show willingness but also uncertainty.",
                 type: "info",
             };
             setVictimLogs((prev) => [...prev, newLog]);

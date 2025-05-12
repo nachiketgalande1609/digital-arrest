@@ -309,7 +309,7 @@ const ReactLeaflet: React.FC<ReactLeafletProps> = ({
         // Set timeout to reveal real location after 40 seconds
         setTimeout(() => {
             setRealLocationFound(true);
-        }, 40000);
+        }, 43000);
 
         return () => {
             if (zoomIntervalRef.current) {
