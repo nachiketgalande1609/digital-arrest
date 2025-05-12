@@ -155,7 +155,7 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
             // Add a small delay before moving to next message
             const timer = setTimeout(() => {
                 setCurrentScammerMessageIndex((prev) => prev + 1);
-            }, 1800);
+            }, 2500);
 
             return () => clearTimeout(timer);
         }
