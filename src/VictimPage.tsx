@@ -182,7 +182,7 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
                     }
                     return newProgress;
                 });
-            }, 100);
+            }, 80);
         };
 
         const startReverification = () => {
@@ -199,7 +199,7 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
                     }
                     return newProgress;
                 });
-            }, 100);
+            }, 40);
         };
 
         if (callStatus === "analyzing") {
@@ -320,7 +320,7 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
                             {["reverification", "ending"].includes(scanStage) && (
                                 <>
                                     <LogMessage severity="error" message="Language patterns matched known scam scripts (92% confidence)" />
-                                    <LogMessage severity="warning" message="Initiating final reverification process..." />
+                                    <LogMessage severity="warning" message="Initiating final re-verification process..." />
                                     <div className="hash-progress-container" style={{ marginTop: "10px" }}>
                                         {renderProgressBar(reverificationProgress)}
                                     </div>
@@ -329,7 +329,7 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
 
                             {scanStage === "ending" && (
                                 <>
-                                    <LogMessage severity="error" message="Reverification complete - all checks confirmed" />
+                                    <LogMessage severity="error" message="Re-verification complete - all checks confirmed" />
                                     <LogMessage severity="error" message="Final verdict: HIGH CONFIDENCE SCAM DETECTED" />
                                     <LogMessage severity="error" message="SCAM DETECTED: Confidence level: 98.7%" />
                                 </>
@@ -409,7 +409,7 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
                                             <div className="milestone-log modern accent">
                                                 <div className="log-content">
                                                     <div className="log-title">Final Verification</div>
-                                                    <div className="log-message">Reverifying scam indicators</div>
+                                                    <div className="log-message">Re-verifying scam indicators</div>
                                                 </div>
                                             </div>
                                         </>

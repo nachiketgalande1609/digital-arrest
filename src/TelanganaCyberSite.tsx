@@ -167,8 +167,7 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
             const timestamp = new Date().toLocaleTimeString();
             const newLog: LogEntry = {
                 timestamp,
-                message:
-                    "Deepfake Response: What! This sounds serious. I have no one at Taiwan. I don't know anyone from there. I have never sent or received anything from Taiwan. There is a mistake.",
+                message: "Deepfake Response: What! This seems serious. There is a mistake.",
                 type: "warning",
             };
             setVictimLogs((prev) => [...prev, newLog]);
@@ -176,8 +175,7 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
             const timestamp = new Date().toLocaleTimeString();
             const newLog: LogEntry = {
                 timestamp,
-                message:
-                    "Deepfake Response: Kindly listen, I believe there is some sort of misunderstanding. I truly don't know anything about this parcel. I assure you, I have done nothing wrong. Could you please let me know how can I resolve this?",
+                message: "Deepfake Response: Trust me I am innocent. Please let me know how can I resolve this.",
                 type: "warning",
             };
             setVictimLogs((prev) => [...prev, newLog]);
