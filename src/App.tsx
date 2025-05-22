@@ -29,10 +29,10 @@ const App: React.FC = () => {
         { src: "before_beep/4_scammer.wav", type: "caller" },
         { src: "before_beep/5_victim.wav", type: "victim" },
         { src: "before_beep/6_scammer.wav", type: "caller" },
-        { src: "after_beep/7_victim.mp3", type: "victim" },
-        { src: "after_beep/8_scammer.mp3", type: "caller" },
-        { src: "after_beep/9_victim.mp3", type: "victim" },
-        { src: "after_beep/10_scammer.mp3", type: "caller" },
+        { src: "after_beep/Payel_11Lab_1.mp3", type: "victim" },
+        { src: "after_beep/Scammer_11Lbs_1.mp3", type: "caller" },
+        { src: "after_beep/Payel_11Lab_2.mp3", type: "victim" },
+        { src: "after_beep/Scammer_11Lbs_2.mp3", type: "caller" },
     ];
 
     const [callerInfo] = useState<CallerInfo>({
