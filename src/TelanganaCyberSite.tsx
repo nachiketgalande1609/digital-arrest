@@ -140,7 +140,7 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
 
                     return updatedLogs;
                 });
-            }, 520);
+            }, 360);
 
             return () => clearInterval(scammerProgressInterval);
         }
@@ -163,19 +163,19 @@ const TelangalanCyberSite: React.FC<TelangalanCyberSiteProps> = ({
 
     // Victim response logs based on audio index
     useEffect(() => {
-        if (currentAudioIndex === 6) {
+        if (currentAudioIndex === 5) {
             const timestamp = new Date().toLocaleTimeString();
             const newLog: LogEntry = {
                 timestamp,
-                message: "Deepfake Response: What! This seems serious. There is a mistake.",
+                message: "Deepfake Response: I think there is a mistake. I have not sent anything to Taiwan",
                 type: "warning",
             };
             setVictimLogs((prev) => [...prev, newLog]);
-        } else if (currentAudioIndex === 8) {
+        } else if (currentAudioIndex === 9) {
             const timestamp = new Date().toLocaleTimeString();
             const newLog: LogEntry = {
                 timestamp,
-                message: "Deepfake Response: Trust me I am innocent. Please let me know how can I resolve this.",
+                message: "Deepfake Response: Nine lakhs! This is huge.",
                 type: "warning",
             };
             setVictimLogs((prev) => [...prev, newLog]);

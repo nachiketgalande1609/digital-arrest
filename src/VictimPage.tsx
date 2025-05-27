@@ -29,18 +29,6 @@ const threatPatterns = [
     "Bank Account Compromise",
     "Fake Charity Donation",
     "Investment Scam",
-    "Fake Covid-19 Relief",
-    "Fake Government Grant",
-    "Fake Delivery Notification",
-    "Fake Covid Test Results",
-    "Fake Insurance Policy",
-    "Fake Inheritance Claim",
-    "Fake Rental Property",
-    "Fake Cryptocurrency Offer",
-    "Fake Online Shopping Refund",
-    "Fake Electricity Bill Payment",
-    "Fake Water Bill Payment",
-    "Fake Gas Connection Offer",
     "QR Code Phishing",
     "SIM Swap Fraud",
     "Business Email Compromise (BEC)",
@@ -117,7 +105,7 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
                     setScanStage("patterns");
                 }
             }
-        }, 500);
+        }, 200);
 
         return () => clearTimeout(timer);
     }, [callStatus, displayedLogs.length, initialLogs, scanStage]);
@@ -165,7 +153,7 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
                     }
                     return newProgress;
                 });
-            }, 100);
+            }, 50);
         };
 
         const startLanguageSearch = () => {
@@ -182,7 +170,7 @@ const VictimPage: React.FC<VictimPageProps> = ({ callStatus, progress, callerInf
                     }
                     return newProgress;
                 });
-            }, 80);
+            }, 60);
         };
 
         const startReverification = () => {

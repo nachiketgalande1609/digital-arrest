@@ -24,13 +24,14 @@ const App: React.FC = () => {
 
     const audioFiles = [
         { src: "before_beep/1_victim.wav", type: "victim" },
-        { src: "before_beep/2_scammer.wav", type: "caller" },
-        { src: "before_beep/3_victim.wav", type: "victim" },
-        { src: "before_beep/4_scammer.wav", type: "caller" },
+        { src: "before_beep/4_scammer_1.wav", type: "caller" },
+        { src: "before_beep/4_scammer_2.wav", type: "caller" },
         { src: "before_beep/5_victim.wav", type: "victim" },
         { src: "before_beep/6_scammer.wav", type: "caller" },
         { src: "after_beep/Payel_11Lab_1.mp3", type: "victim" },
-        { src: "after_beep/Scammer_11Lbs_1.mp3", type: "caller" },
+        { src: "after_beep/Scammer_11Lbs_1_1.mp3", type: "caller" },
+        { src: "after_beep/Scammer_11Lbs_1_2.mp3", type: "caller" },
+        { src: "after_beep/Scammer_11Lbs_1_3.mp3", type: "caller" },
         { src: "after_beep/Payel_11Lab_2.mp3", type: "victim" },
         { src: "after_beep/Scammer_11Lbs_2.mp3", type: "caller" },
     ];
@@ -107,7 +108,7 @@ const App: React.FC = () => {
         if (targetAudioRef.current) {
             targetAudioRef.current.src = currentAudio.src;
             targetAudioRef.current.onended = () => {
-                if (currentAudioIndex === 5) {
+                if (currentAudioIndex === 4) {
                     setCallStatus("scam-detected");
                     // Play beep before switching to cyber site
                     playBeepSound(() => {
@@ -133,7 +134,7 @@ const App: React.FC = () => {
             targetAudioRef.current.play().catch((err) => {
                 console.error("Error playing audio:", err);
                 setTimeout(() => {
-                    if (currentAudioIndex === 5) {
+                    if (currentAudioIndex === 4) {
                         setCallStatus("scam-detected");
                         playBeepSound(() => {
                             setCurrentScreen("cyber");
